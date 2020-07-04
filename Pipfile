@@ -11,6 +11,8 @@ fastapi = "*"
 uvicorn = "*"
 python-multipart = "*"
 fastapi-users = {extras = ["mongodb"], version = "*"}
+pyjwt = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
 
 [requires]
 python_version = "3.8"
