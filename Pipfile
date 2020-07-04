@@ -10,6 +10,7 @@ black = "*"
 fastapi = "*"
 uvicorn = "*"
 python-multipart = "*"
+fastapi-users = {extras = ["mongodb"], version = "*"}
 
 [requires]
 python_version = "3.8"
