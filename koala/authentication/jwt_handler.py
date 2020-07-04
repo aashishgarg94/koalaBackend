@@ -2,10 +2,9 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import jwt
+from koala.constants import ALGORITHM, SECRET_KEY
 from passlib.context import CryptContext
 from pydantic import BaseModel
-
-from koala.constants import SECRET_KEY, ALGORITHM
 
 
 class Token(BaseModel):
@@ -18,7 +17,6 @@ class TokenData(BaseModel):
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 
 def get_password_hash(password):

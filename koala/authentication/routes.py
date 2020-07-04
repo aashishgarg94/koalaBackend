@@ -1,15 +1,13 @@
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-
+from koala.authentication.authentication import (
+    User,
+    authenticate_user,
+    get_current_active_user,
+)
 from koala.authentication.jwt_handler import *
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from koala.fixtures.dummy_data import fake_users_db
-from koala.authentication.authentication import (
-    authenticate_user,
-    User,
-    get_current_active_user,
-)
 
 router = APIRouter()
 

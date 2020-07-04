@@ -1,18 +1,13 @@
 from typing import Optional
 
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-
 from jwt import PyJWTError
-from pydantic import BaseModel
-
+from koala.authentication.jwt_handler import TokenData, pwd_context
+from koala.constants import ALGORITHM, SECRET_KEY
 from koala.fixtures.dummy_data import fake_users_db
-from koala.constants import SECRET_KEY, ALGORITHM
-from koala.authentication.jwt_handler import (
-    pwd_context,
-    TokenData,
-)
+from pydantic import BaseModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
