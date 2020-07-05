@@ -18,9 +18,9 @@ https://stackoverflow.com/questions/25611167/do-i-need-oauth2-for-my-web-apps-ap
 
 #### [Docker](https://hub.docker.com/editions/community/docker-ce-desktop-mac/)
 
-- koala1rocks
-- koala1backend
-- koala1docker
-
 #### Check port
 ```sudo lsof -iTCP -sTCP:LISTEN | grep mongo```
+
+
+### Important Links
+ - 
