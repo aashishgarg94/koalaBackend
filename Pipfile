@@ -14,6 +14,7 @@ python-multipart = "*"
 fastapi-users = {extras = ["mongodb"], version = "*"}
 pyjwt = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
+motor = "*"
 
 [requires]
 python_version = "3.8"
