@@ -1,3 +1,5 @@
+import pprint
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from koala.authentication.authentication import (
@@ -9,9 +11,9 @@ from koala.authentication.jwt_handler import *
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from koala.crud.user import get_comments_for_article
 from koala.fixtures.dummy_data import fake_users_db
-from ..db.mongodb import AsyncIOMotorClient, get_database
-import pprint
+
 from ..core.utils import create_aliased_response
+from ..db.mongodb import AsyncIOMotorClient, get_database
 
 router = APIRouter()
 

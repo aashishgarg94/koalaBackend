@@ -1,6 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-import pprint
-import asyncio
+
 # import nest_asyncio
 # nest_asyncio.apply()
 
@@ -9,7 +8,7 @@ uri = "mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?r
 client = AsyncIOMotorClient(uri)
 
 # Getting a Database
-db = client['koala-backend']
+db = client["koala-backend"]
 
 # Getting a Collection
 # collection = db['users']
@@ -21,14 +20,10 @@ async def find_cursor_to_list():
     asynchronously converts cursor to a list with items
     :return:
     """
-    collection = db['test-users']
+    collection = db["test-users"]
 
-    filter_ = {
-        "someField": "someValue"
-    }
-    projection_ = {
-        "_id": False  # don't return the _id
-    }
+    filter_ = {"someField": "someValue"}
+    projection_ = {"_id": False}  # don't return the _id
     cursor = collection.find()
     # Convert the cursor to a list of items right away.
     # NB! Dangerous with large result sets
