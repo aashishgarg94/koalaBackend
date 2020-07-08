@@ -7,7 +7,11 @@ from koala.authentication.authentication import (
 )
 from koala.authentication.jwt_handler import *
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
+from koala.crud.user import get_comments_for_article
 from koala.fixtures.dummy_data import fake_users_db
+from ..db.mongodb import AsyncIOMotorClient, get_database
+import pprint
+from ..core.utils import create_aliased_response
 
 router = APIRouter()
 
@@ -36,3 +40,12 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 @router.get("/users/me/items/")
 async def read_own_items(current_user: User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+@router.get("/tags")
+async def get_all_tags(db: AsyncIOMotorClient = Depends(get_database)):
+    tags = await get_comments_for_article(db)
+    pprint.pprint(tags)
+    # return 'uday from return'
+    # return TagsList(tags=[tag.tag for tag in tags])
+    return create_aliased_response(tags)

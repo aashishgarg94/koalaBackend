@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from koala.authentication import routes
-from koala.database.mongo_adaptor import connect_to_mongo, close_mongo_connection
+from koala.db.mongo_adaptor import connect_to_mongo, close_mongo_connection
 
 app = FastAPI()
 

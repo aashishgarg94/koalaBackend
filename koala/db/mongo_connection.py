@@ -5,7 +5,7 @@ import asyncio
 # nest_asyncio.apply()
 
 # Creating Client
-uri = "mongodb://localhost:27017"
+uri = "mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?retryWrites=true&w=majority"
 client = AsyncIOMotorClient(uri)
 
 # Getting a Database
@@ -21,7 +21,7 @@ async def find_cursor_to_list():
     asynchronously converts cursor to a list with items
     :return:
     """
-    collection = db['users']
+    collection = db['test-users']
 
     filter_ = {
         "someField": "someValue"
