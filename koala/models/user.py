@@ -5,7 +5,8 @@ from pydantic import BaseModel, EmailStr, SecretStr
 
 # TODO: User role may need to be added over here
 class UserModal(BaseModel):
-    user_name: str
+    username: str
+    full_name: str
     email: EmailStr
     mobile_number: int
     disabled: Optional[bool] = False
@@ -20,15 +21,7 @@ class UserUpdateModal(UserModal):
     password: SecretStr
 
 
-class UserInDB(UserModal):
-    hashed_password: str
-
-
-class UserDB(BaseModel):
-    user_name: str
-    email: EmailStr
-    mobile_number: int
-    disabled: bool
+class UserDB(UserModal):
     hashed_password: str
 
     class Config:

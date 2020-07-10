@@ -4,7 +4,6 @@ from fastapi import APIRouter, HTTPException, status
 
 from ..authentication.jwt_handler import get_password_hash
 from ..crud.user import MongoDBUserDatabase
-from ..db.mongodb import db
 from ..models.user import UserCreateModal, UserDB, UserModal
 
 router = APIRouter()
@@ -14,7 +13,7 @@ router = APIRouter()
     "/register", response_model=UserModal, status_code=status.HTTP_201_CREATED,
 )
 async def register(user: UserCreateModal):
-    user_db = MongoDBUserDatabase(UserDB, db.client["koala-backend"]["test-users"])
+    user_db = MongoDBUserDatabase(UserDB)
     existing_user = await user_db.get_by_email(user.email)
 
     if existing_user is not None:

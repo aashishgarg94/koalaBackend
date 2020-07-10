@@ -1,19 +1,18 @@
-from typing import List, Optional, Type
+from typing import Optional, Type
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 from pydantic import UUID4
 
+from ..db.mongodb import db
 from ..models.user import UD
 
 
 class MongoDBUserDatabase:
     collection: AsyncIOMotorCollection
 
-    def __init__(self, user_db_model: Type[UD], collection: AsyncIOMotorCollection):
+    def __init__(self, user_db_model: Type[UD]):
         self.user_db_model = user_db_model
-        self.collection = collection
-        self.collection.create_index("id", unique=True)
-        self.collection.create_index("email", unique=True)
+        self.collection = db.client["koala-backend"]["test-users"]
 
     async def get(self, id: UUID4) -> Optional[UD]:
         user = await self.collection.find_one({"id": id})
@@ -21,15 +20,6 @@ class MongoDBUserDatabase:
 
     async def get_by_email(self, email: str) -> Optional[UD]:
         user = await self.collection.find_one({"email": email})
-        return self.user_db_model(**user) if user else None
-
-    async def get_by_oauth_account(self, oauth: str, account_id: str) -> Optional[UD]:
-        user = await self.collection.find_one(
-            {
-                "oauth_accounts.oauth_name": oauth,
-                "oauth_accounts.account_id": account_id,
-            }
-        )
         return self.user_db_model(**user) if user else None
 
     async def create(self, user: UD) -> UD:
