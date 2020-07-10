@@ -1,19 +1,13 @@
-import pprint
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from koala.authentication.authentication import (
-    User,
     authenticate_user,
     get_current_active_user,
 )
 from koala.authentication.jwt_handler import *
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
-from koala.crud.user import get_comments_for_article
 from koala.fixtures.dummy_data import fake_users_db
-
-from ..core.utils import create_aliased_response
-from ..db.mongodb import AsyncIOMotorClient, get_database
+from koala.models.user import UserModal
 
 router = APIRouter()
 
@@ -34,20 +28,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
+@router.get("/users/me/", response_model=UserModal)
+async def read_users_me(current_user: UserModal = Depends(get_current_active_user)):
     return current_user
-
-
-@router.get("/users/me/items/")
-async def read_own_items(current_user: User = Depends(get_current_active_user)):
-    return [{"item_id": "Foo", "owner": current_user.username}]
-
-
-@router.get("/tags")
-async def get_all_tags(db: AsyncIOMotorClient = Depends(get_database)):
-    tags = await get_comments_for_article(db)
-    pprint.pprint(tags)
-    # return 'uday from return'
-    # return TagsList(tags=[tag.tag for tag in tags])
-    return create_aliased_response(tags)

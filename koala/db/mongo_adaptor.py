@@ -9,7 +9,9 @@ from .mongodb import db
 async def connect_to_mongo():
     logging.info("Connecting to mongo...")
     db.client = AsyncIOMotorClient(
-        str("mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?retryWrites=true&w=majority"),
+        str(
+            "mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?retryWrites=true&w=majority"
+        ),
         maxPoolSize=10,
         minPoolSize=10,
     )

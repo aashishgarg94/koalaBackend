@@ -22,5 +22,10 @@ https://stackoverflow.com/questions/25611167/do-i-need-oauth2-for-my-web-apps-ap
 ```sudo lsof -iTCP -sTCP:LISTEN | grep mongo```
 
 
+#### Running on local
+```shell script
+uvicorn koala.main:app --reload
+```
+
 ### Important Links
  - 
