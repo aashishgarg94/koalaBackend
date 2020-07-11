@@ -2,6 +2,7 @@ from typing import Optional, Type
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 from pydantic import UUID4
+from pymongo import ReturnDocument
 
 from ..db.mongodb import db
 from ..models.user import UD
@@ -30,5 +31,16 @@ class MongoDBUserDatabase:
         await self.collection.replace_one({"id": user.id}, user.dict())
         return user
 
+    async def find_and_modify(self, user: UD) -> any:
+        find = {"email": user.email}
+        update = user
+        user = await self.collection.find_one_and_update(
+            find, update, return_document=ReturnDocument.AFTER
+        )
+        return self.user_db_model(**user) if user else None
+
     async def delete(self, user: UD) -> None:
-        await self.collection.delete_one({"id": user.id})
+        user = await self.collection.find_one_and_update(
+            {"email": user.email}, {"disabled": True}
+        )
+        return self.user_db_model(**user) if user else None
