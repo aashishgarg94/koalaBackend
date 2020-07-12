@@ -1,11 +1,11 @@
 from typing import Optional, Type
 
 from motor.motor_asyncio import AsyncIOMotorCollection
-from pydantic import UUID4
+from pydantic import UUID4, EmailStr
 from pymongo import ReturnDocument
 
 from ..db.mongodb import db
-from ..models.user import UD
+from ..models.user import UD, UserUpdateCls
 
 
 class MongoDBUserDatabase:
@@ -31,16 +31,18 @@ class MongoDBUserDatabase:
         await self.collection.replace_one({"id": user.id}, user.dict())
         return user
 
-    async def find_and_modify(self, user: UD) -> any:
-        find = {"email": user.email}
-        update = user
+    async def find_and_modify(self, user_update: UserUpdateCls) -> any:
+        find = {"username": user_update.username}
+        update = user_update.dict(exclude_unset=True, exclude={"username"})
         user = await self.collection.find_one_and_update(
-            find, update, return_document=ReturnDocument.AFTER
+            find, {"$set": update}, return_document=ReturnDocument.AFTER
         )
         return self.user_db_model(**user) if user else None
 
-    async def delete(self, user: UD) -> None:
+    async def delete(self, email: EmailStr) -> None:
         user = await self.collection.find_one_and_update(
-            {"email": user.email}, {"disabled": True}
+            {"email": email},
+            {"$set": {"disabled": True}},
+            return_document=ReturnDocument.AFTER,
         )
         return self.user_db_model(**user) if user else None

@@ -12,13 +12,29 @@ class UserModal(BaseModel):
     disabled: Optional[bool] = False
 
 
+class UserBasic(BaseModel):
+    username: Optional[str]
+    email: Optional[str]
+
+
 class UserCreateModal(UserModal):
     email: EmailStr
     password: SecretStr
 
 
-class UserUpdateModal(UserModal):
-    password: SecretStr
+class UserUpdateCls(BaseModel):
+    username: Optional[str]
+    full_name: Optional[str]
+    email: Optional[EmailStr]
+    mobile_number: Optional[int]
+    password: Optional[SecretStr]
+
+
+class UserUpdateModal(BaseModel):
+    full_name: Optional[str]
+    email: Optional[EmailStr]
+    mobile_number: Optional[int]
+    password: Optional[SecretStr]
 
 
 class UserDB(UserModal):
