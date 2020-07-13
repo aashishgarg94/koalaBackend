@@ -1,5 +1,4 @@
 import logging
-import pprint
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -15,7 +14,6 @@ async def connect_to_mongo():
         maxPoolSize=10,
         minPoolSize=10,
     )
-    pprint.pprint(db.client.test)
     logging.info("Successfully connected to db")
 
 

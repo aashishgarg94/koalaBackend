@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from ..crud.master import MasterCollections
-from ..models.master import GigTypeModal, OpCityModal, OpAreaModal
+from ..models.master import GigTypeModal, OpAreaModal, OpCityModal
 
 router = APIRouter()
 

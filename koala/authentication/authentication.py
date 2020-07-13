@@ -1,5 +1,3 @@
-import pprint
-
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -48,7 +46,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = await user_db.get_by_email(token_data.username)
 
     if user is None:
-        pprint.pprint(token_data)
         raise credentials_exception
     return user
 

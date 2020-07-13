@@ -1,5 +1,3 @@
-import pprint
-
 from fastapi import APIRouter, HTTPException, status
 
 from ..authentication.jwt_handler import get_password_hash
@@ -24,7 +22,6 @@ async def register(user: UserCreateModal):
 
     hashed_password = get_password_hash(user.password.get_secret_value())
     db_user = UserDB(**user.dict(), hashed_password=hashed_password)
-    pprint.pprint(db_user.dict())
     created_user = await user_db.create(db_user)
 
     return created_user

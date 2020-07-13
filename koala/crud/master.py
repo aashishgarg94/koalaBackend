@@ -1,8 +1,8 @@
-from koala.config.collections import OP_CITIES, GIG_TYPE, OP_AREAS
+from koala.config.collections import GIG_TYPE, OP_AREAS, OP_CITIES
 from koala.db.mongodb import db
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..models.master import GigTypeModal, OpCityModal, OpAreaModal
+from ..models.master import GigTypeModal, OpAreaModal, OpCityModal
 
 
 class MasterCollections:

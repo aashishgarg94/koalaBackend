@@ -4,8 +4,9 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 from pydantic import UUID4, EmailStr
 from pymongo import ReturnDocument
 
+from ..config.collections import USERS
 from ..db.mongodb import db
-from ..models.user import UD, UserUpdateCls
+from ..models.user import UD, UserBioModal, UserUpdateCls
 
 
 class MongoDBUserDatabase:
@@ -13,7 +14,7 @@ class MongoDBUserDatabase:
 
     def __init__(self, user_db_model: Type[UD]):
         self.user_db_model = user_db_model
-        self.collection = db.client["koala-backend"]["test-users"]
+        self.collection = db.client["koala-backend"][USERS]
 
     async def get(self, id: UUID4) -> Optional[UD]:
         user = await self.collection.find_one({"id": id})
@@ -46,3 +47,13 @@ class MongoDBUserDatabase:
             return_document=ReturnDocument.AFTER,
         )
         return self.user_db_model(**user) if user else None
+
+    async def user_bio_update(self, email: EmailStr, bio: UserBioModal) -> UserBioModal:
+        user = await self.collection.find_one_and_update(
+            {"email": email}, {"$set": {"bio": bio.dict()}}
+        )
+        return UserBioModal(**user["bio"]) if user else None
+
+    async def user_bio_fetch(self, email: EmailStr) -> UserBioModal:
+        user = await self.collection.find_one({"email": email})
+        return UserBioModal(**user["bio"]) if user else None
