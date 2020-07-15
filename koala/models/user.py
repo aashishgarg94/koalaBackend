@@ -3,6 +3,22 @@ from typing import List, Optional, TypeVar
 from pydantic import BaseModel, EmailStr, SecretStr
 
 
+class UserProof(BaseModel):
+    name: Optional[str] = None
+    is_uploaded: Optional[bool] = False
+
+
+class UserBioModal(BaseModel):
+    experience: Optional[int] = 0
+    expected_salary: Optional[int] = 0
+    current_salary: Optional[int] = 0
+    previous_worked_area: Optional[List[str]] = None
+    id_proof: UserProof
+    address_proof: UserProof
+    other_documents_needed: List[UserProof]
+    is_resume_uploaded: bool = False
+
+
 # TODO: User role may need to be added over here
 class UserModal(BaseModel):
     username: str
@@ -10,6 +26,7 @@ class UserModal(BaseModel):
     email: EmailStr
     mobile_number: int
     disabled: Optional[bool] = False
+    bio: Optional[UserBioModal] = None
 
 
 class UserBasic(BaseModel):
@@ -45,29 +62,3 @@ class UserDB(UserModal):
 
 
 UD = TypeVar("UD", bound=UserDB)
-
-
-class UserProof(BaseModel):
-    name: Optional[str] = None
-    is_uploaded: Optional[bool] = False
-
-
-class UserBioModal(BaseModel):
-    experience: Optional[int] = 0
-    expected_salary: Optional[int] = 0
-    current_salary: Optional[int] = 0
-    previous_worked_area: Optional[List[str]] = None
-    id_proof: UserProof
-    address_proof: UserProof
-    other_documents_needed: List[UserProof]
-    is_resume_uploaded: bool = False
-
-
-class UserModalNew(BaseModel):
-    username: str
-    full_name: str
-    email: EmailStr
-    mobile_number: int
-    disabled: Optional[bool] = False
-    hashed_password: str
-    bio: Optional[List[UserBioModal]] = None
