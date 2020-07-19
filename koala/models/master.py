@@ -13,3 +13,12 @@ class OpCityModal(BaseModel):
 
 class OpAreaModal(BaseModel):
     op_areas: List[str] = []
+
+
+class GlobalSequenceIn(BaseModel):
+    _id: str
+
+
+class GlobalSequenceOut(BaseModel):
+    _id: str
+    next_seq: int

@@ -1,4 +1,8 @@
+DB_NAME = "koala-backend"
 USERS = "users"
 GIG_TYPE = "gig-types"
 OP_CITIES = "op-cities"
 OP_AREAS = "op-areas"
+COMPANIES = "companies"
+JOBS = "jobs"
+SEQUENCE = "sequence"
