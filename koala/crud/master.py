@@ -2,7 +2,7 @@ from koala.config.collections import GIG_TYPE, OP_AREAS, OP_CITIES
 from koala.db.mongodb import db
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from ..models.master import GigTypeModal, OpAreaModal, OpCityModal
+from ..models.master import GigTypeModel, OpAreaModel, OpCityModel
 
 
 class MasterCollections:
@@ -18,18 +18,18 @@ class MasterCollections:
         gigs_types = []
         for document in await gigs_cursor.to_list(length=100):
             gigs_types.append(document["name"])
-        return GigTypeModal(**{"gig_types": gigs_types})
+        return GigTypeModel(**{"gig_types": gigs_types})
 
     async def get_op_cities(self):
         cities_cursor = self.op_cities_collection.find()
         cities = []
         for document in await cities_cursor.to_list(length=100):
             cities.append(document["name"])
-        return OpCityModal(**{"op_cities": cities})
+        return OpCityModel(**{"op_cities": cities})
 
     async def get_op_areas(self):
         areas_cursor = self.op_area_collection.find()
         areas = []
         for document in await areas_cursor.to_list(length=100):
             areas.append(document["name"])
-        return OpAreaModal(**{"op_areas": areas})
+        return OpAreaModel(**{"op_areas": areas})

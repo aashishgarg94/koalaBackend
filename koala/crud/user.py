@@ -6,7 +6,7 @@ from pymongo import ReturnDocument
 
 from ..config.collections import USERS
 from ..db.mongodb import db
-from ..models.user import UD, UserBioModal, UserUpdateCls
+from ..models.user import UD, UserBioModel, UserUpdateCls
 
 
 class MongoDBUserDatabase:
@@ -48,12 +48,12 @@ class MongoDBUserDatabase:
         )
         return self.user_db_model(**user) if user else None
 
-    async def user_bio_update(self, email: EmailStr, bio: UserBioModal) -> UserBioModal:
+    async def user_bio_update(self, email: EmailStr, bio: UserBioModel) -> UserBioModel:
         user = await self.collection.find_one_and_update(
             {"email": email}, {"$set": {"bio": bio.dict()}}
         )
-        return UserBioModal(**user["bio"]) if user else None
+        return UserBioModel(**user["bio"]) if user else None
 
-    async def user_bio_fetch(self, email: EmailStr) -> UserBioModal:
+    async def user_bio_fetch(self, email: EmailStr) -> UserBioModel:
         user = await self.collection.find_one({"email": email})
-        return UserBioModal(**user["bio"]) if user else None
+        return UserBioModel(**user["bio"]) if user else None

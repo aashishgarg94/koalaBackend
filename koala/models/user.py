@@ -8,7 +8,7 @@ class UserProof(BaseModel):
     is_uploaded: Optional[bool] = False
 
 
-class UserBioModal(BaseModel):
+class UserBioModel(BaseModel):
     experience: Optional[int] = 0
     expected_salary: Optional[int] = 0
     current_salary: Optional[int] = 0
@@ -20,13 +20,13 @@ class UserBioModal(BaseModel):
 
 
 # TODO: User role may need to be added over here
-class UserModal(BaseModel):
+class UserModel(BaseModel):
     username: str
     full_name: str
     email: EmailStr
     mobile_number: int
     disabled: Optional[bool] = False
-    bio: Optional[UserBioModal] = None
+    bio: Optional[UserBioModel] = None
 
 
 class UserBasic(BaseModel):
@@ -34,7 +34,7 @@ class UserBasic(BaseModel):
     email: Optional[str]
 
 
-class UserCreateModal(UserModal):
+class UserCreateModel(UserModel):
     email: EmailStr
     password: SecretStr
 
@@ -47,14 +47,14 @@ class UserUpdateCls(BaseModel):
     password: Optional[SecretStr]
 
 
-class UserUpdateModal(BaseModel):
+class UserUpdateModel(BaseModel):
     full_name: Optional[str]
     email: Optional[EmailStr]
     mobile_number: Optional[int]
     password: Optional[SecretStr]
 
 
-class UserDB(UserModal):
+class UserDB(UserModel):
     hashed_password: str
 
     class Config:

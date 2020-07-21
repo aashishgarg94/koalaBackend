@@ -2,15 +2,15 @@ from fastapi import APIRouter, HTTPException, status
 
 from ..authentication.jwt_handler import get_password_hash
 from ..crud.user import MongoDBUserDatabase
-from ..models.user import UserCreateModal, UserDB, UserModal
+from ..models.user import UserCreateModel, UserDB, UserModel
 
 router = APIRouter()
 
 
 @router.post(
-    "/register", response_model=UserModal, status_code=status.HTTP_201_CREATED,
+    "/register", response_model=UserModel, status_code=status.HTTP_201_CREATED,
 )
-async def register(user: UserCreateModal):
+async def register(user: UserCreateModel):
     user_db = MongoDBUserDatabase(UserDB)
     existing_user = await user_db.get_by_email(user.email)
 

@@ -1,10 +1,10 @@
-from datetime import date
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
 
 
-class BaseTagModal(BaseModel):
+class BaseTagModel(BaseModel):
     name: str
 
 
@@ -16,10 +16,11 @@ class BaseRangeModel(BaseModel):
 
 class BaseJobMoreInfoModel(BaseModel):
     shift: Optional[str] = None
-    tags: Optional[List[BaseTagModal]]
+    tags: Optional[List[BaseTagModel]]
 
 
 class BaseJobModel(BaseModel):
+    company_id: str
     title: str
     sub_title: str
     experience: BaseRangeModel
@@ -29,13 +30,31 @@ class BaseJobModel(BaseModel):
     more_info: Optional[BaseJobMoreInfoModel] = None
 
 
-class BaseJobModelDB(BaseJobModel):
-    posted_on: date
-    company_id: str  # TODO: company id will be here
+class JobInModel(BaseJobModel):
+    is_updated: Optional[bool] = False
+    is_deleted: Optional[bool] = False
+    created_on: Optional[datetime]
+    updated_on: Optional[datetime]
+    deleted_on: Optional[datetime]
 
-    class Config:
-        orm_mode = True
+
+class JobOutModel(JobInModel):
+    id: int
 
 
-class JobCreatedOut(BaseModel):
+class JobOutWithPagination(BaseModel):
+    total_jobs: int
+    current_page: int
+    jobs: List[JobOutModel]
+
+
+class BaseIsCreated(BaseModel):
     is_created: bool
+
+
+class BaseIsDeleted(BaseModel):
+    is_deleted: bool
+
+
+class BaseIsUpdated(BaseModel):
+    is_updated: bool

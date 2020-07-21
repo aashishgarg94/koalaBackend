@@ -8,20 +8,23 @@
 #   return seqDoc.seqValue;
 # }
 import logging
-from pymongo import ReturnDocument
-from ..db.mongodb import db
-from ..config.collections import SEQUENCE
-from ..models.master import GlobalSequenceIn, GlobalSequenceOut
 
+from pymongo import ReturnDocument
+
+from ..config.collections import SEQUENCE
+from ..db.mongodb import db
+from ..models.master import GlobalSequenceIn
 
 # TODO: Do I need to add decrement also for failed cases ???
+
 
 async def get_seq_next_value(collection_name: GlobalSequenceIn):
     seq_collection = db.client["koala-backend"][SEQUENCE]
     result = await seq_collection.find_one_and_update(
-        {'_id': collection_name}, {'$inc': {'seq': 1}},
+        {"_id": collection_name},
+        {"$inc": {"seq": 1}},
         upsert=True,
-        return_document=ReturnDocument.AFTER
+        return_document=ReturnDocument.AFTER,
     )
-    logging.info(result.get('seq'))
-    return result.get('seq')
+    logging.info(result.get("seq"))
+    return result.get("seq")
