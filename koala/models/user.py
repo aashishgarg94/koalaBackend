@@ -27,6 +27,7 @@ class UserModel(BaseModel):
     mobile_number: int
     disabled: Optional[bool] = False
     bio: Optional[UserBioModel] = None
+    job_applied: Optional[List[str]] = None
 
 
 class UserBasic(BaseModel):

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException
 
 from ..constants import REQUEST_LIMIT
@@ -32,7 +34,7 @@ async def job_create(job_info: BaseJobModel):
 
 # USER skip AND limit for querying data. Will be used for pagination
 @router.get("/jobs/getAll/", response_model=JobOutWithPagination)
-async def job_get_all(page_no: int):
+async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobsCollection()
     try:
         jobs_count = await job_collection.get_count()

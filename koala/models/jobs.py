@@ -28,6 +28,7 @@ class BaseJobModel(BaseModel):
     location: str
     description: str
     more_info: Optional[BaseJobMoreInfoModel] = None
+    user_applied: Optional[List[str]] = None
 
 
 class JobInModel(BaseJobModel):
