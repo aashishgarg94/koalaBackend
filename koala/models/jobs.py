@@ -4,31 +4,50 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class BaseTagModel(BaseModel):
-    name: str
-
-
 class BaseRangeModel(BaseModel):
     start_range: int
     end_range: int
     range_type: Optional[str]
 
 
+class BaseKeyValueModel(BaseModel):
+    name: str
+
+
+class BaseLanguageProficiency(BaseModel):
+    english: List[BaseKeyValueModel]
+
+
 class BaseJobMoreInfoModel(BaseModel):
+    any_other_documents: Optional[List]
     shift: Optional[str] = None
-    tags: Optional[List[BaseTagModel]]
+    tags: Optional[List[BaseKeyValueModel]] = []
+    user_applied: Optional[List[str]] = None
+
+
+class BaseJobMaster(BaseModel):
+    job_types: List[BaseKeyValueModel]
+    qualifications: List[BaseKeyValueModel]
+    languages: BaseLanguageProficiency
+    skills: List[BaseKeyValueModel]
+    documents: Optional[List[BaseKeyValueModel]]
+    hiring_type: Optional[List[BaseKeyValueModel]]
+    benefits: Optional[List[BaseKeyValueModel]]
 
 
 class BaseJobModel(BaseModel):
     company_id: str
     title: str
     sub_title: str
-    experience: BaseRangeModel
-    salary: BaseRangeModel
-    location: str
     description: str
+    no_of_opening: int
+    salary: BaseRangeModel
+    city: str
+    area: str
+    other_location_info: Optional[str]
+    experience: BaseRangeModel
+    job_info: BaseJobMaster
     more_info: Optional[BaseJobMoreInfoModel] = None
-    user_applied: Optional[List[str]] = None
 
 
 class JobInModel(BaseJobModel):
@@ -59,3 +78,7 @@ class BaseIsDeleted(BaseModel):
 
 class BaseIsUpdated(BaseModel):
     is_updated: bool
+
+
+class JobInfo(BaseModel):
+    job_info: BaseJobMaster
