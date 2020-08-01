@@ -4,15 +4,8 @@ from fastapi import APIRouter, HTTPException
 
 from ..constants import REQUEST_LIMIT
 from ..crud.jobs import JobsCollection
-from ..models.jobs import (
-    BaseIsCreated,
-    BaseIsDeleted,
-    BaseIsUpdated,
-    BaseJobModel,
-    JobInModel,
-    JobOutModel,
-    JobOutWithPagination,
-)
+from ..models.jobs import BaseJobModel, JobInModel, JobOutModel, JobOutWithPagination
+from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsUpdated
 
 router = APIRouter()
 

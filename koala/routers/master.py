@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 from ..crud.master import MasterCollections
-from ..models.master import GigTypeModel, OpAreaModel, OpCityModel
 from ..models.jobs import JobInfo
+from ..models.master import GigTypeModel, OpAreaModel, OpCityModel
 
 router = APIRouter()
 
@@ -33,5 +33,5 @@ async def get_job_info():
     master_collection = MasterCollections()
     try:
         return await master_collection.get_job_info()
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

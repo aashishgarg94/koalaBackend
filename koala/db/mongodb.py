@@ -8,11 +8,15 @@ class DataBase:
 
 db = DataBase()
 
+# Trying out if we can ingest this in class based on crud operation. In progress...
+# async def get_database() -> AsyncIOMotorDatabase:
+#     return db.client.koala_backend
+#
+#
+# async def get_collection(db_collection: str):
+#     koala_db = await get_database()
+#     return koala_db[db_collection]
 
-async def get_database() -> AsyncIOMotorClient:
-    return db.client
 
-
-# Need to work on it
-def create_collection_connection(collection_name: str):
+def get_collection(collection_name: str):
     return db.client[DB_NAME][collection_name]

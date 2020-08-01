@@ -1,12 +1,9 @@
-from koala.config.collections import GIG_TYPE, OP_AREAS, OP_CITIES, JOB_MASTER
+from koala.config.collections import GIG_TYPE, JOB_MASTER, OP_AREAS, OP_CITIES
 from koala.db.mongodb import db
 from motor.motor_asyncio import AsyncIOMotorCollection
-from fastapi.encoders import jsonable_encoder
 
-from ..models.master import GigTypeModel, OpAreaModel, OpCityModel
 from ..models.jobs import JobInfo
-import logging
-import json
+from ..models.master import GigTypeModel, OpAreaModel, OpCityModel
 
 
 class MasterCollections:
@@ -41,7 +38,7 @@ class MasterCollections:
 
     async def get_job_info(self) -> JobInfo:
         try:
-            job_info_cursor = self.job_master_collection.find({}, {'_id': 0})
+            job_info_cursor = self.job_master_collection.find({}, {"_id": 0})
             job_info = {}
             for document in await job_info_cursor.to_list(length=100):
                 job_info.update(document)

@@ -1,59 +1,114 @@
+from datetime import datetime
 from typing import Optional, Type
+from fastapi import HTTPException
 
-from motor.motor_asyncio import AsyncIOMotorCollection
-from pydantic import UUID4, EmailStr
-from pymongo import ReturnDocument
+from pydantic import EmailStr
 
 from ..config.collections import USERS
-from ..db.mongodb import db
-from ..models.user import UD, UserBioModel, UserUpdateCls
+from ..models.master import BaseIsCreated, BaseIsDisabled
+from ..models.user import (
+    UD,
+    BioUpdateInModel,
+    BioUpdateOutModel,
+    UserBioModel,
+    UserInModel,
+    UserModel,
+    UserOutModel,
+    UserUpdateCls,
+    UserUpdateOutModel,
+)
+from .mongo_base import MongoBase, return_id_transformation
 
 
 class MongoDBUserDatabase:
-    collection: AsyncIOMotorCollection
-
     def __init__(self, user_db_model: Type[UD]):
         self.user_db_model = user_db_model
-        self.collection = db.client["koala-backend"][USERS]
+        self.collection = MongoBase()
+        self.collection(USERS)
 
-    async def get(self, id: UUID4) -> Optional[UD]:
-        user = await self.collection.find_one({"id": id})
-        return self.user_db_model(**user) if user else None
+    async def find_by_email(self, email: str) -> Optional[UD]:
+        try:
+            return await self.collection.find_one(
+                {"email": email}, return_doc_id=True, extended_class_model=UserOutModel,
+            )
+        except Exception as e:
+            raise e
 
-    async def get_by_email(self, email: str) -> Optional[UD]:
-        user = await self.collection.find_one({"email": email})
-        return self.user_db_model(**user) if user else None
+    async def create_user(self, user: UserInModel) -> BaseIsCreated:
+        try:
+            user.created_on = datetime.now()
+            result = await self.collection.insert_one(
+                user.dict(), return_doc_id=True, extended_class_model=BaseIsCreated
+            )
+            return BaseIsCreated(id=result, is_created=True) if result else None
+        except Exception as e:
+            raise e
 
-    async def create(self, user: UD) -> UD:
-        await self.collection.insert_one(user.dict())
-        return user
+    async def find_and_modify(
+        self, user_update: UserUpdateCls, current_user: UserModel
+    ) -> UserUpdateOutModel:
+        try:
+            find = {"email": current_user.email}
+            user_update.is_updated = True
+            user_update.updated_on = datetime.now()
+            user = await self.collection.find_one_and_modify(
+                find,
+                {"$set": user_update.dict(exclude_unset=True)},
+                return_doc_id=True,
+                extended_class_model=UserUpdateOutModel,
+            )
+            return user if user else None
+        except Exception as e:
+            raise e
 
-    async def update(self, user: UD) -> UD:
-        await self.collection.replace_one({"id": user.id}, user.dict())
-        return user
+    async def disable_one(self, user: UserUpdateCls) -> BaseIsDisabled:
+        try:
+            find = {"email": user.email}
+            user.is_disabled = True
+            user.disabled_on = datetime.now()
+            result = await self.collection.find_one_and_modify(
+                find,
+                {"$set": user.dict(exclude_unset=True)},
+                return_doc_id=True,
+                extended_class_model=BaseIsDisabled,
+            )
+            data = result if result else None
+            return data
+        except Exception as e:
+            raise e
 
-    async def find_and_modify(self, user_update: UserUpdateCls) -> any:
-        find = {"username": user_update.username}
-        update = user_update.dict(exclude_unset=True, exclude={"username"})
-        user = await self.collection.find_one_and_update(
-            find, {"$set": update}, return_document=ReturnDocument.AFTER
-        )
-        return self.user_db_model(**user) if user else None
+    async def user_bio_update(
+        self, bio_updates: BioUpdateInModel, current_user: UserModel
+    ) -> BioUpdateOutModel:
+        try:
+            find = {"email": current_user.email}
+            bio_updates.updated_on = datetime.now()
+            result = await self.collection.find_one_and_modify(
+                find, {"$set": {"bio": bio_updates.dict(exclude_unset=True)}},
+            )
 
-    async def delete(self, email: EmailStr) -> None:
-        user = await self.collection.find_one_and_update(
-            {"email": email},
-            {"$set": {"disabled": True}},
-            return_document=ReturnDocument.AFTER,
-        )
-        return self.user_db_model(**user) if user else None
+            custom_bio_dict = result.get("bio")
+            custom_bio_dict["_id"] = result.get("_id")
+            result_transformation = return_id_transformation(
+                extended_class_model=BioUpdateOutModel, result=custom_bio_dict
+            )
 
-    async def user_bio_update(self, email: EmailStr, bio: UserBioModel) -> UserBioModel:
-        user = await self.collection.find_one_and_update(
-            {"email": email}, {"$set": {"bio": bio.dict()}}
-        )
-        return UserBioModel(**user["bio"]) if user else None
+            return result_transformation if result else None
+        except Exception as e:
+            raise e
 
-    async def user_bio_fetch(self, email: EmailStr) -> UserBioModel:
-        user = await self.collection.find_one({"email": email})
-        return UserBioModel(**user["bio"]) if user else None
+    async def user_bio_fetch(self, email: EmailStr) -> Optional[BioUpdateOutModel]:
+        try:
+            result = await self.collection.find_one({"email": email})
+
+            if result.get("bio"):
+                custom_bio_dict = result.get("bio")
+                custom_bio_dict["_id"] = result.get("_id")
+                result_transformation = return_id_transformation(
+                    extended_class_model=BioUpdateOutModel, result=custom_bio_dict
+                )
+                return result_transformation
+
+            raise HTTPException(status_code=200, detail="Bio not available")
+        except Exception as e:
+            raise e

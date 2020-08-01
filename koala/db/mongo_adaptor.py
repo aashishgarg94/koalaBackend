@@ -14,10 +14,10 @@ async def connect_to_mongo():
         maxPoolSize=10,
         minPoolSize=10,
     )
-    logging.info("Successfully connected to db")
+    logging.info("KOALA shouts: Successfully connected :)")
 
 
 async def close_mongo_connection():
     logging.info("closing db connection")
     db.client.close()
-    logging.info("Database connection closed")
+    logging.info("KOALA says: Database connection closed gracefully")

@@ -1,6 +1,8 @@
-from typing import List
+from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from ..core.mongo_model import OID, MongoModel
 
 
 class GigTypeModel(BaseModel):
@@ -23,3 +25,31 @@ class GlobalSequenceIn(BaseModel):
 class GlobalSequenceOut(BaseModel):
     _id: str
     next_seq: int
+
+
+class BaseRangeModel(BaseModel):
+    start_range: int
+    end_range: int
+    range_type: Optional[str]
+
+
+class BaseIsCreated(MongoModel):
+    id: OID = Field()
+    is_created: bool
+
+
+class BaseIsDisabled(MongoModel):
+    id: OID = Field()
+    is_disabled: bool
+
+
+class BaseIsDeleted(MongoModel):
+    is_deleted: bool
+
+
+class BaseIsUpdated(MongoModel):
+    is_updated: bool
+
+
+class BaseKeyValueModel(BaseModel):
+    name: str

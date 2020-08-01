@@ -3,15 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-
-class BaseRangeModel(BaseModel):
-    start_range: int
-    end_range: int
-    range_type: Optional[str]
-
-
-class BaseKeyValueModel(BaseModel):
-    name: str
+from ..models.master import BaseKeyValueModel, BaseRangeModel
 
 
 class BaseLanguageProficiency(BaseModel):
@@ -66,18 +58,6 @@ class JobOutWithPagination(BaseModel):
     total_jobs: int
     current_page: int
     jobs: List[JobOutModel]
-
-
-class BaseIsCreated(BaseModel):
-    is_created: bool
-
-
-class BaseIsDeleted(BaseModel):
-    is_deleted: bool
-
-
-class BaseIsUpdated(BaseModel):
-    is_updated: bool
 
 
 class JobInfo(BaseModel):
