@@ -17,6 +17,7 @@ import logging
 from fastapi import HTTPException
 from pymongo import ReturnDocument
 
+from ..constants import REQUEST_LIMIT
 from ..db.mongodb import get_collection
 
 
@@ -24,9 +25,18 @@ from ..db.mongodb import get_collection
 def return_id_transformation(extended_class_model, result):
     try:
         logging.info(f"Post flight operations. Performing transformations now...")
-        data = extended_class_model.from_mongo(data=result) if result else None
-        logging.info(f"Transformation successfully completed ;)")
-        return data
+        is_list_type = isinstance(result, list)
+        if is_list_type:
+            data_list = []
+            for document in result:
+                data = extended_class_model.from_mongo(data=document)
+                data_list.append(data)
+            logging.info(f"Transformation successfully completed ;)")
+            return data_list
+        else:
+            data = extended_class_model.from_mongo(data=result) if result else None
+            logging.info(f"Transformation successfully completed ;)")
+            return data
     except Exception as e:
         raise e
 
@@ -148,5 +158,46 @@ class MongoBase:
         except Exception as e:
             logging.error(
                 f"Mongo base: Error while updating one in collection. Error: {e}"
+            )
+            raise e
+
+    async def find(
+        self,
+        finder: dict,
+        return_doc_id=False,
+        extended_class_model=None,
+        limit: int = REQUEST_LIMIT,
+        only_list_without_id: bool = False,
+    ):
+        try:
+            self.pre_flight_check(return_doc_id, extended_class_model)
+            if only_list_without_id:
+                logging.warning(
+                    f"only_list_without_id is provided, return_doc_id and extended_class_model will be skipped"
+                )
+        except Exception as e:
+            raise e
+        logging.info(f"Pre flight operations looks good ;)")
+        try:
+            result = self.collection.find(finder)
+            logging.info(
+                f"Mongo base: Item fetched. Checking if transformation required..."
+            )
+            result_list = []
+            if only_list_without_id:
+                for document in await result.to_list(length=limit):
+                    result_list.append(document["name"])
+            else:
+                for document in await result.to_list(length=limit):
+                    result_list.append(document)
+                if return_doc_id:
+                    transformed_result = return_id_transformation(
+                        extended_class_model=extended_class_model, result=result_list
+                    )
+                    return transformed_result
+            return result_list
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while fetching one from collection. Error: {e}"
             )
             raise e

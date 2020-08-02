@@ -6,4 +6,12 @@ OP_AREAS = "op-areas"
 COMPANIES = "companies"
 JOBS = "jobs"
 SEQUENCE = "sequence"
-JOB_MASTER = "job-master"
+
+# JOB MASTER
+BENEFITS = "benefits"
+DOCUMENTS = "documents"
+HIRING_TYPES = "hiring_types"
+JOB_TYPES = "job_types"
+LANGUAGES = "languages"
+QUALIFICATIONS = "qualifications"
+SKILLS = "skills"

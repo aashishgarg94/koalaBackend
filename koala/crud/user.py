@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Type
-from fastapi import HTTPException
 
+from fastapi import HTTPException
 from pydantic import EmailStr
 
 from ..config.collections import USERS

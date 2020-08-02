@@ -5,16 +5,27 @@ from pydantic import BaseModel, Field
 from ..core.mongo_model import OID, MongoModel
 
 
-class GigTypeModel(BaseModel):
-    gig_types: List[str] = []
+class BaseNameModel(MongoModel):
+    id: OID = Field()
+    name: str
 
 
-class OpCityModel(BaseModel):
-    op_cities: List[str] = []
+class LanguageBaseNameModel(MongoModel):
+    id: OID = Field()
+    name: str
+    language: str
 
 
-class OpAreaModel(BaseModel):
-    op_areas: List[str] = []
+class GigTypeModel(MongoModel):
+    gig_types: List[BaseNameModel] = []
+
+
+class OpCityModel(MongoModel):
+    op_cities: List[BaseNameModel] = []
+
+
+class OpAreaModel(MongoModel):
+    op_areas: List[BaseNameModel] = []
 
 
 class GlobalSequenceIn(BaseModel):
@@ -53,3 +64,13 @@ class BaseIsUpdated(MongoModel):
 
 class BaseKeyValueModel(BaseModel):
     name: str
+
+
+class JobMasterModel(MongoModel):
+    benefits: List[BaseNameModel]
+    documents: List[BaseNameModel]
+    hiring_types: List[BaseNameModel]
+    job_types: List[BaseNameModel]
+    languages: List[LanguageBaseNameModel]
+    qualifications: List[BaseNameModel]
+    skills: List[BaseNameModel]
