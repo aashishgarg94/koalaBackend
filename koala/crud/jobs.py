@@ -1,81 +1,111 @@
+import logging
 from datetime import datetime
 from typing import List, Optional
 
-from koala.db.mongodb import db
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo import ReturnDocument
+from bson import ObjectId
 
-from ..config.collections import DB_NAME, JOBS
-from ..core.utils import get_seq_next_value
+from ..config.collections import JOBS
 from ..models.jobs import JobInModel, JobOutModel
+from ..models.master import BaseIsCreated
+from .mongo_base import MongoBase
 
 
-class JobsCollection:
-    jobs_collection = AsyncIOMotorClient
-
+class JobCollection:
     def __init__(self):
-        self.jobs_collection = db.client[DB_NAME][JOBS]
+        self.collection = MongoBase()
+        self.collection(JOBS)
 
-    async def job_create(self, job_info: JobInModel) -> Optional[JobOutModel]:
+    async def create(self, job_detail: JobInModel) -> Optional[JobOutModel]:
         try:
-            job_info.created_on = datetime.now()
-            job_info_json = job_info.dict()
-            job_info_json["_id"] = await get_seq_next_value(JOBS)
-            result = await self.jobs_collection.insert_one(job_info_json)
-            return result if result else False
+            job_detail.created_on = datetime.now()
+            result = await self.collection.insert_one(
+                job_detail.dict(),
+                return_doc_id=True,
+                extended_class_model=BaseIsCreated,
+            )
+            data = BaseIsCreated(id=result, is_created=True) if result else None
+            logging.info(f"Job created fetched successfully")
+            return data
         except Exception as e:
+            logging.error(f"Error: Job creation {e}")
             raise e
 
     async def get_count(self) -> int:
         try:
-            return await self.jobs_collection.count_documents({"is_deleted": False})
+            filter_condition = {"is_deleted": False}
+            count = await self.collection.count(filter_condition)
+            logging.info(f"Job count fetched successfully")
+            return count if count else 0
         except Exception as e:
+            logging.error(f"Error: Job count {e}")
             raise e
 
-    async def get_all(self, skip: int, limit: int) -> List[JobOutModel]:
+    async def get_all(self, skip: int, limit: int) -> Optional[List[JobOutModel]]:
         try:
-            jobs = []
-            jobs_cursor = (
-                self.jobs_collection.find({"is_deleted": False}).skip(skip).limit(limit)
+            filter_condition = {"is_deleted": False}
+            data = await self.collection.find(
+                finder=filter_condition,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
             )
-            for document in await jobs_cursor.to_list(length=limit):
-                jobs.append(JobOutModel(**document, id=document.get("_id")))
-            return jobs
+            logging.info(f"Job get all successfully")
+            return data if data else None
         except Exception as e:
+            logging.error(f"Error: Get all {e}")
             raise e
 
-    async def get_by_id(self, job_id) -> Optional[JobOutModel]:
+    async def get_by_id(self, job_id: str) -> Optional[JobOutModel]:
         try:
-            job = await self.jobs_collection.find_one({"_id": job_id})
-            return JobOutModel(**job, id=job.get("_id")) if job else None
+            finder = {"_id": ObjectId(job_id)}
+            job = await self.collection.find_one(
+                finder=finder, return_doc_id=True, extended_class_model=JobOutModel
+            )
+            logging.info(f"Job get by id successfully")
+            return job if job else None
         except Exception as e:
+            logging.error(f"Error: Get by id {e}")
             raise e
 
-    async def find_and_update(
-        self, job_id: int, job_changes: JobInModel
+    async def find_one_and_modify(
+        self, job_id: str, job_changes: JobInModel
     ) -> Optional[JobOutModel]:
-        find = {"_id": job_id}
+        finder = {"_id": ObjectId(job_id)}
         try:
             job_changes.is_updated = True
             job_changes.updated_on = datetime.now()
             job_changes_json = job_changes.dict(
                 exclude_unset=True, exclude_defaults=True
             )
+            updater = {"$set": job_changes_json}
 
-            result = await self.jobs_collection.find_one_and_update(
-                find, {"$set": job_changes_json}, return_document=ReturnDocument.AFTER,
+            updated_job = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+                return_updated_document=True,
             )
-            return JobOutModel(**result, id=result.get("_id")) if result else None
+            logging.info(f"Job find one and modify successfully")
+            return updated_job if updated_job else None
         except Exception as e:
+            logging.error(f"Error: Find one and modify {e}")
             raise e
 
-    async def delete_by_id(self, job_id: int) -> Optional[JobOutModel]:
+    async def delete_by_id(self, job_id: str) -> Optional[JobOutModel]:
         try:
-            result = await self.jobs_collection.find_one_and_update(
-                {"_id": job_id},
-                {"$set": {"is_deleted": True, "deleted_on": datetime.now()}},
-                return_document=ReturnDocument.AFTER,
+            finder = {"_id": ObjectId(job_id)}
+            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+                return_updated_document=True,
             )
-            return JobOutModel(**result, id=result.get("_id")) if result else False
+            logging.info(f"Job delete by id successfully")
+            return result if result else None
         except Exception as e:
+            logging.error(f"Error: Delete by id {e}")
             raise e

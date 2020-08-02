@@ -17,7 +17,7 @@ import logging
 from fastapi import HTTPException
 from pymongo import ReturnDocument
 
-from ..constants import REQUEST_LIMIT
+from ..constants import REQUEST_LIMIT, REQUEST_SKIP_DEFAULT
 from ..db.mongodb import get_collection
 
 
@@ -166,6 +166,7 @@ class MongoBase:
         finder: dict,
         return_doc_id=False,
         extended_class_model=None,
+        skip: int = REQUEST_SKIP_DEFAULT,
         limit: int = REQUEST_LIMIT,
         only_list_without_id: bool = False,
     ):
@@ -179,7 +180,7 @@ class MongoBase:
             raise e
         logging.info(f"Pre flight operations looks good ;)")
         try:
-            result = self.collection.find(finder)
+            result = self.collection.find(finder).skip(skip).limit(limit)
             logging.info(
                 f"Mongo base: Item fetched. Checking if transformation required..."
             )
@@ -199,5 +200,17 @@ class MongoBase:
         except Exception as e:
             logging.error(
                 f"Mongo base: Error while fetching one from collection. Error: {e}"
+            )
+            raise e
+
+    async def count(
+        self, filter_condition: dict,
+    ):
+        try:
+            logging.info(f"Mongo base: Fetching count...")
+            return await self.collection.count_documents(filter_condition)
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while counting from collection. Error: {e}"
             )
             raise e

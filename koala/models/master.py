@@ -55,10 +55,12 @@ class BaseIsDisabled(MongoModel):
 
 
 class BaseIsDeleted(MongoModel):
+    id: OID = Field()
     is_deleted: bool
 
 
 class BaseIsUpdated(MongoModel):
+    id: OID = Field()
     is_updated: bool
 
 

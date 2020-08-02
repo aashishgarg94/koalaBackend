@@ -10,7 +10,6 @@ from ..models.user import (
     UD,
     BioUpdateInModel,
     BioUpdateOutModel,
-    UserBioModel,
     UserInModel,
     UserModel,
     UserOutModel,

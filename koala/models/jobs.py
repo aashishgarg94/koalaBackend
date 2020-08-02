@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from ..core.mongo_model import OID, MongoModel
 from ..models.master import BaseKeyValueModel, BaseRangeModel
 
 
@@ -27,7 +28,7 @@ class BaseJobMaster(BaseModel):
     benefits: Optional[List[BaseKeyValueModel]]
 
 
-class BaseJobModel(BaseModel):
+class BaseJobModel(MongoModel):
     company_id: str
     title: str
     sub_title: str
@@ -51,10 +52,10 @@ class JobInModel(BaseJobModel):
 
 
 class JobOutModel(JobInModel):
-    id: int
+    id: OID = Field()
 
 
-class JobOutWithPagination(BaseModel):
+class JobOutWithPagination(MongoModel):
     total_jobs: int
     current_page: int
     jobs: List[JobOutModel]
