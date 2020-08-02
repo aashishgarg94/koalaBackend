@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import Depends, FastAPI
 from koala.authentication.authentication import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
-from koala.routers import auth, jobs, jobs_user, master, register, user
+from koala.routers import auth, jobs, job_user, master, register, user
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ app.include_router(
 app.include_router(
     jobs.router, tags=["jobs"], dependencies=[Depends(get_current_active_user)]
 )
-app.include_router(jobs_user.router, tags=["Jobs User"])
+app.include_router(job_user.router, tags=["Jobs User"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

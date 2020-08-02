@@ -12,7 +12,7 @@ router = APIRouter()
 # Apply for job
 @router.post("/job/apply/")
 async def job_apply(
-    job_id: int, current_user: UserModel = Depends(get_current_active_user)
+    job_id: str, current_user: UserModel = Depends(get_current_active_user)
 ):
     pprint.pprint(current_user)
 
