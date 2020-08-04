@@ -13,6 +13,7 @@
 # Will return the complete set, independent modules have to handle specific transformation
 
 import logging
+from typing import List
 
 from fastapi import HTTPException
 from pymongo import ReturnDocument
@@ -132,6 +133,7 @@ class MongoBase:
         return_updated_document: bool = True,
         return_doc_id=False,
         extended_class_model=None,
+        insert_if_not_found: bool = False,
     ):
         try:
             self.pre_flight_check(return_doc_id, extended_class_model)
@@ -145,6 +147,7 @@ class MongoBase:
                 return_document=ReturnDocument.AFTER
                 if return_updated_document
                 else ReturnDocument.BEFORE,
+                upsert=insert_if_not_found,
             )
             logging.info(
                 f"Mongo base: Item updated. Checking if transformation required..."
@@ -208,9 +211,18 @@ class MongoBase:
     ):
         try:
             logging.info(f"Mongo base: Fetching count...")
-            return await self.collection.count_documents(filter_condition)
+            return await self.collection.count_documents(filter=filter_condition)
         except Exception as e:
             logging.error(
                 f"Mongo base: Error while counting from collection. Error: {e}"
             )
+            raise e
+
+    async def aggregate(self, condition: List):
+        try:
+            result = self.collection.aggregate(condition)
+            for document in await result.to_list(length=10):
+                logging.info(document)
+        except Exception as e:
+            logging.error(f"Mongo base: Error while aggregating. Error {e}")
             raise e

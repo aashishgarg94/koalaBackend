@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr, Field, SecretStr
 
 from ..core.mongo_model import OID, MongoModel
 from ..models.master import BaseKeyValueModel, BaseRangeModel
+from .job_user import UserJobsRelationModel
 
 
 class BaseFullNameModel(BaseModel):
@@ -34,18 +35,6 @@ class UserModel(BaseModel):
 
 class UserRegisterModel(UserModel):
     password: SecretStr
-
-
-class UserJobRelationModel(BaseModel):
-    job_id: str
-    last_viewed_on: Optional[datetime]
-    is_applied: Optional[bool] = False
-    applied_on: Optional[datetime]
-
-
-# class UserJobModel(BaseModel):
-#     viewed_job: Optional[JobUserModel]
-#     applied_job: Optional[JobUserModel]  # Contains applied job id's
 
 
 class UserProof(BaseModel):
@@ -79,7 +68,7 @@ class UserInModel(UserModel):
     disabled_on: Optional[datetime]
     deleted_on: Optional[datetime]
     bio: Optional[UserBioModel] = None
-    job: Optional[UserJobRelationModel] = None
+    job_applied: Optional[List[UserJobsRelationModel]] = []
 
     class Config:
         orm_mode = True

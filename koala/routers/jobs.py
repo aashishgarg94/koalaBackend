@@ -28,7 +28,7 @@ async def job_create(job_info: BaseJobModel):
 
 
 # USER skip AND limit for querying data. Will be used for pagination
-@router.get("/jobs/getAll/", response_model=JobOutWithPagination)
+@router.get("/jobs/all/", response_model=JobOutWithPagination)
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
     try:

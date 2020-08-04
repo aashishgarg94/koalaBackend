@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Type
 
+from bson import ObjectId
 from fastapi import HTTPException
 from pydantic import EmailStr
 
@@ -24,6 +25,14 @@ class MongoDBUserDatabase:
         self.user_db_model = user_db_model
         self.collection = MongoBase()
         self.collection(USERS)
+
+    async def find_by_object_id(self, user_id: ObjectId) -> Optional[UD]:
+        try:
+            return await self.collection.find_one(
+                {"_id": user_id}, return_doc_id=True, extended_class_model=UserOutModel,
+            )
+        except Exception as e:
+            raise e
 
     async def find_by_email(self, email: str) -> Optional[UD]:
         try:

@@ -15,3 +15,7 @@ JOB_TYPES = "job_types"
 LANGUAGES = "languages"
 QUALIFICATIONS = "qualifications"
 SKILLS = "skills"
+
+# Job and Users - Apply
+USER_JOBS = "user_jobs"
+JOB_APPLICANTS = "job_applicants"
