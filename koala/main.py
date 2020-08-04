@@ -3,8 +3,23 @@ from fastapi import Depends, FastAPI
 from koala.authentication.authentication import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.routers import auth, job_user, jobs, master, register, user
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "https?://.*",
+    "http://localhost:*",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_event_handler("startup", connect_to_mongo)
 app.add_event_handler("shutdown", close_mongo_connection)
