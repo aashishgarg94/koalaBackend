@@ -59,6 +59,11 @@ class BaseIsDeleted(MongoModel):
     is_deleted: bool
 
 
+class BaseIsJobClosed(MongoModel):
+    id: OID = Field()
+    is_closed: bool
+
+
 class BaseIsUpdated(MongoModel):
     id: OID = Field()
     is_updated: bool

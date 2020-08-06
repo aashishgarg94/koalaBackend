@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from ..constants import REQUEST_LIMIT
 from ..crud.jobs import JobCollection
 from ..models.jobs import BaseJobModel, JobInModel, JobOutModel, JobOutWithPagination
-from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsUpdated
+from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsUpdated, BaseIsJobClosed
 
 router = APIRouter()
 
@@ -68,6 +68,20 @@ async def job_update(job_id: str, job_detail: BaseJobModel):
         return BaseIsUpdated(**updated_job.dict()) if updated_job else None
     except Exception:
         HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.get("/jobs/close/{job_id}", response_model=BaseIsJobClosed)
+async def job_delete_by_id(job_id: str):
+    job_collection = JobCollection()
+    try:
+        closed_job = await job_collection.job_close_by_id(job_id)
+        return (
+            BaseIsJobClosed(**closed_job.dict())
+            if closed_job
+            else BaseIsJobClosed(**{"is_closed": False})
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
 
 
 @router.post("/jobs/delete/{job_id}", response_model=BaseIsDeleted)

@@ -93,6 +93,22 @@ class JobCollection:
             logging.error(f"Error: Find one and modify {e}")
             raise e
 
+    async def job_close_by_id(self, job_id: str) -> Optional[JobOutModel]:
+        try:
+            finder = {"_id": ObjectId(job_id)}
+            updater = {"$set": {"is_closed": True, "closed_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+                return_updated_document=True,
+            )
+            return result if result else None
+        except Exception as e:
+            logging.error(f"Error: Closed by id {e}")
+            raise e
+
     async def delete_by_id(self, job_id: str) -> Optional[JobOutModel]:
         try:
             finder = {"_id": ObjectId(job_id)}

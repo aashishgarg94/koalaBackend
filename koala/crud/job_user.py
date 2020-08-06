@@ -10,9 +10,9 @@ from ..models.job_user import (
     BaseIsApplied,
     JobApplicantsModel,
     UserJobsModel,
-    UserJobsRelationModel,
+    UserJobsRelationModel, JobApplicantsRelationModel,
 )
-from ..models.jobs import JobApplicantsRelationModel, JobOutModel
+from ..models.jobs import JobOutModel
 from ..models.master import BaseIsCreated, BaseIsUpdated
 from ..models.user import UserInModel, UserModel, UserOutModel
 from .mongo_base import MongoBase

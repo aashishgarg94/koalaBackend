@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
+from .user import BaseFullNameModel
 from ..core.mongo_model import OID, MongoModel
 from ..models.master import BaseKeyValueModel, BaseRangeModel
 from .job_user import BaseApplicantApplied
@@ -26,6 +27,10 @@ class BaseJobMaster(BaseModel):
     documents: Optional[List[BaseKeyValueModel]]
     hiring_type: Optional[List[BaseKeyValueModel]]
     benefits: Optional[List[BaseKeyValueModel]]
+    working_days: int
+    contact_name: BaseFullNameModel
+    contact_email: EmailStr
+    contact_number: int
 
 
 class BaseJobModel(MongoModel):
@@ -46,9 +51,11 @@ class BaseJobModel(MongoModel):
 class JobInModel(BaseJobModel):
     applicants_details: BaseApplicantApplied
     is_updated: Optional[bool] = False
+    is_closed: Optional[bool] = False
     is_deleted: Optional[bool] = False
     created_on: Optional[datetime]
     updated_on: Optional[datetime]
+    closed_on: Optional[datetime]
     deleted_on: Optional[datetime]
 
 
