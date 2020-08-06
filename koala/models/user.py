@@ -10,8 +10,8 @@ from .job_user import UserJobsRelationModel
 
 class BaseFullNameModel(BaseModel):
     first_name: str
-    middle_name: Optional[str]
-    last_name: Optional[str]
+    middle_name: Optional[str] = ""
+    last_name: Optional[str] = ""
 
 
 class GpsModel(BaseModel):

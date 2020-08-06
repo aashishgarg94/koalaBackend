@@ -13,6 +13,11 @@ class UserJobsRelationModel(MongoModel):
 
 class JobApplicantsRelationModel(MongoModel):
     user_id: OID = Field()
+    full_name: str
+    preferred_city: str
+    preferred_area: str
+    mobile_number: int
+    match_score: int = 0
     applied_on: Optional[datetime]
 
 
@@ -56,3 +61,9 @@ class BaseJobCount(BaseModel):
 
 class BaseApplicantCount(BaseModel):
     total_applicants: int
+
+
+class BaseApplicantApplied(MongoModel):
+    total_applicants: Optional[int] = 0
+    applicants_with_documents: Optional[int] = 0
+    applicants: Optional[List[JobApplicantsRelationModel]] = []

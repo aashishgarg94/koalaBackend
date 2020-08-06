@@ -47,23 +47,32 @@ class JobUser:
             raise e
 
     async def update_job_with_user(
-        self, job_id: ObjectId, user_id: ObjectId
+        self, job_id: ObjectId, current_user: UserModel
     ) -> BaseIsUpdated:
         try:
             self.collection(JOBS)
             finder = {"_id": job_id}
             updater = {
+                "$inc": {"applicants_details.total_applicants": 1},
                 "$push": {
-                    "user_applied": {
+                    "applicants_details.applicants": {
                         "$each": [
                             JobApplicantsRelationModel(
-                                user_id=user_id, applied_on=datetime.now()
+                                user_id=ObjectId(current_user.id),
+                                full_name=current_user.full_name.first_name
+                                + current_user.full_name.middle_name
+                                + current_user.full_name.last_name,
+                                preferred_city=current_user.bio.preferred_city,
+                                preferred_area=current_user.bio.preferred_city,
+                                mobile_number=current_user.mobile_number,
+                                match_score=77,
+                                applied_on=datetime.now(),
                             ).dict()
                         ],
                         "$sort": {"applied_on": -1},
                         "$slice": EMBEDDED_COLLECTION_LIMIT,
                     }
-                }
+                },
             }
             result = await self.collection.find_one_and_modify(
                 find=finder,
@@ -130,13 +139,22 @@ class JobUser:
             raise e
 
     async def update_job_applicants_with_applicants(
-        self, job_id: ObjectId, user_id: ObjectId
+        self, job_id: ObjectId, current_user: UserModel
     ) -> BaseIsCreated:
         try:
             self.collection(JOB_APPLICANTS)
 
             document = JobApplicantsModel(
-                job_id=job_id, user_id=user_id, applied_on=datetime.now()
+                job_id=job_id,
+                user_id=ObjectId(current_user.id),
+                full_name=current_user.full_name.first_name
+                + current_user.full_name.middle_name
+                + current_user.full_name.last_name,
+                preferred_city=current_user.bio.preferred_city,
+                preferred_area=current_user.bio.preferred_city,
+                mobile_number=current_user.mobile_number,
+                match_score=77,
+                applied_on=datetime.now(),
             )
             result = await self.collection.insert_one(
                 document=document.dict(),
@@ -145,7 +163,9 @@ class JobUser:
             )
             return BaseIsCreated(id=result, is_created=True) if result else None
         except Exception as e:
-            logging.error(f"Job apply ERROR: While inserting in user_jobs")
+            logging.error(
+                f"Job apply ERROR: While inserting in job_applicants with applicants"
+            )
             raise e
 
     async def apply_job(self, job_id: str, current_user: UserModel) -> BaseIsApplied:
@@ -154,7 +174,9 @@ class JobUser:
             job_id = ObjectId(job_id)
 
             # Handle main collection update
-            job_update = await self.update_job_with_user(job_id=job_id, user_id=user_id)
+            job_update = await self.update_job_with_user(
+                job_id=job_id, current_user=current_user
+            )
             user_update = await self.update_user_with_job(
                 user_id=user_id, job_id=job_id
             )
@@ -166,7 +188,7 @@ class JobUser:
                 user_id=user_id, job_id=job_id
             )
             job_applicants_update = await self.update_job_applicants_with_applicants(
-                job_id=job_id, user_id=user_id
+                job_id=job_id, current_user=current_user
             )
             logging.info(user_jobs_update)
             logging.info(job_applicants_update)
@@ -234,7 +256,7 @@ class JobUser:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            return data[0].user_applied if data else []
+            return data[0].applicants_details.applicants if data else []
         except Exception as e:
             logging.error(f"Error: while getting recent applicants {e}")
             raise e

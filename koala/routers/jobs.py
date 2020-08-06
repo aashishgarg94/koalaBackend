@@ -15,9 +15,9 @@ DUMMY_COMPANY_ID = "100-workforce"
 
 @router.post("/jobs/create/", response_model=BaseIsCreated)
 async def job_create(job_info: BaseJobModel):
-    job_detail = JobInModel(**job_info.dict())
-    job_collection = JobCollection()
     try:
+        job_detail = JobInModel(**job_info.dict(), applicants_details={})
+        job_collection = JobCollection()
         result = await job_collection.create(job_detail)
         if result is False:
             raise HTTPException(status_code=400, detail="Not able to process")

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from ..core.mongo_model import OID, MongoModel
 from ..models.master import BaseKeyValueModel, BaseRangeModel
-from .job_user import JobApplicantsRelationModel
+from .job_user import BaseApplicantApplied
 
 
 class BaseLanguageProficiency(BaseModel):
@@ -44,7 +44,7 @@ class BaseJobModel(MongoModel):
 
 
 class JobInModel(BaseJobModel):
-    user_applied: Optional[List[JobApplicantsRelationModel]] = []
+    applicants_details: BaseApplicantApplied
     is_updated: Optional[bool] = False
     is_deleted: Optional[bool] = False
     created_on: Optional[datetime]
