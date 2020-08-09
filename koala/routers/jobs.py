@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 
 from ..constants import REQUEST_LIMIT
 from ..crud.jobs import JobCollection
-from ..models.jobs import BaseJobModel, JobInModel, JobOutModel, JobOutWithPagination
+from ..models.jobs import BaseJobModel, JobInModel, JobOutModel, JobOutWithPagination, JobListOutWithPaginationModel
 from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsUpdated, BaseIsJobClosed
 
 router = APIRouter()
@@ -28,7 +28,27 @@ async def job_create(job_info: BaseJobModel):
 
 
 # USER skip AND limit for querying data. Will be used for pagination
-@router.get("/jobs/all/", response_model=JobOutWithPagination)
+@router.get("/jobs/all/full_detail", response_model=JobOutWithPagination)
+async def job_get_all(page_no: Optional[int] = 1):
+    job_collection = JobCollection()
+    try:
+        jobs_count = await job_collection.get_count()
+
+        job_list = []
+        if jobs_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+            job_list = await job_collection.get_all_with_full_details(skip, REQUEST_LIMIT)
+
+        return JobOutWithPagination(
+            total_jobs=jobs_count, current_page=page_no, jobs=job_list
+        )
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.get("/jobs/all/", response_model=JobListOutWithPaginationModel)
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
     try:
@@ -40,11 +60,12 @@ async def job_get_all(page_no: Optional[int] = 1):
             skip = adjusted_page_number * REQUEST_LIMIT
             job_list = await job_collection.get_all(skip, REQUEST_LIMIT)
 
-        return JobOutWithPagination(
+        return JobListOutWithPaginationModel(
             total_jobs=jobs_count, current_page=page_no, jobs=job_list
         )
 
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error while calling processing. Error {e}")
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 

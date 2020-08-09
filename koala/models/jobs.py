@@ -71,3 +71,27 @@ class JobOutWithPagination(MongoModel):
 
 class JobInfo(BaseModel):
     job_info: BaseJobMaster
+
+
+class JobListOutModel(MongoModel):
+    id: OID = Field()
+    title: str
+    sub_title: str
+    description: str
+    status: Optional[bool] = False
+    city: str
+    area: str
+    # applicants_details: BaseApplicantApplied
+    is_updated: Optional[bool] = False
+    is_closed: Optional[bool] = False
+    is_deleted: Optional[bool] = False
+    created_on: Optional[datetime]
+    updated_on: Optional[datetime]
+    closed_on: Optional[datetime]
+    deleted_on: Optional[datetime]
+
+
+class JobListOutWithPaginationModel(MongoModel):
+    jobs: List[JobListOutModel]
+    current_page: int
+    total_jobs: int
