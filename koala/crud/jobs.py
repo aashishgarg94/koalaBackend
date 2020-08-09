@@ -5,7 +5,7 @@ from typing import List, Optional
 from bson import ObjectId
 
 from ..config.collections import JOBS
-from ..models.jobs import JobInModel, JobOutModel, JobListOutModel
+from ..models.jobs import JobInModel, JobListOutModel, JobOutModel
 from ..models.master import BaseIsCreated
 from .mongo_base import MongoBase
 
@@ -40,7 +40,9 @@ class JobCollection:
             logging.error(f"Error: Job count {e}")
             raise e
 
-    async def get_all_with_full_details(self, skip: int, limit: int) -> Optional[List[JobOutModel]]:
+    async def get_all_with_full_details(
+        self, skip: int, limit: int
+    ) -> Optional[List[JobOutModel]]:
         try:
             filter_condition = {"is_deleted": False}
             data = await self.collection.find(

@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -14,11 +15,13 @@ class UserJobsRelationModel(MongoModel):
 class JobApplicantsRelationModel(MongoModel):
     user_id: OID = Field()
     full_name: str
-    preferred_city: str
-    preferred_area: str
+    preferred_city: Optional[str] = None
+    preferred_area: Optional[str] = None
     mobile_number: int
     match_score: int = 0
     applied_on: Optional[datetime]
+    applicant_status: Optional[str] = None
+    status_change_date: Optional[datetime]
 
 
 class BaseIsApplied(MongoModel):
@@ -67,3 +70,25 @@ class BaseApplicantApplied(MongoModel):
     total_applicants: Optional[int] = 0
     applicants_with_documents: Optional[int] = 0
     applicants: Optional[List[JobApplicantsRelationModel]] = []
+
+
+class AllowedActionModel(str, Enum):
+    bookmark = "bookmarked"
+    shortlist = "shortlisted"
+    reject = "rejected"
+
+
+class JobApplicantAction(BaseModel):
+    job_id: str
+    applicant_id: str
+
+
+class JobApplicantInAction(JobApplicantAction):
+    applicant_status: str
+    status_change_date: Optional[datetime]
+
+
+class JobApplicantActionOutModel(MongoModel):
+    id: OID = Field()
+    updated_status: str
+    updated_date: datetime

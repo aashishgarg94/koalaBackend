@@ -47,7 +47,7 @@ class UserBioModel(BaseModel):
     experience: float
     current_salary: Optional[BaseRangeModel]
     expected_salary: Optional[BaseRangeModel]
-    preferred_city: str
+    preferred_city: Optional[str]
     preferred_area: Optional[str]
     job_preference: Optional[List[str]]  # Will create the options for this on frontend
     job_types: Optional[List[BaseKeyValueModel]]

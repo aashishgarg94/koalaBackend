@@ -8,9 +8,11 @@ from ..config.collections import JOB_APPLICANTS, JOBS, USER_JOBS, USERS
 from ..constants import EMBEDDED_COLLECTION_LIMIT
 from ..models.job_user import (
     BaseIsApplied,
+    JobApplicantInAction,
     JobApplicantsModel,
+    JobApplicantsRelationModel,
     UserJobsModel,
-    UserJobsRelationModel, JobApplicantsRelationModel,
+    UserJobsRelationModel,
 )
 from ..models.jobs import JobOutModel
 from ..models.master import BaseIsCreated, BaseIsUpdated
@@ -62,8 +64,12 @@ class JobUser:
                                 full_name=current_user.full_name.first_name
                                 + current_user.full_name.middle_name
                                 + current_user.full_name.last_name,
-                                preferred_city=current_user.bio.preferred_city,
-                                preferred_area=current_user.bio.preferred_city,
+                                preferred_city=current_user.bio.preferred_city
+                                if current_user.bio
+                                else None,
+                                preferred_area=current_user.bio.preferred_area
+                                if current_user.bio
+                                else None,
                                 mobile_number=current_user.mobile_number,
                                 match_score=77,
                                 applied_on=datetime.now(),
@@ -150,8 +156,12 @@ class JobUser:
                 full_name=current_user.full_name.first_name
                 + current_user.full_name.middle_name
                 + current_user.full_name.last_name,
-                preferred_city=current_user.bio.preferred_city,
-                preferred_area=current_user.bio.preferred_city,
+                preferred_city=current_user.bio.preferred_city
+                if current_user.bio
+                else None,
+                preferred_area=current_user.bio.preferred_area
+                if current_user.bio
+                else None,
                 mobile_number=current_user.mobile_number,
                 match_score=77,
                 applied_on=datetime.now(),
@@ -278,4 +288,32 @@ class JobUser:
             return data if data else []
         except Exception as e:
             logging.error(f"Error: while getting all applicants {e}")
+            raise e
+
+    async def apply_action_on_job(
+        self, job_user_map: JobApplicantInAction
+    ) -> BaseIsUpdated:
+        try:
+            self.collection(JOBS)
+
+            finder = {"_id": ObjectId(job_user_map.job_id)}
+            updater = {
+                "$set": {
+                    "applicants_details.applicants.$[elem].applicant_status": job_user_map.applicant_status,
+                    "applicants_details.applicants.$[elem].status_change_date": datetime.now(),
+                }
+            }
+            array_filter = [{"elem.user_id": ObjectId(job_user_map.applicant_id)}]
+
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                array_filters=array_filter,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
+            return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+        except Exception as e:
+            logging.error(f"Error: while updating job status {e}")
             raise e

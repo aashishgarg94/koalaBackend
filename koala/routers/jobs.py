@@ -5,8 +5,14 @@ from fastapi import APIRouter, HTTPException
 
 from ..constants import REQUEST_LIMIT
 from ..crud.jobs import JobCollection
-from ..models.jobs import BaseJobModel, JobInModel, JobOutModel, JobOutWithPagination, JobListOutWithPaginationModel
-from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsUpdated, BaseIsJobClosed
+from ..models.jobs import (
+    BaseJobModel,
+    JobInModel,
+    JobListOutWithPaginationModel,
+    JobOutModel,
+    JobOutWithPagination,
+)
+from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsJobClosed, BaseIsUpdated
 
 router = APIRouter()
 
@@ -38,7 +44,9 @@ async def job_get_all(page_no: Optional[int] = 1):
         if jobs_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            job_list = await job_collection.get_all_with_full_details(skip, REQUEST_LIMIT)
+            job_list = await job_collection.get_all_with_full_details(
+                skip, REQUEST_LIMIT
+            )
 
         return JobOutWithPagination(
             total_jobs=jobs_count, current_page=page_no, jobs=job_list

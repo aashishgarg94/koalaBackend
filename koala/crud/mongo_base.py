@@ -134,6 +134,7 @@ class MongoBase:
         return_doc_id=False,
         extended_class_model=None,
         insert_if_not_found: bool = False,
+        array_filters=None,
     ):
         try:
             self.pre_flight_check(return_doc_id, extended_class_model)
@@ -148,6 +149,7 @@ class MongoBase:
                 if return_updated_document
                 else ReturnDocument.BEFORE,
                 upsert=insert_if_not_found,
+                array_filters=array_filters,
             )
             logging.info(
                 f"Mongo base: Item updated. Checking if transformation required..."

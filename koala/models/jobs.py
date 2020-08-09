@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
-from .user import BaseFullNameModel
 from ..core.mongo_model import OID, MongoModel
 from ..models.master import BaseKeyValueModel, BaseRangeModel
 from .job_user import BaseApplicantApplied
+from .user import BaseFullNameModel
 
 
 class BaseLanguageProficiency(BaseModel):

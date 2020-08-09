@@ -7,13 +7,18 @@ from ..authentication.authentication import get_current_active_user
 from ..constants import REQUEST_LIMIT
 from ..crud.job_user import JobUser
 from ..models.job_user import (
+    AllowedActionModel,
     BaseApplicantCount,
     BaseIsApplied,
     BaseJobApplicant,
     BaseJobCount,
+    JobApplicantAction,
+    JobApplicantActionOutModel,
+    JobApplicantInAction,
     JobApplicantOutWithPagination,
     UserJobsOutWithPagination,
 )
+from ..models.master import BaseIsUpdated
 from ..models.user import UserModel
 
 router = APIRouter()
@@ -131,4 +136,20 @@ async def get_job_all_applicants(job_info: BaseJobApplicant):
         )
     except Exception as e:
         logging.error(e)
+        raise e
+
+
+@router.post("/job/application/action", response_model=BaseIsUpdated)
+async def job_applicant_action(
+    applicant_status: AllowedActionModel, job_applicant_detail: JobApplicantAction
+):
+    try:
+        job_user = JobUser()
+        job_user_map = JobApplicantInAction(
+            **job_applicant_detail.dict(), applicant_status=applicant_status.value
+        )
+        result = await job_user.apply_action_on_job(job_user_map)
+        return result if result else None
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
         raise e
