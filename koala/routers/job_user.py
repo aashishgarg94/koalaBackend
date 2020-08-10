@@ -107,33 +107,37 @@ async def get_jos_applicant_recent(job_id: str):
     try:
         job_user = JobUser()
         recent_applicant = await job_user.job_get_recent_applicants(job_id=job_id)
-        return {"recent_job_count": len(recent_applicant), "jobs": recent_applicant}
+        return recent_applicant
     except Exception as e:
         logging.error(e)
         raise e
 
 
-@router.post("/job/applicant/", response_model=JobApplicantOutWithPagination)
+# , response_model=JobApplicantOutWithPagination
+@router.post("/job/applicant/")
 async def get_job_all_applicants(job_info: BaseJobApplicant):
     try:
         job_user = JobUser()
-        applicant_count = await job_user.get_job_applicants_count(
-            job_id=job_info.job_id
+        # applicant_count = await job_user.get_job_applicants_count(
+        #     job_id=job_info.job_id
+        # )
+        #
+        # applicant_list = []
+        # if applicant_count > 0:
+        adjusted_page_number = job_info.page_no - 1
+        skip = adjusted_page_number * REQUEST_LIMIT
+        applicants_map = await job_user.job_get_all_applicants(
+            skip=skip, limit=REQUEST_LIMIT, job_id=job_info.job_id
         )
 
-        applicant_list = []
-        if applicant_count > 0:
-            adjusted_page_number = job_info.page_no - 1
-            skip = adjusted_page_number * REQUEST_LIMIT
-            applicant_list = await job_user.job_get_all_applicants(
-                skip=skip, limit=REQUEST_LIMIT, job_id=job_info.job_id
-            )
+        applicants_map["current_page"] = job_info.page_no
+        return applicants_map
 
-        return JobApplicantOutWithPagination(
-            total_applicants=applicant_count,
-            current_page=job_info.page_no,
-            applicants=applicant_list,
-        )
+        # return JobApplicantOutWithPagination(
+        #     total_applicants=applicant_count,
+        #     current_page=job_info.page_no,
+        #     applicants=applicant_list,
+        # )
     except Exception as e:
         logging.error(e)
         raise e
@@ -148,7 +152,7 @@ async def job_applicant_action(
         job_user_map = JobApplicantInAction(
             **job_applicant_detail.dict(), applicant_status=applicant_status.value
         )
-        result = await job_user.apply_action_on_job(job_user_map)
+        result = await job_user.apply_job_action(job_user_map)
         return result if result else None
     except Exception as e:
         logging.error(f"Error while applying action: ERROR: {e}")

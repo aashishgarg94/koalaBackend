@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
+from ..constants import BOOKMARKED, REJECTED, SHORTLISTED
 from ..core.mongo_model import OID, MongoModel
 
 
@@ -47,6 +48,10 @@ class JobApplicantsModel(JobApplicantsRelationModel):
     job_id: OID = Field()
 
 
+class JobApplicantsOutModel(JobApplicantsRelationModel):
+    id: OID = Field()
+
+
 class BaseJobApplicant(BaseModel):
     job_id: str
     page_no: int
@@ -73,9 +78,9 @@ class BaseApplicantApplied(MongoModel):
 
 
 class AllowedActionModel(str, Enum):
-    bookmark = "bookmarked"
-    shortlist = "shortlisted"
-    reject = "rejected"
+    bookmark = BOOKMARKED
+    shortlist = SHORTLISTED
+    reject = REJECTED
 
 
 class JobApplicantAction(BaseModel):

@@ -5,11 +5,20 @@ from typing import List
 from bson import ObjectId
 
 from ..config.collections import JOB_APPLICANTS, JOBS, USER_JOBS, USERS
-from ..constants import EMBEDDED_COLLECTION_LIMIT
+from ..constants import (
+    ALL,
+    BOOKMARKED,
+    EMBEDDED_COLLECTION_LIMIT,
+    REJECTED,
+    SHORTLISTED,
+)
 from ..models.job_user import (
+    BaseApplicantApplied,
     BaseIsApplied,
     JobApplicantInAction,
+    JobApplicantOutWithPagination,
     JobApplicantsModel,
+    JobApplicantsOutModel,
     JobApplicantsRelationModel,
     UserJobsModel,
     UserJobsRelationModel,
@@ -61,9 +70,7 @@ class JobUser:
                         "$each": [
                             JobApplicantsRelationModel(
                                 user_id=ObjectId(current_user.id),
-                                full_name=current_user.full_name.first_name
-                                + current_user.full_name.middle_name
-                                + current_user.full_name.last_name,
+                                full_name=f"{current_user.full_name.first_name} {current_user.full_name.middle_name} {current_user.full_name.last_name}",
                                 preferred_city=current_user.bio.preferred_city
                                 if current_user.bio
                                 else None,
@@ -153,9 +160,7 @@ class JobUser:
             document = JobApplicantsModel(
                 job_id=job_id,
                 user_id=ObjectId(current_user.id),
-                full_name=current_user.full_name.first_name
-                + current_user.full_name.middle_name
-                + current_user.full_name.last_name,
+                full_name=f"{current_user.full_name.first_name} {current_user.full_name.middle_name} {current_user.full_name.last_name}",
                 preferred_city=current_user.bio.preferred_city
                 if current_user.bio
                 else None,
@@ -254,9 +259,7 @@ class JobUser:
             logging.error(f"Error: while getting job applicant count {e}")
             raise e
 
-    async def job_get_recent_applicants(
-        self, job_id: str
-    ) -> List[JobApplicantsRelationModel]:
+    async def job_get_recent_applicants(self, job_id: str) -> any:
         try:
             self.collection(JOBS)
 
@@ -266,14 +269,36 @@ class JobUser:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            return data[0].applicants_details.applicants if data else []
+
+            total_jobs = 0
+            applicants = {ALL: [], BOOKMARKED: [], SHORTLISTED: [], REJECTED: []}
+
+            for job_data in data:
+                if len(job_data.applicants_details.applicants) > 0:
+                    total_jobs = job_data.applicants_details.total_applicants
+                    for job_applicants in job_data.applicants_details.applicants:
+                        # Add to all
+                        applicants.get(ALL).append(job_applicants)
+
+                        # Add to bookmarked
+                        if job_applicants.applicant_status == BOOKMARKED:
+                            applicants.get(BOOKMARKED).append(job_applicants)
+
+                        # Add to shortlisted
+                        if job_applicants.applicant_status == SHORTLISTED:
+                            applicants.get(SHORTLISTED).append(job_applicants)
+
+                        # Add to rejected
+                        if job_applicants.applicant_status == REJECTED:
+                            applicants.get(REJECTED).append(job_applicants)
+
+            return {"total_jobs": total_jobs, "applicants": applicants}
         except Exception as e:
             logging.error(f"Error: while getting recent applicants {e}")
             raise e
 
-    async def job_get_all_applicants(
-        self, skip: int, limit: int, job_id: str
-    ) -> List[JobApplicantsRelationModel]:
+    # List[JobApplicantsRelationModel]
+    async def job_get_all_applicants(self, skip: int, limit: int, job_id: str) -> any:
         try:
             self.collection(JOB_APPLICANTS)
 
@@ -285,14 +310,34 @@ class JobUser:
                 return_doc_id=True,
                 extended_class_model=JobApplicantsRelationModel,
             )
-            return data if data else []
+
+            applicants = {ALL: [], BOOKMARKED: [], SHORTLISTED: [], REJECTED: []}
+
+            if len(data) > 0:
+                for job_data in data:
+                    # Add to all
+                    applicants.get(ALL).append(job_data)
+
+                    # Add to bookmarked
+                    if job_data.applicant_status == BOOKMARKED:
+                        applicants.get(BOOKMARKED).append(job_data)
+
+                    # Add to shortlisted
+                    if job_data.applicant_status == SHORTLISTED:
+                        applicants.get(SHORTLISTED).append(job_data)
+
+                    # Add to rejected
+                    if job_data.applicant_status == REJECTED:
+                        applicants.get(REJECTED).append(job_data)
+
+            return {"total_jobs": len(applicants.get(ALL)), "applicants": applicants}
+
+            # return data if data else []
         except Exception as e:
             logging.error(f"Error: while getting all applicants {e}")
             raise e
 
-    async def apply_action_on_job(
-        self, job_user_map: JobApplicantInAction
-    ) -> BaseIsUpdated:
+    async def apply_action_on_job(self, job_user_map: JobApplicantInAction) -> bool:
         try:
             self.collection(JOBS)
 
@@ -313,7 +358,56 @@ class JobUser:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+            return True if result else False
         except Exception as e:
             logging.error(f"Error: while updating job status {e}")
+            raise e
+
+    async def apply_action_on_job_applicants(
+        self, job_user_map: JobApplicantInAction
+    ) -> bool:
+        try:
+            self.collection(JOB_APPLICANTS)
+
+            finder = {"job_id": ObjectId(job_user_map.job_id)}
+            updater = {
+                "$set": {
+                    "applicant_status": job_user_map.applicant_status,
+                    "status_change_date": datetime.now(),
+                }
+            }
+
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=JobApplicantsOutModel,
+            )
+            # return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+            return True if result else False
+
+        except Exception as e:
+            logging.error(f"Error: while updating job status {e}")
+            raise e
+
+    async def apply_job_action(
+        self, job_user_map: JobApplicantInAction
+    ) -> BaseIsUpdated:
+        try:
+            on_job_collection_result = await self.apply_action_on_job(
+                job_user_map=job_user_map
+            )
+            on_job_applicants_collection_result = await self.apply_action_on_job_applicants(
+                job_user_map=job_user_map
+            )
+            logging.info(on_job_collection_result)
+            logging.info(on_job_applicants_collection_result)
+            return (
+                BaseIsUpdated(id=job_user_map.job_id, is_updated=True)
+                if on_job_collection_result and on_job_applicants_collection_result
+                else None
+            )
+        except Exception as e:
+            logging.error(f"Error while applying job action. ERROR: {e}")
             raise e
