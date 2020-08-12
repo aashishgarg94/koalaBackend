@@ -18,6 +18,7 @@ class JobApplicantsRelationModel(MongoModel):
     full_name: str
     preferred_city: Optional[str] = None
     preferred_area: Optional[str] = None
+    preferred_gigtype: Optional[str] = None
     mobile_number: int
     match_score: int = 0
     applied_on: Optional[datetime]

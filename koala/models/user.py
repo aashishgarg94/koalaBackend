@@ -30,6 +30,7 @@ class UserModel(BaseModel):
     gender: str
     current_city: Optional[str] = None
     current_area: Optional[str] = None
+    current_gigtype: Optional[str] = None
     gps: Optional[GpsModel] = None
 
 
@@ -49,6 +50,7 @@ class UserBioModel(BaseModel):
     expected_salary: Optional[BaseRangeModel]
     preferred_city: Optional[str]
     preferred_area: Optional[str]
+    preferred_gigtype: Optional[str]
     job_preference: Optional[List[str]]  # Will create the options for this on frontend
     job_types: Optional[List[BaseKeyValueModel]]
     previous_worked_area: Optional[List[str]] = None

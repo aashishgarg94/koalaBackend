@@ -42,6 +42,8 @@ class BaseJobModel(MongoModel):
     salary: BaseRangeModel
     city: str
     area: str
+    gig_type: Optional[str]
+    gender: Optional[str]
     other_location_info: Optional[str]
     experience: BaseRangeModel
     job_info: BaseJobMaster
@@ -81,6 +83,8 @@ class JobListOutModel(MongoModel):
     status: Optional[bool] = False
     city: str
     area: str
+    gig_type: Optional[str]
+    gender: Optional[str]
     # applicants_details: BaseApplicantApplied
     is_updated: Optional[bool] = False
     is_closed: Optional[bool] = False
