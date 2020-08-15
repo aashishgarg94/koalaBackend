@@ -40,10 +40,7 @@ app.include_router(user.router, tags=["User"])
 app.include_router(
     master.router, tags=["Master"], dependencies=[Depends(get_current_active_user)]
 )
-app.include_router(
-    company.router,
-    tags=["Company"]
-)
+app.include_router(company.router, tags=["Company"])
 app.include_router(
     jobs.router, tags=["Jobs"], dependencies=[Depends(get_current_active_user)]
 )

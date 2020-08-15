@@ -4,9 +4,9 @@ from typing import List, Optional
 from pydantic import BaseModel, EmailStr, Field, SecretStr
 
 from ..core.mongo_model import OID, MongoModel
-from ..models.master import BaseKeyValueModel, BaseRangeModel, BaseAddress
+from ..models.master import BaseAddress, BaseKeyValueModel, BaseRangeModel
 from .job_user import BaseApplicantApplied
-from .user import BaseFullNameModel, GpsModel
+from .user import BaseFullNameModel
 
 
 class BaseCompanyModel(BaseModel):
@@ -22,14 +22,16 @@ class CompanyModelPassword(BaseCompanyModel):
     password: SecretStr
 
 
-# Not using is currently, will use this when we have separate endpoint to update company details
 class CompanyInModel(BaseCompanyModel):
-    hashed_password: str
     created_on: Optional[datetime]
     is_updated: Optional[bool] = False
     updated_on: Optional[datetime]
     is_deleted: Optional[bool] = False
     deleted_on: Optional[datetime]
+
+
+class CompanyInPasswordModel(CompanyInModel):
+    hashed_password: str
 
 
 # Not is use, can be used if we need to pass company id in some other collection,

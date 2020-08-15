@@ -1,11 +1,8 @@
 import logging
-from typing import Optional
 
-from fastapi import APIRouter, HTTPException, status
-from pydantic import EmailStr
-
+from fastapi import APIRouter, HTTPException
 from koala.crud.company import CompanyCollection
-from koala.models.jobs import CompanyOutModel
+from pydantic import EmailStr
 
 router = APIRouter()
 
@@ -16,8 +13,9 @@ async def get_company_details(contact_email: EmailStr):
         company_collection = CompanyCollection()
         company_details = await company_collection.find_by_email(contact_email)
         return company_details
-    except Exception as e:
+    except Exception:
         logging.info(f"Something went wrong while fetching company details")
-        raise HTTPException(status_code=500, detail="Something went wrong while fetching company details")
-
-
+        raise HTTPException(
+            status_code=500,
+            detail="Something went wrong while fetching company details",
+        )

@@ -7,6 +7,7 @@ from bson import ObjectId
 from ..config.collections import JOBS
 from ..models.jobs import JobInModel, JobListOutModel, JobOutModel
 from ..models.master import BaseIsCreated
+from .company import CompanyCollection
 from .mongo_base import MongoBase
 
 
@@ -25,6 +26,17 @@ class JobCollection:
             )
             data = BaseIsCreated(id=result, is_created=True) if result else None
             logging.info(f"Job created fetched successfully")
+
+            # Updating company details
+            company_details = job_detail.job_info.company_details
+            company_collection = CompanyCollection()
+            update_company = await company_collection.find_one_and_modify(
+                company_details=company_details
+            )
+            if update_company.is_updated is not True:
+                logging.info(
+                    f"Not able to update company details while creating the job"
+                )
             return data
         except Exception as e:
             logging.error(f"Error: Job creation {e}")
