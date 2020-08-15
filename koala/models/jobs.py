@@ -1,12 +1,41 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, SecretStr
 
 from ..core.mongo_model import OID, MongoModel
-from ..models.master import BaseKeyValueModel, BaseRangeModel
+from ..models.master import BaseKeyValueModel, BaseRangeModel, BaseAddress
 from .job_user import BaseApplicantApplied
-from .user import BaseFullNameModel
+from .user import BaseFullNameModel, GpsModel
+
+
+class BaseCompanyModel(BaseModel):
+    company_name: str
+    industry: str
+    address: BaseAddress
+    contact_name: BaseFullNameModel
+    contact_email: EmailStr
+    contact_number: int
+
+
+class CompanyModelPassword(BaseCompanyModel):
+    password: SecretStr
+
+
+# Not using is currently, will use this when we have separate endpoint to update company details
+class CompanyInModel(BaseCompanyModel):
+    hashed_password: str
+    created_on: Optional[datetime]
+    is_updated: Optional[bool] = False
+    updated_on: Optional[datetime]
+    is_deleted: Optional[bool] = False
+    deleted_on: Optional[datetime]
+
+
+# Not is use, can be used if we need to pass company id in some other collection,
+# currently company details are embedded in every job
+class CompanyOutModel(BaseCompanyModel, MongoModel):
+    id: OID = Field()
 
 
 class BaseLanguageProficiency(BaseModel):
@@ -28,9 +57,7 @@ class BaseJobMaster(BaseModel):
     hiring_type: Optional[List[BaseKeyValueModel]]
     benefits: Optional[List[BaseKeyValueModel]]
     working_days: int
-    contact_name: BaseFullNameModel
-    contact_email: EmailStr
-    contact_number: int
+    company_details: CompanyOutModel
 
 
 class BaseJobModel(MongoModel):
