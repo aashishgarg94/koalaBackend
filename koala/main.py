@@ -8,6 +8,7 @@ from koala.routers import auth, job_user, jobs, master, register, user
 app = FastAPI()
 
 origins = [
+    "https://*.amplifyapp.com",
     "https?://.*",
     "http://localhost:*",
     "http://localhost:3000",
