@@ -19,3 +19,8 @@ SKILLS = "skills"
 # Job and Users - Apply
 USER_JOBS = "user_jobs"
 JOB_APPLICANTS = "job_applicants"
+
+
+# WEBSITE
+WEBSITE_APPLICANT = "website_applicant"
+WEBSITE_PROVIDER = "website_provider"

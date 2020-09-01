@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # from starlette.middleware.cors import CORSMiddleware
 from koala.authentication.authentication import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
-from koala.routers import auth, job_user, jobs, master, register, user
+from koala.routers import auth, job_user, jobs, master, register, user, website
 
 app = FastAPI()
 
@@ -16,11 +16,17 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=origins,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["POST", "GET", "OPTIONS", "DELETE", 'PUT'],
-    allow_headers=["x-requested-with", "Content-Type", "origin", "authorization", "accept", 'client-security-token'],
+    allow_methods=["POST", "GET", "OPTIONS", "DELETE", "PUT"],
+    allow_headers=[
+        "x-requested-with",
+        "Content-Type",
+        "origin",
+        "authorization",
+        "accept",
+        "client-security-token",
+    ],
 )
 
 app.add_event_handler("startup", connect_to_mongo)
@@ -39,6 +45,9 @@ app.include_router(
     job_user.router,
     tags=["Users & Jobs"],
     dependencies=[Depends(get_current_active_user)],
+)
+app.include_router(
+    website.router, tags=["Website APIs"],
 )
 
 if __name__ == "__main__":
