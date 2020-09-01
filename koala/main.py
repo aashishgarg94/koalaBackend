@@ -20,7 +20,7 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["POST", "GET", "OPTIONS", "DELETE", 'PUT'],
-    allow_headers=["*"],
+    allow_headers=["x-requested-with", "Content-Type", "origin", "authorization", "accept", 'client-security-token'],
 )
 
 app.add_event_handler("startup", connect_to_mongo)
