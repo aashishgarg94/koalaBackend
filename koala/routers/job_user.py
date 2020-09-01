@@ -25,7 +25,7 @@ router = APIRouter()
 
 
 # Apply for job
-@router.post("/job/apply/", response_model=BaseIsApplied)
+@router.post("/job/apply", response_model=BaseIsApplied)
 async def job_apply(
     job_id: str, current_user: UserModel = Depends(get_current_active_user)
 ):
@@ -64,7 +64,7 @@ async def user_get_user_jobs_recent(
 
 
 # Get all applied jobs, get user from token
-@router.get("/user/jobs/")
+@router.get("/user/jobs")
 async def get_user_all_jobs(
     page_no: Optional[int] = 1,
     current_user: UserModel = Depends(get_current_active_user),
@@ -114,7 +114,7 @@ async def get_jos_applicant_recent(job_id: str):
 
 
 # , response_model=JobApplicantOutWithPagination
-@router.post("/job/applicant/")
+@router.post("/job/applicant")
 async def get_job_all_applicants(job_info: BaseJobApplicant):
     try:
         job_user = JobUser()

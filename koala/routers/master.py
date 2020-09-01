@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 # Get all gigs
-@router.get("/gigs/", response_model=GigTypeModel)
+@router.get("/gigs", response_model=GigTypeModel)
 async def get_gig_type():
     try:
         master_collection = MasterCollections()
@@ -18,7 +18,7 @@ async def get_gig_type():
 
 # TODO: For now getting the cities we operate in later we can get them by states
 # Get cities we operate in
-@router.get("/op_cities/", response_model=OpCityModel)
+@router.get("/op_cities", response_model=OpCityModel)
 async def get_op_cities():
     try:
         master_collection = MasterCollections()
@@ -27,7 +27,7 @@ async def get_op_cities():
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/op_area/", response_model=OpAreaModel)
+@router.get("/op_area", response_model=OpAreaModel)
 async def get_op_cities():
     try:
         master_collection = MasterCollections()

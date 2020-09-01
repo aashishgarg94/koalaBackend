@@ -26,7 +26,7 @@ Create User will be done from registration
 
 
 # API -  Get Current User
-@router.get("/user/me/", response_model=UserModel)
+@router.get("/user/me", response_model=UserModel)
 async def read_user_me(current_user: UserModel = Depends(get_current_active_user)):
     try:
         return current_user
@@ -36,7 +36,7 @@ async def read_user_me(current_user: UserModel = Depends(get_current_active_user
 
 
 # API - Update User
-@router.post("/user/update/me/", response_model=UserUpdateOutModel)
+@router.post("/user/update/me", response_model=UserUpdateOutModel)
 async def update_user_me(
     update_user: UserUpdateModel,
     current_user: UserModel = Depends(get_current_active_user),
@@ -51,7 +51,7 @@ async def update_user_me(
 
 
 # API - Delete User
-@router.get("/user/disable/me/", response_model=BaseIsDisabled)
+@router.get("/user/disable/me", response_model=BaseIsDisabled)
 async def disable_user_me(current_user: UserModel = Depends(get_current_active_user)):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
@@ -64,7 +64,7 @@ async def disable_user_me(current_user: UserModel = Depends(get_current_active_u
 
 
 # Get user bio
-@router.get("/user/bio/", response_model=BioUpdateOutModel)
+@router.get("/user/bio", response_model=BioUpdateOutModel)
 async def user_bio_fetch(current_user: UserModel = Depends(get_current_active_user)):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
@@ -75,7 +75,7 @@ async def user_bio_fetch(current_user: UserModel = Depends(get_current_active_us
 
 
 # Update user bio for creating it's profile
-@router.post("/user/bio/update/", response_model=BioUpdateOutModel)
+@router.post("/user/bio/update", response_model=BioUpdateOutModel)
 async def user_bio_update(
     user_bio_updates: UserBioModel,
     current_user: UserModel = Depends(get_current_active_user),

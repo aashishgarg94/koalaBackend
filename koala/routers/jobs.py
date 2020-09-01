@@ -19,7 +19,7 @@ router = APIRouter()
 DUMMY_COMPANY_ID = "100-workforce"
 
 
-@router.post("/jobs/create/", response_model=BaseIsCreated)
+@router.post("/jobs/create", response_model=BaseIsCreated)
 async def job_create(job_info: BaseJobModel):
     try:
         job_detail = JobInModel(**job_info.dict(), applicants_details={})
@@ -56,7 +56,7 @@ async def job_get_all(page_no: Optional[int] = 1):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/jobs/all/", response_model=JobListOutWithPaginationModel)
+@router.get("/jobs/all", response_model=JobListOutWithPaginationModel)
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
     try:
@@ -78,7 +78,7 @@ async def job_get_all(page_no: Optional[int] = 1):
 
 
 # TODO: Get encoded job_id - Decide on encoder
-@router.get("/jobs/get/{job_id}/", response_model=JobOutModel)
+@router.get("/jobs/get/{job_id}", response_model=JobOutModel)
 async def get_job_by_id(job_id: str):
     job_collection = JobCollection()
     try:
