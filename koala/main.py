@@ -11,8 +11,7 @@ app = FastAPI()
 origins = [
     "https://koala.bharatworks.co",
     "https://site.bharatworks.co",
-    "https://pragaty.co",
-    "https://pragaty.in",
+    "https://www.pragaty.in",
     "http://localhost:*",
     "http://localhost:3000",
 ]
