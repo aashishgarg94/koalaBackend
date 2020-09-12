@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter, HTTPException
-from koala.crud.company import CompanyCollection
+from koala.crud.jobs_crud.company import CompanyCollection
 from pydantic import EmailStr
 
 router = APIRouter()

@@ -2,10 +2,9 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-from ..authentication import authentication
-from ..authentication.jwt_handler import Token, create_access_token
-from ..constants import ACCESS_TOKEN_EXPIRE_MINUTES
+from koala.authentication import authentication
+from koala.authentication.jwt_handler import Token, create_access_token
+from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
 

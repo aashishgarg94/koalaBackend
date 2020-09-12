@@ -16,10 +16,9 @@ import logging
 from typing import List
 
 from fastapi import HTTPException
+from koala.constants import REQUEST_LIMIT, REQUEST_SKIP_DEFAULT
+from koala.db.mongodb import get_collection
 from pymongo import ReturnDocument
-
-from ..constants import REQUEST_LIMIT, REQUEST_SKIP_DEFAULT
-from ..db.mongodb import get_collection
 
 
 # Keeping is static for exceptional cases where we might need to transform the data explicitly

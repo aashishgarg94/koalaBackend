@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException
-
-from ..crud.master import MasterCollections
-from ..models.master import GigTypeModel, JobMasterModel, OpAreaModel, OpCityModel
+from koala.crud.jobs_crud.master import MasterCollections
+from koala.models.jobs_models.master import (
+    GigTypeModel,
+    JobMasterModel,
+    OpAreaModel,
+    OpCityModel,
+)
 
 router = APIRouter()
 

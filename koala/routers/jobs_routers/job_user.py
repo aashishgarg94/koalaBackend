@@ -2,24 +2,21 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-
-from ..authentication.authentication import get_current_active_user
-from ..constants import REQUEST_LIMIT
-from ..crud.job_user import JobUser
-from ..models.job_user import (
+from koala.authentication.authentication import get_current_active_user
+from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.job_user import JobUser
+from koala.models.jobs_models.job_user import (
     AllowedActionModel,
     BaseApplicantCount,
     BaseIsApplied,
     BaseJobApplicant,
     BaseJobCount,
     JobApplicantAction,
-    JobApplicantActionOutModel,
     JobApplicantInAction,
-    JobApplicantOutWithPagination,
     UserJobsOutWithPagination,
 )
-from ..models.master import BaseIsUpdated
-from ..models.user import UserModel
+from koala.models.jobs_models.master import BaseIsUpdated
+from koala.models.jobs_models.user import UserModel
 
 router = APIRouter()
 

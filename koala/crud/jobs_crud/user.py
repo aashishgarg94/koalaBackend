@@ -3,11 +3,9 @@ from typing import Optional, Type
 
 from bson import ObjectId
 from fastapi import HTTPException
-from pydantic import EmailStr
-
-from ..config.collections import USERS
-from ..models.master import BaseIsCreated, BaseIsDisabled
-from ..models.user import (
+from koala.config.collections import USERS
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
+from koala.models.jobs_models.user import (
     UD,
     BioUpdateInModel,
     BioUpdateOutModel,
@@ -17,6 +15,8 @@ from ..models.user import (
     UserUpdateCls,
     UserUpdateOutModel,
 )
+from pydantic import EmailStr
+
 from .mongo_base import MongoBase, return_id_transformation
 
 

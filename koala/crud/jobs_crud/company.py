@@ -4,9 +4,13 @@ from typing import Optional
 
 from bson import ObjectId
 from koala.config.collections import COMPANIES
-from koala.crud.mongo_base import MongoBase
-from koala.models.jobs import CompanyInModel, CompanyInPasswordModel, CompanyOutModel
-from koala.models.master import BaseIsCreated, BaseIsUpdated, BaseNotFound
+from koala.crud.jobs_crud.mongo_base import MongoBase
+from koala.models.jobs_models.jobs import (
+    CompanyInModel,
+    CompanyInPasswordModel,
+    CompanyOutModel,
+)
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseNotFound
 from pydantic import EmailStr
 
 

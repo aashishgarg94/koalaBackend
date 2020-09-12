@@ -1,8 +1,7 @@
 from typing import List, Optional
 
+from koala.core.mongo_model import OID, MongoModel
 from pydantic import BaseModel, Field
-
-from ..core.mongo_model import OID, MongoModel
 
 
 class GpsModel(BaseModel):

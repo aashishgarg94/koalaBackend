@@ -3,10 +3,10 @@ from datetime import datetime
 from typing import List, Optional
 
 from bson import ObjectId
+from koala.config.collections import JOBS
+from koala.models.jobs_models.jobs import JobInModel, JobListOutModel, JobOutModel
+from koala.models.jobs_models.master import BaseIsCreated
 
-from ..config.collections import JOBS
-from ..models.jobs import JobInModel, JobListOutModel, JobOutModel
-from ..models.master import BaseIsCreated
 from .company import CompanyCollection
 from .mongo_base import MongoBase
 

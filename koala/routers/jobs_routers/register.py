@@ -1,11 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
-
-from ..authentication.jwt_handler import get_password_hash
-from ..crud.company import CompanyCollection
-from ..crud.user import MongoDBUserDatabase
-from ..models.jobs import CompanyInPasswordModel, CompanyModelPassword
-from ..models.master import BaseIsCreated
-from ..models.user import UserInModel, UserRegisterModel
+from koala.authentication.jwt_handler import get_password_hash
+from koala.crud.jobs_crud.company import CompanyCollection
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.jobs import CompanyInPasswordModel, CompanyModelPassword
+from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.user import UserInModel, UserRegisterModel
 
 router = APIRouter()
 

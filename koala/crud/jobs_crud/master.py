@@ -12,8 +12,7 @@ from koala.config.collections import (
     QUALIFICATIONS,
     SKILLS,
 )
-
-from ..models.master import (
+from koala.models.jobs_models.master import (
     BaseNameModel,
     GigTypeModel,
     JobMasterModel,
@@ -21,6 +20,7 @@ from ..models.master import (
     OpAreaModel,
     OpCityModel,
 )
+
 from .mongo_base import MongoBase
 
 

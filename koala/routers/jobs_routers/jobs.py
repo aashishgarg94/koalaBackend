@@ -2,17 +2,21 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
-
-from ..constants import REQUEST_LIMIT
-from ..crud.jobs import JobCollection
-from ..models.jobs import (
+from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.jobs import JobCollection
+from koala.models.jobs_models.jobs import (
     BaseJobModel,
     JobInModel,
     JobListOutWithPaginationModel,
     JobOutModel,
     JobOutWithPagination,
 )
-from ..models.master import BaseIsCreated, BaseIsDeleted, BaseIsJobClosed, BaseIsUpdated
+from koala.models.jobs_models.master import (
+    BaseIsCreated,
+    BaseIsDeleted,
+    BaseIsJobClosed,
+    BaseIsUpdated,
+)
 
 router = APIRouter()
 

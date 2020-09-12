@@ -2,11 +2,11 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.user import UserInModel
 
 from ..authentication.jwt_handler import TokenData, pwd_context
 from ..constants import ALGORITHM, SECRET_KEY
-from ..crud.user import MongoDBUserDatabase
-from ..models.user import UserInModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 

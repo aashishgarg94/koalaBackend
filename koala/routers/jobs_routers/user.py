@@ -2,16 +2,14 @@ import logging
 
 from fastapi import APIRouter, Depends
 from koala.authentication.authentication import get_current_active_user
-from koala.crud.user import MongoDBUserDatabase
-
-from ..models.master import BaseIsDisabled
-from ..models.user import (
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.master import BaseIsDisabled
+from koala.models.jobs_models.user import (
     BioUpdateInModel,
     BioUpdateOutModel,
     UserBioModel,
     UserInModel,
     UserModel,
-    UserOutModel,
     UserUpdateCls,
     UserUpdateModel,
     UserUpdateOutModel,

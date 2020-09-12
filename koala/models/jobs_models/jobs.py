@@ -1,10 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
 
+from koala.core.mongo_model import OID, MongoModel
+from koala.models.jobs_models.master import (
+    BaseAddress,
+    BaseKeyValueModel,
+    BaseRangeModel,
+)
 from pydantic import BaseModel, EmailStr, Field, SecretStr
 
-from ..core.mongo_model import OID, MongoModel
-from ..models.master import BaseAddress, BaseKeyValueModel, BaseRangeModel
 from .job_user import BaseApplicantApplied
 from .user import BaseFullNameModel
 

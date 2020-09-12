@@ -3,29 +3,27 @@ from datetime import datetime
 from typing import List
 
 from bson import ObjectId
-
-from ..config.collections import JOB_APPLICANTS, JOBS, USER_JOBS, USERS
-from ..constants import (
+from koala.config.collections import JOB_APPLICANTS, JOBS, USER_JOBS, USERS
+from koala.constants import (
     ALL,
     BOOKMARKED,
     EMBEDDED_COLLECTION_LIMIT,
     REJECTED,
     SHORTLISTED,
 )
-from ..models.job_user import (
-    BaseApplicantApplied,
+from koala.models.jobs_models.job_user import (
     BaseIsApplied,
     JobApplicantInAction,
-    JobApplicantOutWithPagination,
     JobApplicantsModel,
     JobApplicantsOutModel,
     JobApplicantsRelationModel,
     UserJobsModel,
     UserJobsRelationModel,
 )
-from ..models.jobs import JobOutModel
-from ..models.master import BaseIsCreated, BaseIsUpdated
-from ..models.user import UserInModel, UserModel, UserOutModel
+from koala.models.jobs_models.jobs import JobOutModel
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
+from koala.models.jobs_models.user import UserInModel, UserModel, UserOutModel
+
 from .mongo_base import MongoBase
 from .user import MongoDBUserDatabase
 
