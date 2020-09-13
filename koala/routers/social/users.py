@@ -69,5 +69,3 @@ async def get_user_follower(user_id: str):
         logging.info(data)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
-
-

@@ -14,7 +14,7 @@ from koala.routers.jobs_routers import (
     user,
     website,
 )
-from koala.routers.social import (groups, users)
+from koala.routers.social import groups, users
 
 app = FastAPI()
 
