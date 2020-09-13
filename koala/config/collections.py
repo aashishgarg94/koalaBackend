@@ -24,3 +24,8 @@ JOB_APPLICANTS = "job_applicants"
 # WEBSITE
 WEBSITE_APPLICANT = "website_applicant"
 WEBSITE_PROVIDER = "website_provider"
+
+
+# GROUPS
+SOCIAL_GROUPS = "social_groups"
+SOCIAL_USERS = "social_users"

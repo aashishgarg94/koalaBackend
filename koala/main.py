@@ -14,6 +14,7 @@ from koala.routers.jobs_routers import (
     user,
     website,
 )
+from koala.routers.social import (groups, users)
 
 app = FastAPI()
 
@@ -43,6 +44,7 @@ app.add_middleware(
 app.add_event_handler("startup", connect_to_mongo)
 app.add_event_handler("shutdown", close_mongo_connection)
 
+# JOBS ROUTERS
 app.include_router(register.router, tags=["Register"])
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(user.router, tags=["User"])
@@ -60,6 +62,19 @@ app.include_router(
 )
 app.include_router(
     website.router, tags=["Website APIs"],
+)
+
+# SOCIAL ROUTERS
+app.include_router(
+    groups.router,
+    tags=["Social Groups"],
+    # dependencies=[Depends(get_current_active_user)],
+)
+
+app.include_router(
+    users.router,
+    tags=["Social Users"]
+    # dependencies=[Depends(get_current_active_user)],
 )
 
 if __name__ == "__main__":
