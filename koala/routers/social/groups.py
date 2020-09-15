@@ -8,13 +8,14 @@ from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.social.groups import (
     BaseSocialGroup,
     GroupsWithPaginationModel,
-    SocialGroupCreateIn, SocialGroupCreateOut,
+    SocialGroupCreateIn,
+    SocialGroupCreateOut,
 )
 
 router = APIRouter()
 
 
-@router.post("/group/create", response_model=BaseIsCreated)
+@router.post("/create", response_model=BaseIsCreated)
 async def create_group(group_details: BaseSocialGroup):
     try:
         master_collection = SocialGroupsCollection()
@@ -25,7 +26,7 @@ async def create_group(group_details: BaseSocialGroup):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/group/get_all", response_model=GroupsWithPaginationModel)
+@router.get("/get_all", response_model=GroupsWithPaginationModel)
 async def get_all_groups(page_no: Optional[int] = 1):
     try:
         master_collection = SocialGroupsCollection()
@@ -44,7 +45,7 @@ async def get_all_groups(page_no: Optional[int] = 1):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/group/group_by_id", response_model=SocialGroupCreateOut)
+@router.post("/group_by_id", response_model=SocialGroupCreateOut)
 async def get_group_by_id(group_id: str):
     try:
         master_collection = SocialGroupsCollection()
@@ -53,7 +54,7 @@ async def get_group_by_id(group_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/group/all_users", response_model=dict)
+@router.post("/all_users", response_model=dict)
 async def get_group_users(group_id: str):
     try:
         master_collection = SocialGroupsCollection()
@@ -63,7 +64,7 @@ async def get_group_users(group_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/group/user_by_id", response_model=dict)
+@router.post("/user_by_id", response_model=dict)
 async def get_group_user_by_id(user_id: str):
     try:
         logging.info(user_id)

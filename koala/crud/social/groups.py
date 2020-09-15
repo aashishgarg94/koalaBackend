@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import List, Optional
 
 from bson import ObjectId
-
 from koala.config.collections import SOCIAL_GROUPS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated

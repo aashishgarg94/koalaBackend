@@ -1,7 +1,10 @@
 import logging
+from datetime import datetime
 
 from koala.config.collections import SOCIAL_USERS
 from koala.crud.jobs_crud.mongo_base import MongoBase
+from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.social.users import CreatePostModelIn, CreatePostModelOut
 
 
 class SocialUsersCollection:
@@ -9,15 +12,38 @@ class SocialUsersCollection:
         self.collection = MongoBase()
         self.collection(SOCIAL_USERS)
 
-    async def create_group(self, post_details: dict) -> any:
+    async def create_post(self, post_details: CreatePostModelIn) -> any:
         try:
-            logging.info(post_details)
+            post_details.created_on = datetime.now()
+            result = await self.collection.insert_one(
+                post_details.dict(),
+                return_doc_id=True,
+                extended_class_model=BaseIsCreated,
+            )
+            return BaseIsCreated(id=result, is_created=True) if result else None
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
-    async def get_user_all_posts(self, user_id: str) -> any:
+    async def get_count(self) -> int:
         try:
-            pass
+            filter_condition = {"is_deleted": False}
+            count = await self.collection.count(filter_condition)
+            return count if count else 0
+        except Exception as e:
+            logging.error(f"Error: Job count {e}")
+            raise e
+
+    async def get_user_all_posts(self, skip: int, limit: int) -> any:
+        try:
+            filter_condition = {"is_deleted": False}
+            data = await self.collection.find(
+                finder=filter_condition,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+            return data if data else None
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 

@@ -16,3 +16,6 @@ ALL = "all"
 BOOKMARKED = "bookmarked"
 SHORTLISTED = "shortlisted"
 REJECTED = "rejected"
+
+GOLD = "gold"
+NORMAL = "normal"

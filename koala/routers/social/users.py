@@ -1,33 +1,80 @@
 import logging
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from koala.authentication.authentication import get_current_active_user
+from koala.constants import REQUEST_LIMIT
 from koala.crud.social.users import SocialUsersCollection
+from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.user import UserModel
+from koala.models.social.users import (
+    BaseCreatePostModel,
+    BasePostOwnerModel,
+    CreatePostModelIn,
+    CreatePostModelPaginationModel,
+)
 
 router = APIRouter()
 
 
-@router.post("/user/create_post", response_model=dict)
-async def create_post(post_details: dict):
+def get_user_model(current_user: UserModel, get_type: str):
     try:
-        logging.info(post_details)
+        # Get user
+        user_name = current_user.full_name
+        user_email = current_user.email
+        user_id = current_user.id
+
+        if get_type == "id":
+            return user_id
+        elif get_type == "object":
+            # Update owner
+            return BasePostOwnerModel(name=user_name, email=user_email, user_id=user_id)
+    except Exception as e:
+        logging.error(e)
+        raise e
+
+
+@router.post("/create_post", response_model=BaseIsCreated)
+async def create_post(
+    post_details: BaseCreatePostModel,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
         master_collection = SocialUsersCollection()
-        data = await master_collection.create_group(post_details=post_details)
-        logging.info(data)
-    except Exception:
+
+        user_map = get_user_model(current_user, "object")
+        post_details = CreatePostModelIn(**post_details.dict(), owner=user_map)
+
+        return await master_collection.create_post(post_details=post_details)
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user/all_posts", response_model=dict)
-async def get_user_all_posts(user_id: str):
+@router.post("/all_posts", response_model=CreatePostModelPaginationModel)
+async def get_user_all_posts(page_no: Optional[int] = 1):
     try:
         master_collection = SocialUsersCollection()
-        data = await master_collection.get_user_all_posts(user_id)
-        logging.info(data)
-    except Exception:
+
+        user_count = await master_collection.get_count()
+
+        user_list = []
+        if user_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+            user_list = await master_collection.get_user_all_posts(
+                skip=skip, limit=REQUEST_LIMIT
+            )
+
+        return CreatePostModelPaginationModel(
+            total_posts=user_count, current_page=page_no, posts=user_list
+        )
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user/post_by_id", response_model=dict)
+@router.post("/post_by_id", response_model=dict)
 async def get_user_post_by_id(post_id: str):
     try:
         logging.info(post_id)
@@ -38,7 +85,7 @@ async def get_user_post_by_id(post_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user/follow_group", response_model=dict)
+@router.post("/follow_group", response_model=dict)
 async def make_user_follow_group(user_details: dict):
     try:
         logging.info(user_details)
@@ -49,7 +96,7 @@ async def make_user_follow_group(user_details: dict):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user/followed_groups", response_model=dict)
+@router.post("/followed_groups", response_model=dict)
 async def get_user_followed_groups(user_id: str):
     try:
         logging.info(user_id)
@@ -60,7 +107,7 @@ async def get_user_followed_groups(user_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user/follower", response_model=dict)
+@router.post("/follower", response_model=dict)
 async def get_user_follower(user_id: str):
     try:
         logging.info(user_id)

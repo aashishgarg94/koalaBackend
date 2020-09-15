@@ -67,13 +67,15 @@ app.include_router(
 # SOCIAL ROUTERS
 app.include_router(
     groups.router,
+    prefix="/group",
     tags=["Social Groups"],
-    # dependencies=[Depends(get_current_active_user)],
+    dependencies=[Depends(get_current_active_user)],
 )
 
 app.include_router(
     users.router,
-    tags=["Social Users"]
+    prefix="/user",
+    tags=["Social Users"],
     # dependencies=[Depends(get_current_active_user)],
 )
 
