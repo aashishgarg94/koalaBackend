@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 from typing import List, Optional
 
+from bson import ObjectId
+
 from koala.config.collections import SOCIAL_GROUPS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
@@ -55,12 +57,17 @@ class SocialGroupsCollection:
             logging.error(f"Error: Create group error {e}")
 
     async def get_group_by_id(self, group_id: str) -> any:
+        group_id_obj = ObjectId(group_id)
         try:
-            logging.info(group_id)
+            return await self.collection.find_one(
+                {"_id": group_id_obj},
+                return_doc_id=True,
+                extended_class_model=SocialGroupCreateOut,
+            )
         except Exception as e:
-            logging.error(f"Error: Create group error {e}")
+            raise e
 
-    async def get_group_users(self, group_id: str) -> any:
+    async def get_group_users(self, group_id: ObjectId) -> any:
         try:
             pass
         except Exception as e:
