@@ -60,9 +60,6 @@ app.include_router(
     tags=["Users & Jobs"],
     dependencies=[Depends(get_current_active_user)],
 )
-app.include_router(
-    website.router, tags=["Website APIs"],
-)
 
 # SOCIAL ROUTERS
 app.include_router(
@@ -76,7 +73,12 @@ app.include_router(
     users.router,
     prefix="/user",
     tags=["Social Users"],
-    # dependencies=[Depends(get_current_active_user)],
+    dependencies=[Depends(get_current_active_user)],
+)
+
+# Website API's
+app.include_router(
+    website.router, tags=["Website APIs"],
 )
 
 if __name__ == "__main__":

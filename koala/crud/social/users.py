@@ -1,7 +1,8 @@
 import logging
 from datetime import datetime
 
-from koala.config.collections import SOCIAL_USERS
+from bson import ObjectId
+from koala.config.collections import SOCIAL_POSTS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.social.users import CreatePostModelIn, CreatePostModelOut
@@ -10,7 +11,7 @@ from koala.models.social.users import CreatePostModelIn, CreatePostModelOut
 class SocialUsersCollection:
     def __init__(self):
         self.collection = MongoBase()
-        self.collection(SOCIAL_USERS)
+        self.collection(SOCIAL_POSTS)
 
     async def create_post(self, post_details: CreatePostModelIn) -> any:
         try:
@@ -49,7 +50,12 @@ class SocialUsersCollection:
 
     async def get_user_post_by_id(self, post_id: str) -> any:
         try:
-            logging.info(post_id)
+            post_id_obj = ObjectId(post_id)
+            return await self.collection.find_one(
+                {"_id": post_id_obj},
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 

@@ -11,6 +11,7 @@ from koala.models.social.users import (
     BaseCreatePostModel,
     BasePostOwnerModel,
     CreatePostModelIn,
+    CreatePostModelOut,
     CreatePostModelPaginationModel,
 )
 
@@ -74,13 +75,12 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/post_by_id", response_model=dict)
+@router.post("/post_by_id", response_model=CreatePostModelOut)
 async def get_user_post_by_id(post_id: str):
     try:
         logging.info(post_id)
         master_collection = SocialUsersCollection()
-        data = await master_collection.get_user_post_by_id(post_id=post_id)
-        logging.info(data)
+        return await master_collection.get_user_post_by_id(post_id=post_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 

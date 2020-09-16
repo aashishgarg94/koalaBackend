@@ -28,4 +28,4 @@ WEBSITE_PROVIDER = "website_provider"
 
 # GROUPS
 SOCIAL_GROUPS = "social_groups"
-SOCIAL_USERS = "social_users"
+SOCIAL_POSTS = "social_posts"
