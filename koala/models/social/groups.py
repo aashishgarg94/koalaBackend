@@ -55,3 +55,8 @@ class GroupsWithPaginationModel(MongoModel):
     current_page: int
     total_groups: int
     groups: List[SocialGroupCreateOut]
+
+
+class GroupsFollowed(MongoModel):
+    total_groups: int = 0
+    group_list: Optional[List[OID]] = []

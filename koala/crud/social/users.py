@@ -2,9 +2,10 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
-from koala.config.collections import SOCIAL_POSTS
+from koala.config.collections import SOCIAL_POSTS, USERS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import CreatePostModelIn, CreatePostModelOut
 
 
@@ -59,15 +60,24 @@ class SocialUsersCollection:
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
-    async def make_user_follow_group(self, user_details: dict) -> any:
+    async def get_user_followed_groups(self, user_id: str) -> GroupsFollowed:
         try:
-            logging.info(user_details)
+            self.collection(USERS)
+            data = await self.collection.find(
+                finder={"_id": ObjectId(user_id)},
+                projection={"groups_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+            return GroupsFollowed(
+                total_groups=len(data[0]["groups_followed"]),
+                group_list=data[0]["groups_followed"],
+            )
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
-    async def get_user_followed_groups(self, user_id: str) -> any:
+    async def make_user_follow_group(self, user_details: dict) -> any:
         try:
-            logging.info(user_id)
+            logging.info(user_details)
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 

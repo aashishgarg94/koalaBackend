@@ -168,6 +168,7 @@ class MongoBase:
     async def find(
         self,
         finder: dict,
+        projection: dict = None,
         return_doc_id=False,
         extended_class_model=None,
         skip: int = REQUEST_SKIP_DEFAULT,
@@ -184,7 +185,11 @@ class MongoBase:
             raise e
         logging.info(f"Pre flight operations looks good ;)")
         try:
-            result = self.collection.find(finder).skip(skip).limit(limit)
+            result = (
+                self.collection.find(filter=finder, projection=projection)
+                .skip(skip)
+                .limit(limit)
+            )
             logging.info(
                 f"Mongo base: Item fetched. Checking if transformation required..."
             )

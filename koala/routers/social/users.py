@@ -7,6 +7,7 @@ from koala.constants import REQUEST_LIMIT
 from koala.crud.social.users import SocialUsersCollection
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserModel
+from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import (
     BaseCreatePostModel,
     BaseFollowerModel,
@@ -89,7 +90,18 @@ async def get_user_post_by_id(post_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/follow_group", response_model=dict)
+@router.post("/followed_groups", response_model=GroupsFollowed)
+async def get_user_followed_groups(user_id: str):
+    try:
+        logging.info(user_id)
+        master_collection = SocialUsersCollection()
+        return await master_collection.get_user_followed_groups(user_id=user_id)
+    except Exception as e:
+        logging.info(e)
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/follow_user", response_model=dict)
 async def make_user_follow_group(
     group_id: str, current_user: UserModel = Depends(get_current_active_user),
 ):
@@ -105,12 +117,12 @@ async def make_user_follow_group(
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/followed_groups", response_model=dict)
-async def get_user_followed_groups(user_id: str):
+@router.post("/user_followed", response_model=dict)
+async def get_user_follower(user_id: str):
     try:
         logging.info(user_id)
         master_collection = SocialUsersCollection()
-        data = await master_collection.get_user_followed_groups(user_id=user_id)
+        data = await master_collection.get_user_follower(user_id=user_id)
         logging.info(data)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
