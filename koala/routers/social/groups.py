@@ -83,7 +83,8 @@ async def make_user_follow_group(
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/all_users", response_model=dict)
+# In progress
+@router.post("/inprogress/all_users", response_model=dict)
 async def get_group_users(group_id: str):
     try:
         master_collection = SocialGroupsCollection()
@@ -92,13 +93,3 @@ async def get_group_users(group_id: str):
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
-
-@router.post("/user_by_id", response_model=dict)
-async def get_group_user_by_id(user_id: str):
-    try:
-        logging.info(user_id)
-        master_collection = SocialGroupsCollection()
-        data = await master_collection.get_group_user_by_id(user_id=user_id)
-        logging.info(data)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Something went wrong")
