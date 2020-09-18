@@ -11,10 +11,14 @@ from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import (
     BaseCreatePostModel,
     BaseFollowerModel,
+    BaseIsFollowed,
     BasePostOwnerModel,
     CreatePostModelIn,
     CreatePostModelOut,
     CreatePostModelPaginationModel,
+    FollowerModel,
+    UserFollowed,
+    UsersFollowing,
 )
 
 router = APIRouter()
@@ -101,7 +105,7 @@ async def get_user_followed_groups(user_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/follow_user", response_model=dict)
+@router.post("/follow_user", response_model=BaseIsFollowed)
 async def make_user_follow_group(
     user_id: str, current_user: UserModel = Depends(get_current_active_user),
 ):
@@ -112,28 +116,28 @@ async def make_user_follow_group(
         data = await master_collection.make_user_follow_user(
             user_id=user_id, user_map=user_map
         )
-        logging.info(data)
+        return data
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/user_followed", response_model=dict)
-async def get_user_follower(user_id: str):
+@router.get("/user_followed", response_model=UserFollowed)
+async def get_user_followed(current_user: UserModel = Depends(get_current_active_user)):
     try:
-        logging.info(user_id)
+        user_id = get_user_model(current_user, "id")
         master_collection = SocialUsersCollection()
-        data = await master_collection.get_user_follower(user_id=user_id)
-        logging.info(data)
+        return await master_collection.get_user_followed(user_id=user_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/follower", response_model=dict)
-async def get_user_follower(user_id: str):
+@router.get("/user_following", response_model=FollowerModel)
+async def get_user_following(
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
-        logging.info(user_id)
+        user_id = get_user_model(current_user, "id")
         master_collection = SocialUsersCollection()
-        data = await master_collection.get_user_follower(user_id=user_id)
-        logging.info(data)
+        return await master_collection.get_user_following(user_id=user_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

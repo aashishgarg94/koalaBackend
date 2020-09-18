@@ -19,6 +19,7 @@ from koala.models.social.users import (
     BaseFollowedIdRef,
     BaseFollowerModel,
     BaseIsFollowed,
+    FollowerModel,
 )
 
 
@@ -45,7 +46,7 @@ class SocialGroupsCollection:
             count = await self.collection.count(filter_condition)
             return count if count else 0
         except Exception as e:
-            logging.error(f"Error: Job count {e}")
+            logging.error(f"Error: Get Count {e}")
             raise e
 
     async def get_all_groups(
@@ -62,7 +63,7 @@ class SocialGroupsCollection:
             )
             return data if data else None
         except Exception as e:
-            logging.error(f"Error: Create group error {e}")
+            logging.error(f"Error: Get all groups {e}")
 
     async def get_group_by_id(self, group_id: str) -> any:
         group_id_obj = ObjectId(group_id)
@@ -73,7 +74,7 @@ class SocialGroupsCollection:
                 extended_class_model=SocialGroupCreateOut,
             )
         except Exception as e:
-            raise e
+            logging.error(f"Error: Get group by id {e}")
 
     async def followGroup(
         self, group_id: str, user_map=BaseFollowerModel
@@ -125,16 +126,19 @@ class SocialGroupsCollection:
                     else None
                 )
         except Exception as e:
-            raise e
+            logging.error(f"Error: Follow group {e}")
 
-    async def get_group_users(self, group_id: ObjectId) -> any:
+    async def get_group_users(self, group_id: str) -> FollowerModel:
         try:
-            pass
-        except Exception as e:
-            logging.error(f"Error: Create group error {e}")
+            data = await self.collection.find(
+                finder={"_id": ObjectId(group_id)},
+                projection={"followers": 1, "_id": 0},
+                return_doc_id=False,
+            )
 
-    async def get_group_user_by_id(self, user_id: str) -> any:
-        try:
-            logging.info(user_id)
+            return FollowerModel(
+                total_followers=data[0]["followers"]["total_followers"],
+                followers_list=data[0]["followers"]["followers_list"],
+            )
         except Exception as e:
-            logging.error(f"Error: Create group error {e}")
+            logging.error(f"Error: Get group users {e}")

@@ -37,7 +37,7 @@ class BaseFollowerModel(BaseModel):
     followed_on: datetime = None
 
 
-class FollowerModel(BaseModel):
+class FollowerModel(MongoModel):
     total_followers: int = 0
     followers_list: Optional[List[BaseFollowerModel]] = []
 
@@ -81,3 +81,12 @@ class BaseFollowedIdRef(BaseModel):
 class BaseIsFollowed(MongoModel):
     id: OID = Field()
     is_followed: bool
+
+
+class UserFollowed(MongoModel):
+    users_followed: Optional[List[OID]] = []
+
+
+class UsersFollowing(MongoModel):
+    total_groups: int = 0
+    users_following: Optional[List[OID]] = []

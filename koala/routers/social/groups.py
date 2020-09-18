@@ -95,11 +95,10 @@ async def get_group_users(group_id: str, user_id: str):
 
 
 # In progress
-@router.post("/inprogress/all_users", response_model=dict)
+@router.post("/all_users", response_model=FollowerModel)
 async def get_group_users(group_id: str):
     try:
         master_collection = SocialGroupsCollection()
-        data = await master_collection.get_group_users(group_id)
-        logging.info(data)
+        return await master_collection.get_group_users(group_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

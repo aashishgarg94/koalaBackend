@@ -13,6 +13,9 @@ from koala.models.social.users import (
     BaseIsFollowed,
     CreatePostModelIn,
     CreatePostModelOut,
+    FollowerModel,
+    UserFollowed,
+    UsersFollowing,
 )
 
 
@@ -54,7 +57,7 @@ class SocialUsersCollection:
             )
             return data if data else None
         except Exception as e:
-            logging.error(f"Error: Create social users error {e}")
+            logging.error(f"Error: Get user all posts {e}")
 
     async def get_user_post_by_id(self, post_id: str) -> any:
         try:
@@ -65,7 +68,7 @@ class SocialUsersCollection:
                 extended_class_model=CreatePostModelOut,
             )
         except Exception as e:
-            logging.error(f"Error: Create social users error {e}")
+            logging.error(f"Error: Get user post by id {e}")
 
     async def get_user_followed_groups(self, user_id: str) -> GroupsFollowed:
         try:
@@ -80,11 +83,11 @@ class SocialUsersCollection:
                 group_list=data[0]["groups_followed"],
             )
         except Exception as e:
-            logging.error(f"Error: Create social users error {e}")
+            logging.error(f"Error: Get user followed groups {e}")
 
     async def make_user_follow_user(
         self, user_id: str, user_map=BaseFollowerModel
-    ) -> any:
+    ) -> BaseIsFollowed:
         try:
             # Updating User collection for user followers
             user_map.followed_on = datetime.now()
@@ -135,10 +138,33 @@ class SocialUsersCollection:
 
         except Exception as e:
             logging.info(e)
-            logging.error(f"Error: Create social users error {e}")
+            logging.error(f"Error: Make user follow {e}")
 
-    async def get_user_follower(self, user_id: str) -> any:
+    async def get_user_followed(self, user_id: ObjectId) -> UserFollowed:
         try:
-            logging.info(user_id)
+            self.collection(USERS)
+            data = await self.collection.find(
+                finder={"_id": user_id},
+                projection={"users_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+
+            return UserFollowed(users_followed=data[0]["users_followed"],)
         except Exception as e:
-            logging.error(f"Error: Create social users error {e}")
+            logging.error(f"Error: Get user followed {e}")
+
+    async def get_user_following(self, user_id: str) -> FollowerModel:
+        try:
+            self.collection(USERS)
+            data = await self.collection.find(
+                finder={"_id": user_id},
+                projection={"users_following": 1, "_id": 0},
+                return_doc_id=False,
+            )
+
+            return FollowerModel(
+                total_followers=data[0]["users_following"]["total_followers"],
+                followers_list=data[0]["users_following"]["followers_list"],
+            )
+        except Exception as e:
+            logging.error(f"Error: Get user following {e}")
