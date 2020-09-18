@@ -21,7 +21,7 @@ class BaseCommentsModel(BaseModel):
 
 class BasePostOwnerModel(BaseModel):
     name: BaseFullNameModel
-    email: str
+    email: Optional[EmailStr]
     user_id: OID = Field()
 
 
@@ -31,13 +31,14 @@ class BaseShareModel(BaseModel):
 
 
 class BaseFollowerModel(BaseModel):
-    name: Optional[str]
-    email: Optional[str]
+    name: BaseFullNameModel
+    email: Optional[EmailStr]
+    user_id: OID = Field()
 
 
 class FollowerModel(BaseModel):
-    followersCount: int = 0
-    followers: Optional[List[BaseFollowerModel]]
+    total_followers: int = 0
+    followers_list: Optional[List[BaseFollowerModel]] = []
 
 
 class BaseCreatePostModel(MongoModel):
@@ -49,7 +50,6 @@ class BaseCreatePostModel(MongoModel):
 class BaseFullDetailPostModel(BaseCreatePostModel):
     owner: BasePostOwnerModel
     like: int = 0
-    membership_type: Optional[str] = NORMAL
     comments: Optional[List[BaseCommentsModel]] = []
     shares: Optional[BaseShareModel]
     followers: Optional[FollowerModel]

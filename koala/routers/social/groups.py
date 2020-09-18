@@ -1,28 +1,43 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.social.groups import SocialGroupsCollection
 from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.user import UserModel
 from koala.models.social.groups import (
+    BasePostListModel,
     BaseSocialGroup,
+    BaseSocialPostModel,
     GroupsWithPaginationModel,
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
+from koala.models.social.users import FollowerModel
+from koala.routers.social.users import get_user_model
 
 router = APIRouter()
 
 
 @router.post("/create", response_model=BaseIsCreated)
-async def create_group(group_details: BaseSocialGroup):
+async def create_group(
+    group_details: BaseSocialGroup,
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
-        master_collection = SocialGroupsCollection()
-        group_details = SocialGroupCreateIn(**group_details.dict())
+        user_map = get_user_model(current_user, "owner")
+        posts = BaseSocialPostModel()
+        followers = FollowerModel()
+        group_details = SocialGroupCreateIn(
+            **group_details.dict(), posts=posts, owner=user_map, followers=followers
+        )
 
+        master_collection = SocialGroupsCollection()
         return await master_collection.create_group(group_details=group_details)
-    except Exception:
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -51,6 +66,23 @@ async def get_group_by_id(group_id: str):
         master_collection = SocialGroupsCollection()
         return await master_collection.get_group_by_id(group_id=group_id)
     except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/follow_group", response_model=dict)
+async def make_user_follow_group(
+    group_id: str, current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        # logging.info(user_details)
+        user_map = get_user_model(current_user, "follower")
+        # group_details = SocialGroupCreateIn(**group_details.dict(), owner=user_map)
+
+        master_collection = SocialGroupsCollection()
+        data = await master_collection.followGroup(group_id=group_id, owner=user_map)
+        logging.info(data)
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 

@@ -4,13 +4,17 @@ from typing import List, Optional
 
 from bson import ObjectId
 from koala.config.collections import SOCIAL_GROUPS
+from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.social.groups import (
+    BaseFullDetailGroupModel,
+    BasePostListModel,
     BaseSocialGroup,
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
+from koala.models.social.users import BasePostOwnerModel
 
 
 class SocialGroupsCollection:
@@ -63,6 +67,42 @@ class SocialGroupsCollection:
                 return_doc_id=True,
                 extended_class_model=SocialGroupCreateOut,
             )
+        except Exception as e:
+            raise e
+
+    async def followGroup(self, group_id: str, owner=BasePostOwnerModel) -> any:
+        try:
+            group_id_obj = ObjectId(group_id)
+
+            finder = {"_id": group_id_obj}
+            # updater = {"$set": {"posts.owner": owner.dict()}}
+            updater = {
+                "$inc": {"posts.total_posts": 1},
+                "$push": {
+                    "posts.posts_list": {
+                        "$each": [BasePostListModel(owner=owner,).dict()],
+                        "$sort": {"applied_on": -1},
+                        "$slice": EMBEDDED_COLLECTION_LIMIT,
+                    }
+                },
+            }
+
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=SocialGroupCreateOut,
+            )
+
+            logging.info(result)
+            return result
+
+            # return await self.collection.find_one(
+            #     {"_id": group_id_obj},
+            #     return_doc_id=True,
+            #     extended_class_model=SocialGroupCreateOut,
+            # )
         except Exception as e:
             raise e
 
