@@ -65,6 +65,8 @@ class UserInModel(UserModel):
     is_disabled: Optional[bool] = False
     is_updated: Optional[bool] = False
     is_deleted: Optional[bool] = False
+    groups_followed: Optional[List[OID]] = []
+    users_followed: Optional[List[OID]] = []
     created_on: Optional[datetime]
     updated_on: Optional[datetime]
     disabled_on: Optional[datetime]

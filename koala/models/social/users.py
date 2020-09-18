@@ -74,6 +74,10 @@ class CreatePostModelPaginationModel(MongoModel):
     posts: List[CreatePostModelOut]
 
 
+class BaseFollowedIdRef(BaseModel):
+    id: OID = Field()
+
+
 class BaseIsFollowed(MongoModel):
     id: OID = Field()
     is_followed: bool

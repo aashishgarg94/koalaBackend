@@ -3,10 +3,11 @@ from datetime import datetime
 from typing import List, Optional
 
 from bson import ObjectId
-from koala.config.collections import SOCIAL_GROUPS
+from koala.config.collections import SOCIAL_GROUPS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import (
     BaseFullDetailGroupModel,
     BasePostListModel,
@@ -14,7 +15,11 @@ from koala.models.social.groups import (
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import BasePostOwnerModel, BaseFollowerModel, BaseIsFollowed
+from koala.models.social.users import (
+    BaseFollowedIdRef,
+    BaseFollowerModel,
+    BaseIsFollowed,
+)
 
 
 class SocialGroupsCollection:
@@ -70,11 +75,15 @@ class SocialGroupsCollection:
         except Exception as e:
             raise e
 
-    async def followGroup(self, group_id: str, user_map=BaseFollowerModel) -> any:
+    async def followGroup(
+        self, group_id: str, user_map=BaseFollowerModel
+    ) -> BaseIsFollowed:
         try:
+            # Updating Social group collection
             user_map.followed_on = datetime.now()
+            group_id_obj = ObjectId(group_id)
 
-            finder = {"_id": ObjectId(group_id)}
+            finder = {"_id": group_id_obj}
             updater = {
                 "$inc": {"followers.total_followers": 1},
                 "$push": {
@@ -86,7 +95,7 @@ class SocialGroupsCollection:
                 },
             }
 
-            result = await self.collection.find_one_and_modify(
+            group_result = await self.collection.find_one_and_modify(
                 find=finder,
                 update=updater,
                 return_updated_document=True,
@@ -94,7 +103,27 @@ class SocialGroupsCollection:
                 extended_class_model=SocialGroupCreateOut,
             )
 
-            return BaseIsFollowed(id=result.id, is_followed=True) if result else None
+            # Updating User collection
+            if group_result.id:
+                finder = {"_id": user_map.user_id}
+                updater = {
+                    "$push": {"groups_followed": {"$each": [group_id_obj],}},
+                }
+
+                self.collection(USERS)
+                user_result = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_updated_document=True,
+                    return_doc_id=True,
+                    extended_class_model=UserUpdateOutModel,
+                )
+
+                return (
+                    BaseIsFollowed(id=group_id, is_followed=True)
+                    if group_result and user_result
+                    else None
+                )
         except Exception as e:
             raise e
 

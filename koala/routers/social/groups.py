@@ -15,7 +15,7 @@ from koala.models.social.groups import (
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import FollowerModel, BaseIsFollowed
+from koala.models.social.users import BaseIsFollowed, FollowerModel
 from koala.routers.social.users import get_user_model
 
 router = APIRouter()
