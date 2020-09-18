@@ -9,18 +9,11 @@ from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import (
-    BaseFullDetailGroupModel,
-    BasePostListModel,
     BaseSocialGroup,
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import (
-    BaseFollowedIdRef,
-    BaseFollowerModel,
-    BaseIsFollowed,
-    FollowerModel,
-)
+from koala.models.social.users import BaseFollowerModel, BaseIsFollowed, FollowerModel
 
 
 class SocialGroupsCollection:

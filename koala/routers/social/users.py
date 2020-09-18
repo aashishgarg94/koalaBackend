@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -41,55 +40,60 @@ def get_user_model(current_user: UserModel, get_type: str):
             data = BaseFollowerModel(name=user_name, email=user_email, user_id=user_id)
             return data
     except Exception as e:
-        logging.error(e)
         raise e
 
 
 @router.post("/create_post", response_model=BaseIsCreated)
 async def create_post(
     post_details: BaseCreatePostModel,
+    is_group_post: bool,
+    group_id: Optional[str] = None,
     current_user: UserModel = Depends(get_current_active_user),
 ):
+    if is_group_post is True and group_id is None:
+        raise HTTPException(
+            status_code=400, detail="group_id is required with group post True"
+        )
     try:
-        master_collection = SocialUsersCollection()
+        social_users_collection = SocialUsersCollection()
 
         user_map = get_user_model(current_user, "owner")
         post_details = CreatePostModelIn(**post_details.dict(), owner=user_map)
 
-        return await master_collection.create_post(post_details=post_details)
-    except Exception as e:
-        logging.error(e)
+        return await social_users_collection.create_post(
+            post_details=post_details, is_group_post=is_group_post, group_id=group_id
+        )
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
 @router.post("/all_posts", response_model=CreatePostModelPaginationModel)
 async def get_user_all_posts(page_no: Optional[int] = 1):
     try:
-        master_collection = SocialUsersCollection()
+        social_users_collection = SocialUsersCollection()
 
-        user_count = await master_collection.get_count()
+        user_count = await social_users_collection.get_count()
 
         user_list = []
         if user_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            user_list = await master_collection.get_user_all_posts(
+            user_list = await social_users_collection.get_user_all_posts(
                 skip=skip, limit=REQUEST_LIMIT
             )
 
         return CreatePostModelPaginationModel(
             total_posts=user_count, current_page=page_no, posts=user_list
         )
-    except Exception as e:
-        logging.info(e)
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
 @router.post("/post_by_id", response_model=CreatePostModelOut)
 async def get_user_post_by_id(post_id: str):
     try:
-        master_collection = SocialUsersCollection()
-        return await master_collection.get_user_post_by_id(post_id=post_id)
+        social_users_collection = SocialUsersCollection()
+        return await social_users_collection.get_user_post_by_id(post_id=post_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -97,11 +101,9 @@ async def get_user_post_by_id(post_id: str):
 @router.post("/followed_groups", response_model=GroupsFollowed)
 async def get_user_followed_groups(user_id: str):
     try:
-        logging.info(user_id)
-        master_collection = SocialUsersCollection()
-        return await master_collection.get_user_followed_groups(user_id=user_id)
-    except Exception as e:
-        logging.info(e)
+        social_users_collection = SocialUsersCollection()
+        return await social_users_collection.get_user_followed_groups(user_id=user_id)
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -112,8 +114,8 @@ async def make_user_follow_group(
     try:
         user_map = get_user_model(current_user, "follower")
 
-        master_collection = SocialUsersCollection()
-        data = await master_collection.make_user_follow_user(
+        social_users_collection = SocialUsersCollection()
+        data = await social_users_collection.make_user_follow_user(
             user_id=user_id, user_map=user_map
         )
         return data
@@ -125,8 +127,8 @@ async def make_user_follow_group(
 async def get_user_followed(current_user: UserModel = Depends(get_current_active_user)):
     try:
         user_id = get_user_model(current_user, "id")
-        master_collection = SocialUsersCollection()
-        return await master_collection.get_user_followed(user_id=user_id)
+        social_users_collection = SocialUsersCollection()
+        return await social_users_collection.get_user_followed(user_id=user_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -137,7 +139,7 @@ async def get_user_following(
 ):
     try:
         user_id = get_user_model(current_user, "id")
-        master_collection = SocialUsersCollection()
-        return await master_collection.get_user_following(user_id=user_id)
+        social_users_collection = SocialUsersCollection()
+        return await social_users_collection.get_user_following(user_id=user_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

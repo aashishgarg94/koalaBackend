@@ -1,4 +1,3 @@
-import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,7 +7,6 @@ from koala.crud.social.groups import SocialGroupsCollection
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserModel
 from koala.models.social.groups import (
-    BasePostListModel,
     BaseSocialGroup,
     BaseSocialPostModel,
     GroupsWithPaginationModel,
@@ -34,24 +32,25 @@ async def create_group(
             **group_details.dict(), posts=posts, owner=user_map, followers=followers
         )
 
-        master_collection = SocialGroupsCollection()
-        return await master_collection.create_group(group_details=group_details)
-    except Exception as e:
-        logging.info(e)
+        social_groups_collection = SocialGroupsCollection()
+        return await social_groups_collection.create_group(group_details=group_details)
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
 @router.get("/get_all", response_model=GroupsWithPaginationModel)
 async def get_all_groups(page_no: Optional[int] = 1):
     try:
-        master_collection = SocialGroupsCollection()
-        groups_count = await master_collection.get_count()
+        social_groups_collection = SocialGroupsCollection()
+        groups_count = await social_groups_collection.get_count()
 
         group_list = []
         if groups_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            group_list = await master_collection.get_all_groups(skip, REQUEST_LIMIT)
+            group_list = await social_groups_collection.get_all_groups(
+                skip, REQUEST_LIMIT
+            )
 
         return GroupsWithPaginationModel(
             total_groups=groups_count, current_page=page_no, groups=group_list
@@ -63,8 +62,8 @@ async def get_all_groups(page_no: Optional[int] = 1):
 @router.post("/group_by_id", response_model=SocialGroupCreateOut)
 async def get_group_by_id(group_id: str):
     try:
-        master_collection = SocialGroupsCollection()
-        return await master_collection.get_group_by_id(group_id=group_id)
+        social_groups_collection = SocialGroupsCollection()
+        return await social_groups_collection.get_group_by_id(group_id=group_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -76,29 +75,18 @@ async def make_user_follow_group(
     try:
         user_map = get_user_model(current_user, "follower")
 
-        master_collection = SocialGroupsCollection()
-        return await master_collection.followGroup(group_id=group_id, user_map=user_map)
-    except Exception as e:
-        logging.info(e)
-        raise HTTPException(status_code=500, detail="Something went wrong")
-
-
-# In progress
-@router.post("/inprogress/create_post", response_model=dict)
-async def get_group_users(group_id: str, user_id: str):
-    try:
-        master_collection = SocialGroupsCollection()
-        data = await master_collection.get_group_users(group_id)
-        logging.info(data)
+        social_groups_collection = SocialGroupsCollection()
+        return await social_groups_collection.followGroup(
+            group_id=group_id, user_map=user_map
+        )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-# In progress
 @router.post("/all_users", response_model=FollowerModel)
 async def get_group_users(group_id: str):
     try:
-        master_collection = SocialGroupsCollection()
-        return await master_collection.get_group_users(group_id)
+        social_groups_collection = SocialGroupsCollection()
+        return await social_groups_collection.get_group_users(group_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

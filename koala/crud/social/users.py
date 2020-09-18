@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
-from koala.config.collections import SOCIAL_POSTS, USERS
+from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
@@ -15,7 +15,6 @@ from koala.models.social.users import (
     CreatePostModelOut,
     FollowerModel,
     UserFollowed,
-    UsersFollowing,
 )
 
 
@@ -24,15 +23,47 @@ class SocialUsersCollection:
         self.collection = MongoBase()
         self.collection(SOCIAL_POSTS)
 
-    async def create_post(self, post_details: CreatePostModelIn) -> any:
+    async def create_post(
+        self, post_details: CreatePostModelIn, is_group_post: bool, group_id: str
+    ) -> any:
         try:
             post_details.created_on = datetime.now()
-            result = await self.collection.insert_one(
+            if is_group_post is True:
+                post_details.is_group_post = True
+                post_details.group_id = ObjectId(group_id)
+            insert_id = await self.collection.insert_one(
                 post_details.dict(),
                 return_doc_id=True,
                 extended_class_model=BaseIsCreated,
             )
-            return BaseIsCreated(id=result, is_created=True) if result else None
+
+            # Update group post list with post is group post
+            if is_group_post is True:
+                finder = {"_id": ObjectId(group_id)}
+                updater = {
+                    "$inc": {"posts.total_posts": 1},
+                    "$push": {
+                        "posts.posts_list": {
+                            "$each": [insert_id],
+                            "$sort": {"applied_on": -1},
+                            "$slice": EMBEDDED_COLLECTION_LIMIT,
+                        }
+                    },
+                }
+
+                self.collection(SOCIAL_GROUPS)
+                group_result = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_updated_document=True,
+                    return_doc_id=False,
+                )
+
+                return (
+                    BaseIsCreated(id=insert_id, is_created=True)
+                    if insert_id and group_result
+                    else None
+                )
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
@@ -137,7 +168,6 @@ class SocialUsersCollection:
                 )
 
         except Exception as e:
-            logging.info(e)
             logging.error(f"Error: Make user follow {e}")
 
     async def get_user_followed(self, user_id: ObjectId) -> UserFollowed:

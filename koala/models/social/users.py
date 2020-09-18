@@ -49,6 +49,8 @@ class BaseCreatePostModel(MongoModel):
 
 
 class BaseFullDetailPostModel(BaseCreatePostModel):
+    is_group_post: bool = False
+    group_id: Optional[OID]
     owner: BasePostOwnerModel
     like: int = 0
     comments: Optional[List[BaseCommentsModel]] = []
