@@ -5,6 +5,7 @@ from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.models.jobs_models.jobs import CompanyInPasswordModel, CompanyModelPassword
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserInModel, UserRegisterModel
+from koala.models.social.users import FollowerModel
 
 router = APIRouter()
 
@@ -26,7 +27,10 @@ async def register(user: UserRegisterModel):
         )
 
     hashed_password = get_password_hash(user.password.get_secret_value())
-    db_user = UserInModel(**user.dict(), hashed_password=hashed_password)
+    users_following = FollowerModel()
+    db_user = UserInModel(
+        **user.dict(), hashed_password=hashed_password, users_following=users_following
+    )
     result = await user_db.create_user(db_user)
     if result is False:
         raise HTTPException(status_code=400, detail="Not able to process")

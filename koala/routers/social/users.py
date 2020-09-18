@@ -103,15 +103,15 @@ async def get_user_followed_groups(user_id: str):
 
 @router.post("/follow_user", response_model=dict)
 async def make_user_follow_group(
-    group_id: str, current_user: UserModel = Depends(get_current_active_user),
+    user_id: str, current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
-        # logging.info(user_details)
-        # user_map = get_user_model(current_user, "follower")
-        # post_details = CreatePostModelIn(**user_details.dict(), owner=user_map)
+        user_map = get_user_model(current_user, "follower")
 
         master_collection = SocialUsersCollection()
-        data = await master_collection.make_user_follow_group(user_details=user_details)
+        data = await master_collection.make_user_follow_user(
+            user_id=user_id, user_map=user_map
+        )
         logging.info(data)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

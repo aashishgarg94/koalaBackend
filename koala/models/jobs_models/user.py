@@ -5,6 +5,7 @@ from koala.core.mongo_model import OID, MongoModel
 from koala.models.jobs_models.master import BaseKeyValueModel, BaseRangeModel
 from pydantic import BaseModel, EmailStr, Field, SecretStr
 
+from ..social.users import FollowerModel
 from .job_user import UserJobsRelationModel
 
 
@@ -66,7 +67,8 @@ class UserInModel(UserModel):
     is_updated: Optional[bool] = False
     is_deleted: Optional[bool] = False
     groups_followed: Optional[List[OID]] = []
-    users_followed: Optional[List[OID]] = []
+    users_followed: Optional[List[OID]] = []  # Users followed by this user
+    users_following: Optional[FollowerModel]  # Users following this user
     created_on: Optional[datetime]
     updated_on: Optional[datetime]
     disabled_on: Optional[datetime]

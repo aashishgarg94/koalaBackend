@@ -3,10 +3,17 @@ from datetime import datetime
 
 from bson import ObjectId
 from koala.config.collections import SOCIAL_POSTS, USERS
+from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed
-from koala.models.social.users import CreatePostModelIn, CreatePostModelOut
+from koala.models.social.users import (
+    BaseFollowerModel,
+    BaseIsFollowed,
+    CreatePostModelIn,
+    CreatePostModelOut,
+)
 
 
 class SocialUsersCollection:
@@ -75,10 +82,59 @@ class SocialUsersCollection:
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
-    async def make_user_follow_group(self, user_details: dict) -> any:
+    async def make_user_follow_user(
+        self, user_id: str, user_map=BaseFollowerModel
+    ) -> any:
         try:
-            logging.info(user_details)
+            # Updating User collection for user followers
+            user_map.followed_on = datetime.now()
+            user_id_obj = ObjectId(user_id)
+
+            finder = {"_id": user_id_obj}
+            updater = {
+                "$inc": {"users_following.total_followers": 1},
+                "$push": {
+                    "users_following.followers_list": {
+                        "$each": [user_map.dict()],
+                        "$sort": {"applied_on": -1},
+                        "$slice": EMBEDDED_COLLECTION_LIMIT,
+                    }
+                },
+            }
+
+            self.collection(USERS)
+            user_following = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=UserUpdateOutModel,
+            )
+
+            # Updating User collection to follower
+            if user_following.id:
+                finder = {"_id": user_map.user_id}
+                updater = {
+                    "$push": {"users_followed": {"$each": [user_id_obj],}},
+                }
+
+                self.collection(USERS)
+                user_follower = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_updated_document=True,
+                    return_doc_id=True,
+                    extended_class_model=UserUpdateOutModel,
+                )
+
+                return (
+                    BaseIsFollowed(id=user_id, is_followed=True)
+                    if user_following and user_follower
+                    else None
+                )
+
         except Exception as e:
+            logging.info(e)
             logging.error(f"Error: Create social users error {e}")
 
     async def get_user_follower(self, user_id: str) -> any:
