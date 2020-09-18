@@ -34,6 +34,7 @@ class BaseFollowerModel(BaseModel):
     name: BaseFullNameModel
     email: Optional[EmailStr]
     user_id: OID = Field()
+    followed_on: datetime = None
 
 
 class FollowerModel(BaseModel):
@@ -71,3 +72,8 @@ class CreatePostModelPaginationModel(MongoModel):
     current_page: int
     total_posts: int
     posts: List[CreatePostModelOut]
+
+
+class BaseIsFollowed(MongoModel):
+    id: OID = Field()
+    is_followed: bool

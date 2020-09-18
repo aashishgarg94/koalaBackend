@@ -15,7 +15,7 @@ from koala.models.social.groups import (
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import FollowerModel
+from koala.models.social.users import FollowerModel, BaseIsFollowed
 from koala.routers.social.users import get_user_model
 
 router = APIRouter()
@@ -69,18 +69,15 @@ async def get_group_by_id(group_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/follow_group", response_model=dict)
+@router.post("/follow_group", response_model=BaseIsFollowed)
 async def make_user_follow_group(
     group_id: str, current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
-        # logging.info(user_details)
         user_map = get_user_model(current_user, "follower")
-        # group_details = SocialGroupCreateIn(**group_details.dict(), owner=user_map)
 
         master_collection = SocialGroupsCollection()
-        data = await master_collection.followGroup(group_id=group_id, owner=user_map)
-        logging.info(data)
+        return await master_collection.followGroup(group_id=group_id, user_map=user_map)
     except Exception as e:
         logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")

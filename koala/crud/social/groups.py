@@ -14,7 +14,7 @@ from koala.models.social.groups import (
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import BasePostOwnerModel
+from koala.models.social.users import BasePostOwnerModel, BaseFollowerModel, BaseIsFollowed
 
 
 class SocialGroupsCollection:
@@ -70,17 +70,16 @@ class SocialGroupsCollection:
         except Exception as e:
             raise e
 
-    async def followGroup(self, group_id: str, owner=BasePostOwnerModel) -> any:
+    async def followGroup(self, group_id: str, user_map=BaseFollowerModel) -> any:
         try:
-            group_id_obj = ObjectId(group_id)
+            user_map.followed_on = datetime.now()
 
-            finder = {"_id": group_id_obj}
-            # updater = {"$set": {"posts.owner": owner.dict()}}
+            finder = {"_id": ObjectId(group_id)}
             updater = {
-                "$inc": {"posts.total_posts": 1},
+                "$inc": {"followers.total_followers": 1},
                 "$push": {
-                    "posts.posts_list": {
-                        "$each": [BasePostListModel(owner=owner,).dict()],
+                    "followers.followers_list": {
+                        "$each": [user_map.dict()],
                         "$sort": {"applied_on": -1},
                         "$slice": EMBEDDED_COLLECTION_LIMIT,
                     }
@@ -95,14 +94,7 @@ class SocialGroupsCollection:
                 extended_class_model=SocialGroupCreateOut,
             )
 
-            logging.info(result)
-            return result
-
-            # return await self.collection.find_one(
-            #     {"_id": group_id_obj},
-            #     return_doc_id=True,
-            #     extended_class_model=SocialGroupCreateOut,
-            # )
+            return BaseIsFollowed(id=result.id, is_followed=True) if result else None
         except Exception as e:
             raise e
 
