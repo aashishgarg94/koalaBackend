@@ -5,16 +5,19 @@ from bson import ObjectId
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import (
+    BaseCommentsModel,
     BaseFollowerModel,
     BaseIsFollowed,
+    BaseShareModel,
     CreatePostModelIn,
     CreatePostModelOut,
     CreatePostModelOutList,
     FollowerModel,
+    ShareModel,
     UserFollowed,
 )
 
@@ -25,13 +28,20 @@ class SocialPostsCollection:
         self.collection(SOCIAL_POSTS)
 
     async def create_post(
-        self, post_details: CreatePostModelIn, is_group_post: bool, group_id: str
+        self,
+        post_details: CreatePostModelIn,
+        is_group_post: bool,
+        group_id: str,
+        shares: BaseShareModel,
     ) -> any:
         try:
             post_details.created_on = datetime.now()
             if is_group_post is True:
                 post_details.is_group_post = True
                 post_details.group_id = ObjectId(group_id)
+
+            post_details.shares = shares
+
             insert_id = await self.collection.insert_one(
                 post_details.dict(),
                 return_doc_id=True,
@@ -65,6 +75,7 @@ class SocialPostsCollection:
                     if insert_id and group_result
                     else None
                 )
+            return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
 
@@ -227,5 +238,38 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
             return CreatePostModelOutList(post_list=social_data)
+        except Exception as e:
+            logging.error(f"Error: Get user followed {e}")
+
+    async def post_action(
+        self,
+        post_id: str,
+        comments: BaseCommentsModel = None,
+        like: int = None,
+        share: str = None,
+    ) -> BaseIsUpdated:
+        try:
+            finder = {"_id": ObjectId(post_id)}
+            updater = {}
+            if like is True:
+                updater = {"$inc": {"like": 1}}
+            elif share is ShareModel.whatsapp:
+                updater = {"$inc": {"shares.whatsapp": 1}}
+            elif share is ShareModel.in_app:
+                updater = {"$inc": {"shares.in_app_share": 1}}
+            elif comments.comments.comment is not None:
+                updater = {
+                    "$push": {"comments": {"$each": [comments.dict()]}},
+                }
+
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+                insert_if_not_found=True,
+                return_updated_document=True,
+            )
+            return BaseIsUpdated(id=result.id, is_updated=True)
         except Exception as e:
             logging.error(f"Error: Get user followed {e}")

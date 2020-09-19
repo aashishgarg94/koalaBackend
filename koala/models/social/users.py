@@ -13,10 +13,14 @@ class AllowedActionModel(str, Enum):
     normal = NORMAL
 
 
-class BaseCommentsModel(BaseModel):
-    name: Optional[str]
-    email: Optional[EmailStr]
+class CommentInModel(BaseModel):
     comment: Optional[str]
+
+
+class BaseCommentsModel(BaseModel):
+    name: BaseFullNameModel
+    email: Optional[EmailStr]
+    comments: Optional[CommentInModel]
 
 
 class BasePostOwnerModel(BaseModel):
@@ -96,3 +100,8 @@ class UserFollowed(MongoModel):
 class UsersFollowing(MongoModel):
     total_groups: int = 0
     users_following: Optional[List[OID]] = []
+
+
+class ShareModel(str, Enum):
+    whatsapp = "Whatsapp"
+    in_app = "In App"

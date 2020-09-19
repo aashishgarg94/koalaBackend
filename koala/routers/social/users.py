@@ -6,21 +6,23 @@ from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import (
+    BaseCommentsModel,
     BaseCreatePostModel,
     BaseFollowerModel,
     BaseIsFollowed,
     BasePostOwnerModel,
+    BaseShareModel,
+    CommentInModel,
     CreatePostModelIn,
     CreatePostModelOut,
     CreatePostModelOutList,
     CreatePostModelPaginationModel,
     FollowerModel,
-    UserFollowed,
-    UsersFollowing,
+    ShareModel,
 )
 
 router = APIRouter()
@@ -63,8 +65,12 @@ async def create_post(
         user_map = get_user_model(current_user, "owner")
         post_details = CreatePostModelIn(**post_details.dict(), owner=user_map)
 
+        shares = BaseShareModel(whatsapp=0, in_app_share=0)
         return await social_posts_collection.create_post(
-            post_details=post_details, is_group_post=is_group_post, group_id=group_id
+            post_details=post_details,
+            is_group_post=is_group_post,
+            group_id=group_id,
+            shares=shares,
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
@@ -177,5 +183,43 @@ async def get_user_following(page_no: Optional[int] = 1):
             )
         else:
             return CreatePostModelOutList(post_list=[])
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/action/like", response_model=BaseIsUpdated)
+async def get_user_following(post_id: str, like: bool = False):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.post_action(post_id=post_id, like=like)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/action/share", response_model=BaseIsUpdated)
+async def get_user_following(
+    post_id: str, share: ShareModel = ShareModel.whatsapp,
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.post_action(post_id=post_id, share=share)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/action/comment", response_model=BaseIsUpdated)
+async def get_user_following(
+    post_id: str,
+    comments: CommentInModel,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        comments = BaseCommentsModel(
+            name=current_user.full_name, email=current_user.email, comments=comments
+        )
+        return await social_posts_collection.post_action(
+            post_id=post_id, comments=comments,
+        )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
