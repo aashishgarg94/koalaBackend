@@ -120,3 +120,14 @@ class MongoDBUserDatabase:
             raise HTTPException(status_code=200, detail="Bio not available")
         except Exception as e:
             raise e
+
+    async def get_follower_count(self, user_id: ObjectId) -> int:
+        try:
+            result = await self.collection.find(
+                finder={"_id": user_id},
+                projection={"users_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+            return len(result[0]["users_followed"])
+        except Exception as e:
+            raise e

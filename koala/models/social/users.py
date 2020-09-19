@@ -70,6 +70,10 @@ class CreatePostModelOut(BaseFullDetailPostModel):
     id: OID = Field()
 
 
+class CreatePostModelOutList(MongoModel):
+    post_list: Optional[List[CreatePostModelOut]]
+
+
 class CreatePostModelPaginationModel(MongoModel):
     current_page: int
     total_posts: int

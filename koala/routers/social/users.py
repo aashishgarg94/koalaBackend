@@ -1,11 +1,13 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialUsersCollection
 from koala.models.jobs_models.master import BaseIsCreated
-from koala.models.jobs_models.user import UserModel
+from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed
 from koala.models.social.users import (
     BaseCreatePostModel,
@@ -14,6 +16,7 @@ from koala.models.social.users import (
     BasePostOwnerModel,
     CreatePostModelIn,
     CreatePostModelOut,
+    CreatePostModelOutList,
     CreatePostModelPaginationModel,
     FollowerModel,
     UserFollowed,
@@ -123,13 +126,29 @@ async def make_user_follow_group(
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/user_followed", response_model=UserFollowed)
-async def get_user_followed(current_user: UserModel = Depends(get_current_active_user)):
+@router.post("/user_followed", response_model=CreatePostModelOutList)
+async def get_user_followed(
+    page_no: Optional[int] = 1,
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
         user_id = get_user_model(current_user, "id")
-        social_users_collection = SocialUsersCollection()
-        return await social_users_collection.get_user_followed(user_id=user_id)
-    except Exception:
+        user_db = MongoDBUserDatabase(UserInModel)
+        user_count = await user_db.get_follower_count(user_id)
+        logging.info(user_count)
+
+        if user_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+
+            social_users_collection = SocialUsersCollection()
+            return await social_users_collection.get_user_followed(
+                user_id=user_id, skip=skip, limit=REQUEST_LIMIT
+            )
+        else:
+            return CreatePostModelOutList(post_list=[])
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 

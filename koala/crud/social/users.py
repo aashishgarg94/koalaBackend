@@ -13,6 +13,7 @@ from koala.models.social.users import (
     BaseIsFollowed,
     CreatePostModelIn,
     CreatePostModelOut,
+    CreatePostModelOutList,
     FollowerModel,
     UserFollowed,
 )
@@ -170,16 +171,18 @@ class SocialUsersCollection:
         except Exception as e:
             logging.error(f"Error: Make user follow {e}")
 
-    async def get_user_followed(self, user_id: ObjectId) -> UserFollowed:
+    async def get_user_followed(
+        self, user_id: ObjectId, skip: int, limit: int
+    ) -> CreatePostModelOutList:
         try:
-            self.collection(USERS)
-            data = await self.collection.find(
-                finder={"_id": user_id},
-                projection={"users_followed": 1, "_id": 0},
-                return_doc_id=False,
+            social_data = await self.collection.find(
+                finder={"owner.user_id": user_id},
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
             )
-
-            return UserFollowed(users_followed=data[0]["users_followed"],)
+            return CreatePostModelOutList(post_list=social_data)
         except Exception as e:
             logging.error(f"Error: Get user followed {e}")
 
