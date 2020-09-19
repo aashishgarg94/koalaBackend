@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.social.groups import SocialGroupsCollection
+from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserModel
 from koala.models.social.groups import (
@@ -13,7 +14,11 @@ from koala.models.social.groups import (
     SocialGroupCreateIn,
     SocialGroupCreateOut,
 )
-from koala.models.social.users import BaseIsFollowed, FollowerModel
+from koala.models.social.users import (
+    BaseIsFollowed,
+    CreatePostModelOutList,
+    FollowerModel,
+)
 from koala.routers.social.users import get_user_model
 
 router = APIRouter()
@@ -88,5 +93,23 @@ async def get_group_users(group_id: str):
     try:
         social_groups_collection = SocialGroupsCollection()
         return await social_groups_collection.get_group_users(group_id)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/posts", response_model=CreatePostModelOutList)
+async def get_user_following(group_id: str, page_no: Optional[int] = 1):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        post_count = await social_posts_collection.get_feed_count(is_group_post=True)
+
+        if post_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+            return await social_posts_collection.get_user_feed(
+                group_id=group_id, skip=skip, limit=REQUEST_LIMIT
+            )
+        else:
+            return CreatePostModelOutList(post_list=[])
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

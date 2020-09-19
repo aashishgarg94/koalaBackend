@@ -19,7 +19,7 @@ from koala.models.social.users import (
 )
 
 
-class SocialUsersCollection:
+class SocialPostsCollection:
     def __init__(self):
         self.collection = MongoBase()
         self.collection(SOCIAL_POSTS)
@@ -201,3 +201,31 @@ class SocialUsersCollection:
             )
         except Exception as e:
             logging.error(f"Error: Get user following {e}")
+
+    async def get_feed_count(self, is_group_post: bool = False) -> int:
+        try:
+            filter_condition = {"is_deleted": False, "is_group_post": is_group_post}
+            count = await self.collection.count(filter_condition)
+            return count if count else 0
+        except Exception as e:
+            logging.error(f"Error: Feed count {e}")
+            raise e
+
+    async def get_user_feed(
+        self, skip: int, limit: int, group_id: str = None
+    ) -> CreatePostModelOutList:
+        try:
+            finder = {
+                "$query": {"group_id": ObjectId(group_id), "is_deleted": False},
+                "$orderby": {"created_on": -1},
+            }
+            social_data = await self.collection.find(
+                finder=finder,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+            return CreatePostModelOutList(post_list=social_data)
+        except Exception as e:
+            logging.error(f"Error: Get user followed {e}")

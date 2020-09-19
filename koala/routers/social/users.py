@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
-from koala.crud.social.users import SocialUsersCollection
+from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed
@@ -58,12 +58,12 @@ async def create_post(
             status_code=400, detail="group_id is required with group post True"
         )
     try:
-        social_users_collection = SocialUsersCollection()
+        social_posts_collection = SocialPostsCollection()
 
         user_map = get_user_model(current_user, "owner")
         post_details = CreatePostModelIn(**post_details.dict(), owner=user_map)
 
-        return await social_users_collection.create_post(
+        return await social_posts_collection.create_post(
             post_details=post_details, is_group_post=is_group_post, group_id=group_id
         )
     except Exception:
@@ -73,15 +73,15 @@ async def create_post(
 @router.post("/all_posts", response_model=CreatePostModelPaginationModel)
 async def get_user_all_posts(page_no: Optional[int] = 1):
     try:
-        social_users_collection = SocialUsersCollection()
+        social_posts_collection = SocialPostsCollection()
 
-        user_count = await social_users_collection.get_count()
+        user_count = await social_posts_collection.get_count()
 
         user_list = []
         if user_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            user_list = await social_users_collection.get_user_all_posts(
+            user_list = await social_posts_collection.get_user_all_posts(
                 skip=skip, limit=REQUEST_LIMIT
             )
 
@@ -95,8 +95,8 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
 @router.post("/post_by_id", response_model=CreatePostModelOut)
 async def get_user_post_by_id(post_id: str):
     try:
-        social_users_collection = SocialUsersCollection()
-        return await social_users_collection.get_user_post_by_id(post_id=post_id)
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_user_post_by_id(post_id=post_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -104,8 +104,8 @@ async def get_user_post_by_id(post_id: str):
 @router.post("/followed_groups", response_model=GroupsFollowed)
 async def get_user_followed_groups(user_id: str):
     try:
-        social_users_collection = SocialUsersCollection()
-        return await social_users_collection.get_user_followed_groups(user_id=user_id)
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_user_followed_groups(user_id=user_id)
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -117,8 +117,8 @@ async def make_user_follow_group(
     try:
         user_map = get_user_model(current_user, "follower")
 
-        social_users_collection = SocialUsersCollection()
-        data = await social_users_collection.make_user_follow_user(
+        social_posts_collection = SocialPostsCollection()
+        data = await social_posts_collection.make_user_follow_user(
             user_id=user_id, user_map=user_map
         )
         return data
@@ -135,14 +135,13 @@ async def get_user_followed(
         user_id = get_user_model(current_user, "id")
         user_db = MongoDBUserDatabase(UserInModel)
         user_count = await user_db.get_follower_count(user_id)
-        logging.info(user_count)
 
         if user_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
 
-            social_users_collection = SocialUsersCollection()
-            return await social_users_collection.get_user_followed(
+            social_posts_collection = SocialPostsCollection()
+            return await social_posts_collection.get_user_followed(
                 user_id=user_id, skip=skip, limit=REQUEST_LIMIT
             )
         else:
@@ -158,7 +157,25 @@ async def get_user_following(
 ):
     try:
         user_id = get_user_model(current_user, "id")
-        social_users_collection = SocialUsersCollection()
-        return await social_users_collection.get_user_following(user_id=user_id)
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_user_following(user_id=user_id)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post("/feed", response_model=CreatePostModelOutList)
+async def get_user_following(page_no: Optional[int] = 1):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        post_count = await social_posts_collection.get_feed_count()
+
+        if post_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+            return await social_posts_collection.get_user_feed(
+                skip=skip, limit=REQUEST_LIMIT
+            )
+        else:
+            return CreatePostModelOutList(post_list=[])
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
