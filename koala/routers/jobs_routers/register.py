@@ -60,5 +60,5 @@ async def register(user: CompanyModelPassword):
         if result is False:
             raise HTTPException(status_code=400, detail="Not able to process")
         return result
-    except Exception as e:
+    except Exception:
         HTTPException(status_code=500, detail="Something went wrong creating user")

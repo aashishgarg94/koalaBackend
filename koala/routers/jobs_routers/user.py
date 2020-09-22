@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Security
 from koala.authentication.authentication import get_current_active_user
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.models.jobs_models.master import BaseIsDisabled
@@ -25,7 +25,11 @@ Create User will be done from registration
 
 # API -  Get Current User
 @router.get("/user/me", response_model=UserModel)
-async def read_user_me(current_user: UserModel = Depends(get_current_active_user)):
+async def read_user_me(
+    current_user: UserModel = Security(
+        get_current_active_user, scopes=["applicant:read"],
+    )
+):
     try:
         return current_user
     except Exception as e:
@@ -37,7 +41,9 @@ async def read_user_me(current_user: UserModel = Depends(get_current_active_user
 @router.post("/user/update/me", response_model=UserUpdateOutModel)
 async def update_user_me(
     update_user: UserUpdateModel,
-    current_user: UserModel = Depends(get_current_active_user),
+    current_user: UserModel = Security(
+        get_current_active_user, scopes=["applicant:write"],
+    ),
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
@@ -50,7 +56,11 @@ async def update_user_me(
 
 # API - Delete User
 @router.get("/user/disable/me", response_model=BaseIsDisabled)
-async def disable_user_me(current_user: UserModel = Depends(get_current_active_user)):
+async def disable_user_me(
+    current_user: UserModel = Security(
+        get_current_active_user, scopes=["applicant:write"],
+    )
+):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
         user = UserUpdateCls(**current_user.dict(exclude_unset=True))
@@ -63,7 +73,11 @@ async def disable_user_me(current_user: UserModel = Depends(get_current_active_u
 
 # Get user bio
 @router.get("/user/bio", response_model=BioUpdateOutModel)
-async def user_bio_fetch(current_user: UserModel = Depends(get_current_active_user)):
+async def user_bio_fetch(
+    current_user: UserModel = Security(
+        get_current_active_user, scopes=["applicant:read"],
+    )
+):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
         return await user_db.user_bio_fetch(current_user.email)
@@ -76,7 +90,9 @@ async def user_bio_fetch(current_user: UserModel = Depends(get_current_active_us
 @router.post("/user/bio/update", response_model=BioUpdateOutModel)
 async def user_bio_update(
     user_bio_updates: UserBioModel,
-    current_user: UserModel = Depends(get_current_active_user),
+    current_user: UserModel = Security(
+        get_current_active_user, scopes=["applicant:write"],
+    ),
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)

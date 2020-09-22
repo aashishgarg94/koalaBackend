@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 
 import jwt
 from koala.constants import ALGORITHM, SECRET_KEY
@@ -14,6 +14,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+    scopes: List[str] = []
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
