@@ -29,7 +29,7 @@ class CompanyCollection:
         except Exception as e:
             raise e
 
-    async def find_by_email(self, email: EmailStr) -> Optional[CompanyOutModel]:
+    async def find_by_email(self, email: EmailStr) -> any:
         try:
             result = await self.collection.find_one(
                 {"contact_email": email},

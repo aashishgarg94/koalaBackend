@@ -84,7 +84,7 @@ class BaseJobModel(MongoModel):
 
 
 class JobInModel(BaseJobModel):
-    applicants_details: BaseApplicantApplied
+    applicants_details: Optional[BaseApplicantApplied]
     is_updated: Optional[bool] = False
     is_closed: Optional[bool] = False
     is_deleted: Optional[bool] = False

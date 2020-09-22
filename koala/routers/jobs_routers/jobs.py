@@ -99,7 +99,8 @@ async def job_update(job_id: str, job_detail: BaseJobModel):
         job_changes = JobInModel(**job_detail.dict())
         updated_job = await job_collection.find_one_and_modify(job_id, job_changes)
         return BaseIsUpdated(**updated_job.dict()) if updated_job else None
-    except Exception:
+    except Exception as e:
+        logging.info(e)
         HTTPException(status_code=500, detail="Something went wrong")
 
 
