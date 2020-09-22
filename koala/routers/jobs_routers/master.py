@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Security
+from koala.authentication.authentication import get_current_active_user
 from koala.crud.jobs_crud.master import MasterCollections
 from koala.models.jobs_models.master import (
     GigTypeModel,
@@ -14,7 +15,9 @@ router = APIRouter()
 @router.get(
     "/gigs",
     response_model=GigTypeModel,
-    dependencies=[Security(scopes=["applicant:read", "master:write"])],
+    dependencies=[
+        Security(get_current_active_user, scopes=["applicant:read", "master:write"])
+    ],
 )
 async def get_gig_type():
     try:
@@ -29,7 +32,9 @@ async def get_gig_type():
 @router.get(
     "/op_cities",
     response_model=OpCityModel,
-    dependencies=[Security(scopes=["applicant:read", "master:write"])],
+    dependencies=[
+        Security(get_current_active_user, scopes=["applicant:read", "master:write"])
+    ],
 )
 async def get_op_cities():
     try:
@@ -42,7 +47,9 @@ async def get_op_cities():
 @router.get(
     "/op_area",
     response_model=OpAreaModel,
-    dependencies=[Security(scopes=["applicant:read", "master:write"])],
+    dependencies=[
+        Security(get_current_active_user, scopes=["applicant:read", "master:write"])
+    ],
 )
 async def get_op_cities():
     try:
@@ -55,7 +62,9 @@ async def get_op_cities():
 @router.get(
     "/job/job_master",
     response_model=JobMasterModel,
-    dependencies=[Security(scopes=["applicant:read", "master:write"])],
+    dependencies=[
+        Security(get_current_active_user, scopes=["applicant:read", "master:write"])
+    ],
 )
 async def get_job_master():
     try:
