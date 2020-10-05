@@ -1,7 +1,9 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Security
+
+from koala.authentication.authentication import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.jobs import JobCollection
 from koala.models.jobs_models.jobs import (
@@ -23,7 +25,9 @@ router = APIRouter()
 DUMMY_COMPANY_ID = "100-workforce"
 
 
-@router.post("/jobs/create", response_model=BaseIsCreated)
+@router.post("/jobs/create", response_model=BaseIsCreated, dependencies=[
+        Security(get_current_active_user, scopes=["company:read", "company:write", "master:write"])
+    ],)
 async def job_create(job_info: BaseJobModel):
     try:
         job_detail = JobInModel(**job_info.dict(), applicants_details={})

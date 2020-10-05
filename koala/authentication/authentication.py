@@ -33,9 +33,6 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
 
     # Applicant scopes
     scopes = ["applicant:read", "applicant:write", "applicant:apply"]
-    # scopes = {"applicant:read": "Perform all applicant read related tasks",
-    #           "applicant:write": "Perform all applicant write related tasks",
-    #           "applicant:apply": "Apply to jobs"}
     return user, scopes
 
 
