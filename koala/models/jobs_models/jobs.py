@@ -38,6 +38,11 @@ class CompanyInPasswordModel(CompanyInModel):
     hashed_password: str
 
 
+class CompanyOutPasswordModel(BaseCompanyModel, MongoModel):
+    id: OID = Field()
+    hashed_password: str
+
+
 # Not is use, can be used if we need to pass company id in some other collection,
 # currently company details are embedded in every job
 class CompanyOutModel(BaseCompanyModel, MongoModel):

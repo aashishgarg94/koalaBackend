@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Security
-from koala.authentication.authentication import get_current_active_user
+from koala.authentication.authentication_user import get_current_active_user
 from koala.crud.jobs_crud.master import MasterCollections
 from koala.models.jobs_models.master import (
     GigTypeModel,

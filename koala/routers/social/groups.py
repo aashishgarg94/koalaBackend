@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from koala.authentication.authentication import get_current_active_user
+from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.social.groups import SocialGroupsCollection
 from koala.crud.social.users import SocialPostsCollection

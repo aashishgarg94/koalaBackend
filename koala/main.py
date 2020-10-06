@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # from starlette.middleware.cors import CORSMiddleware
-from koala.authentication.authentication import get_current_active_user
+from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.routers.jobs_routers import (
     auth,

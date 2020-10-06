@@ -9,6 +9,7 @@ from koala.models.jobs_models.jobs import (
     CompanyInModel,
     CompanyInPasswordModel,
     CompanyOutModel,
+    CompanyOutPasswordModel,
 )
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseNotFound
 from pydantic import EmailStr
@@ -29,12 +30,16 @@ class CompanyCollection:
         except Exception as e:
             raise e
 
-    async def find_by_email(self, email: EmailStr) -> any:
+    async def find_by_email(
+        self, email: EmailStr, is_hashed_password_required: bool = False
+    ) -> any:
         try:
             result = await self.collection.find_one(
                 {"contact_email": email},
                 return_doc_id=True,
-                extended_class_model=CompanyOutModel,
+                extended_class_model=CompanyOutPasswordModel
+                if is_hashed_password_required
+                else CompanyOutModel,
             )
             return result if result else BaseNotFound()
         except Exception as e:
