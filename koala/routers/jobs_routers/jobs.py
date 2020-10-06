@@ -47,7 +47,15 @@ async def job_create(job_info: BaseJobModel):
 
 
 # USER skip AND limit for querying data. Will be used for pagination
-@router.get("/jobs/all/full_detail", response_model=JobOutWithPagination)
+@router.get(
+    "/jobs/all/full_detail",
+    response_model=JobOutWithPagination,
+    dependencies=[
+        Security(
+            get_current_active_user_company, scopes=["applicant:read", "company:read"],
+        )
+    ],
+)
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
     try:
@@ -69,7 +77,15 @@ async def job_get_all(page_no: Optional[int] = 1):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/jobs/all", response_model=JobListOutWithPaginationModel)
+@router.get(
+    "/jobs/all",
+    response_model=JobListOutWithPaginationModel,
+    dependencies=[
+        Security(
+            get_current_active_user_company, scopes=["applicant:read", "company:read"],
+        )
+    ],
+)
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
     try:
@@ -91,7 +107,15 @@ async def job_get_all(page_no: Optional[int] = 1):
 
 
 # TODO: Get encoded job_id - Decide on encoder
-@router.get("/jobs/get/{job_id}", response_model=JobOutModel)
+@router.get(
+    "/jobs/get/{job_id}",
+    response_model=JobOutModel,
+    dependencies=[
+        Security(
+            get_current_active_user_company, scopes=["applicant:read", "company:read"],
+        )
+    ],
+)
 async def get_job_by_id(job_id: str):
     job_collection = JobCollection()
     try:
@@ -100,7 +124,11 @@ async def get_job_by_id(job_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/jobs/update/{job_id}", response_model=BaseIsUpdated)
+@router.post(
+    "/jobs/update/{job_id}",
+    response_model=BaseIsUpdated,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+)
 async def job_update(job_id: str, job_detail: BaseJobModel):
     # Anything can be update regarding a job from here
     job_collection = JobCollection()
@@ -113,7 +141,11 @@ async def job_update(job_id: str, job_detail: BaseJobModel):
         HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/jobs/close/{job_id}", response_model=BaseIsJobClosed)
+@router.get(
+    "/jobs/close/{job_id}",
+    response_model=BaseIsJobClosed,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+)
 async def job_delete_by_id(job_id: str):
     job_collection = JobCollection()
     try:
@@ -127,7 +159,11 @@ async def job_delete_by_id(job_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/jobs/delete/{job_id}", response_model=BaseIsDeleted)
+@router.post(
+    "/jobs/delete/{job_id}",
+    response_model=BaseIsDeleted,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+)
 async def job_delete_by_id(job_id: str):
     job_collection = JobCollection()
     try:
