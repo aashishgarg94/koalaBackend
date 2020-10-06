@@ -2,9 +2,7 @@ import logging
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import (
-    OAuth2PasswordRequestForm as OAuth2PasswordRequestFormCompany,
-)
+from fastapi.security import OAuth2PasswordRequestForm
 from koala.authentication import authentication_company, authentication_user
 from koala.authentication.jwt_handler import Token, create_access_token
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
@@ -13,7 +11,7 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-async def login_user(credentials: OAuth2PasswordRequestFormUsers = Depends()):
+async def login_user(credentials: OAuth2PasswordRequestForm = Depends()):
     try:
         user, scopes = await authentication_user.authenticate(credentials)
         if not user:
@@ -33,7 +31,7 @@ async def login_user(credentials: OAuth2PasswordRequestFormUsers = Depends()):
 
 
 @router.post("/login/company", response_model=Token)
-async def login_company(credentials: OAuth2PasswordRequestFormCompany = Depends()):
+async def login_company(credentials: OAuth2PasswordRequestForm = Depends()):
     try:
         company, scopes = await authentication_company.authenticate(credentials)
         logging.info(company)
