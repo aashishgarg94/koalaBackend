@@ -30,7 +30,9 @@ async def register(user: UserRegisterModel):
         hashed_password = get_password_hash(user.password.get_secret_value())
         users_following = FollowerModel()
         db_user = UserInModel(
-            **user.dict(), hashed_password=hashed_password, users_following=users_following
+            **user.dict(),
+            hashed_password=hashed_password,
+            users_following=users_following
         )
         result = await user_db.create_user(db_user)
         if result is False:

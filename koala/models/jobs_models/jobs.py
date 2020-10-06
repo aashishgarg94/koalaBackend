@@ -40,7 +40,7 @@ class CompanyInPasswordModel(CompanyInModel):
     hashed_password: str
 
 
-class CompanyOutPasswordModel(BaseCompanyModel, MongoModel):
+class CompanyOutPasswordModel(CompanyInModel, MongoModel):
     id: OID = Field()
     hashed_password: str
 

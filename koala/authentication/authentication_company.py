@@ -6,8 +6,6 @@ from fastapi.security import (
     SecurityScopes,
 )
 from jwt import PyJWTError
-from koala.crud.jobs_crud.user import MongoDBUserDatabase
-from koala.models.jobs_models.user import UserInModel
 from pydantic import EmailStr, ValidationError
 
 from ..authentication.jwt_handler import TokenData, pwd_context
@@ -26,7 +24,7 @@ def verify_password_company(plain_password, hashed_password):
 async def authenticate_company(credentials: OAuth2PasswordRequestForm):
     user_db = CompanyCollection()
     user = await user_db.find_by_email(
-        EmailStr(credentials.username), is_hashed_password_required=True
+        credentials.username, is_hashed_password_required=True
     )
 
     if not user:
@@ -66,7 +64,9 @@ async def get_current_user_company(
         raise credentials_exception
 
     user_db = CompanyCollection()
-    user = await user_db.find_by_email(EmailStr(token_data.username), is_hashed_password_required=True)
+    user = await user_db.find_by_email(
+        EmailStr(token_data.username), is_hashed_password_required=True
+    )
 
     if user is None:
         raise credentials_exception
