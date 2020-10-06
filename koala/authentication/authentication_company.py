@@ -34,7 +34,7 @@ async def authenticate_company(credentials: OAuth2PasswordRequestForm):
         return False
 
     # Applicant scopes
-    scopes = ["company:read", "company:write", "company:delete"]
+    scopes = ["company:read", "company:write", "company:delete", "hiring:read"]
     return user, scopes
 
 

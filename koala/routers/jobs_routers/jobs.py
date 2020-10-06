@@ -50,11 +50,7 @@ async def job_create(job_info: BaseJobModel):
 @router.get(
     "/jobs/all/full_detail",
     response_model=JobOutWithPagination,
-    dependencies=[
-        Security(
-            get_current_active_user_company, scopes=["applicant:read", "company:read"],
-        )
-    ],
+    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
 )
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
@@ -80,11 +76,7 @@ async def job_get_all(page_no: Optional[int] = 1):
 @router.get(
     "/jobs/all",
     response_model=JobListOutWithPaginationModel,
-    dependencies=[
-        Security(
-            get_current_active_user_company, scopes=["applicant:read", "company:read"],
-        )
-    ],
+    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
 )
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
@@ -110,11 +102,7 @@ async def job_get_all(page_no: Optional[int] = 1):
 @router.get(
     "/jobs/get/{job_id}",
     response_model=JobOutModel,
-    dependencies=[
-        Security(
-            get_current_active_user_company, scopes=["applicant:read", "company:read"],
-        )
-    ],
+    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
 )
 async def get_job_by_id(job_id: str):
     job_collection = JobCollection()
