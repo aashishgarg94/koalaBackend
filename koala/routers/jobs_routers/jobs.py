@@ -1,8 +1,9 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Security
+from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_company import get_current_active_user_company
+from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.jobs import JobCollection
 from koala.models.jobs_models.jobs import (
@@ -16,8 +17,10 @@ from koala.models.jobs_models.master import (
     BaseIsCreated,
     BaseIsDeleted,
     BaseIsJobClosed,
+    BaseIsSaved,
     BaseIsUpdated,
 )
+from koala.models.jobs_models.user import UserModel
 
 router = APIRouter()
 
@@ -161,5 +164,26 @@ async def job_delete_by_id(job_id: str):
             if deleted_job
             else BaseIsDeleted(**{"is_deleted": False})
         )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/jobs/save/{job_id}",
+    response_model=BaseIsSaved,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"],)],
+)
+async def job_save_by_id(
+    job_id: str, current_user: UserModel = Depends(get_current_active_user)
+):
+    job_collection = JobCollection()
+    try:
+        saved_job = await job_collection.save_job_by_id(job_id, user_id=current_user.id)
+        data = (
+            BaseIsSaved(id=saved_job.id, is_saved=True)
+            if saved_job
+            else BaseIsSaved(id=job_id, is_saved=False)
+        )
+        return data
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

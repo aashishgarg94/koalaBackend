@@ -90,7 +90,12 @@ class BaseJobModel(MongoModel):
     more_info: Optional[BaseJobMoreInfoModel] = None
 
 
+class SavedByObjectId(MongoModel):
+    user_id: OID = Field()
+
+
 class JobInModel(BaseJobModel):
+    saved_by: List[SavedByObjectId] = []
     applicants_details: Optional[BaseApplicantApplied]
     is_updated: Optional[bool] = False
     is_closed: Optional[bool] = False

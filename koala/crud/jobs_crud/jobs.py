@@ -4,7 +4,12 @@ from typing import List, Optional
 
 from bson import ObjectId
 from koala.config.collections import JOBS
-from koala.models.jobs_models.jobs import JobInModel, JobListOutModel, JobOutModel
+from koala.models.jobs_models.jobs import (
+    JobInModel,
+    JobListOutModel,
+    JobOutModel,
+    SavedByObjectId,
+)
 from koala.models.jobs_models.master import BaseIsCreated
 
 from .company import CompanyCollection
@@ -149,6 +154,29 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
                 return_updated_document=True,
+            )
+            logging.info(f"Job delete by id successfully")
+            return result if result else None
+        except Exception as e:
+            logging.error(f"Error: Delete by id {e}")
+            raise e
+
+    async def save_job_by_id(self, job_id: str, user_id: str) -> Optional[JobOutModel]:
+        try:
+            finder = {"_id": ObjectId(job_id)}
+            updater = {
+                "$push": {
+                    "saved_by": {
+                        "$each": [SavedByObjectId(user_id=ObjectId(user_id)).dict()],
+                    }
+                }
+            }
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
             )
             logging.info(f"Job delete by id successfully")
             return result if result else None

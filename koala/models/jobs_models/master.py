@@ -79,6 +79,11 @@ class BaseIsUpdated(MongoModel):
     is_updated: bool
 
 
+class BaseIsSaved(MongoModel):
+    id: OID = Field()
+    is_saved: bool
+
+
 class BaseKeyValueModel(BaseModel):
     name: str
 
