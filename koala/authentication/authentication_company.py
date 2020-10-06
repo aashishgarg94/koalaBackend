@@ -13,16 +13,17 @@ from pydantic import EmailStr, ValidationError
 from ..authentication.jwt_handler import TokenData, pwd_context
 from ..constants import ALGORITHM, SECRET_KEY
 from ..crud.jobs_crud.company import CompanyCollection
+from ..models.jobs_models.jobs import CompanyInPasswordModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/company")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password_company(plain_password, hashed_password):
     data = pwd_context.verify(plain_password, hashed_password)
     return data
 
 
-async def authenticate(credentials: OAuth2PasswordRequestForm):
+async def authenticate_company(credentials: OAuth2PasswordRequestForm):
     user_db = CompanyCollection()
     user = await user_db.find_by_email(
         EmailStr(credentials.username), is_hashed_password_required=True
@@ -31,7 +32,7 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
     if not user:
         return False
 
-    if not verify_password(credentials.password, user.hashed_password):
+    if not verify_password_company(credentials.password, user.hashed_password):
         return False
 
     # Applicant scopes
@@ -39,7 +40,7 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
     return user, scopes
 
 
-async def get_current_user(
+async def get_current_user_company(
     security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
 ):
     if security_scopes.scopes:
@@ -64,8 +65,8 @@ async def get_current_user(
     except (PyJWTError, ValidationError):
         raise credentials_exception
 
-    user_db = MongoDBUserDatabase(UserInModel)
-    user = await user_db.find_by_email(token_data.username)
+    user_db = CompanyCollection()
+    user = await user_db.find_by_email(EmailStr(token_data.username), is_hashed_password_required=True)
 
     if user is None:
         raise credentials_exception
@@ -80,8 +81,8 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(
-    current_user: UserInModel = Depends(get_current_user),
+async def get_current_active_user_company(
+    current_user: CompanyInPasswordModel = Depends(get_current_user_company),
 ):
     if current_user.is_disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

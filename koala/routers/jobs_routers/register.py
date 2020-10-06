@@ -16,25 +16,28 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register(user: UserRegisterModel):
-    user_db = MongoDBUserDatabase(UserInModel)
-    # Check if user already exists
-    existing_user = await user_db.find_by_email(user.email)
+    try:
+        user_db = MongoDBUserDatabase(UserInModel)
+        # Check if user already exists
+        existing_user = await user_db.find_by_email(user.email)
 
-    if existing_user is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="REGISTER_USER_ALREADY_EXISTS",
+        if existing_user is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="REGISTER_USER_ALREADY_EXISTS",
+            )
+
+        hashed_password = get_password_hash(user.password.get_secret_value())
+        users_following = FollowerModel()
+        db_user = UserInModel(
+            **user.dict(), hashed_password=hashed_password, users_following=users_following
         )
-
-    hashed_password = get_password_hash(user.password.get_secret_value())
-    users_following = FollowerModel()
-    db_user = UserInModel(
-        **user.dict(), hashed_password=hashed_password, users_following=users_following
-    )
-    result = await user_db.create_user(db_user)
-    if result is False:
-        raise HTTPException(status_code=400, detail="Not able to process")
-    return result
+        result = await user_db.create_user(db_user)
+        if result is False:
+            raise HTTPException(status_code=400, detail="Not able to process")
+        return result
+    except Exception as e:
+        raise e
 
 
 @router.post(
@@ -48,7 +51,7 @@ async def register(user: CompanyModelPassword):
         # Check if user already exists
         existing_user = await company_collection.find_by_email(user.contact_email)
 
-        if existing_user.status_code != 404:
+        if existing_user is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="REGISTER_USER_ALREADY_EXISTS",
@@ -60,5 +63,5 @@ async def register(user: CompanyModelPassword):
         if result is False:
             raise HTTPException(status_code=400, detail="Not able to process")
         return result
-    except Exception:
-        HTTPException(status_code=500, detail="Something went wrong creating user")
+    except Exception as e:
+        raise e

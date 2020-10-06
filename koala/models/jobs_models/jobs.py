@@ -30,6 +30,8 @@ class CompanyInModel(BaseCompanyModel):
     created_on: Optional[datetime]
     is_updated: Optional[bool] = False
     updated_on: Optional[datetime]
+    is_disabled: Optional[bool] = False
+    disabled_on: Optional[datetime]
     is_deleted: Optional[bool] = False
     deleted_on: Optional[datetime]
 

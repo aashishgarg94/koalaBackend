@@ -34,14 +34,13 @@ class CompanyCollection:
         self, email: EmailStr, is_hashed_password_required: bool = False
     ) -> any:
         try:
-            result = await self.collection.find_one(
+            return await self.collection.find_one(
                 {"contact_email": email},
                 return_doc_id=True,
                 extended_class_model=CompanyOutPasswordModel
                 if is_hashed_password_required
                 else CompanyOutModel,
             )
-            return result if result else BaseNotFound()
         except Exception as e:
             raise e
 

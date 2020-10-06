@@ -33,7 +33,7 @@ async def login_user(credentials: OAuth2PasswordRequestForm = Depends()):
 @router.post("/login/company", response_model=Token)
 async def login_company(credentials: OAuth2PasswordRequestForm = Depends()):
     try:
-        company, scopes = await authentication_company.authenticate(credentials)
+        company, scopes = await authentication_company.authenticate_company(credentials)
         logging.info(company)
         logging.info(scopes)
         if not company:

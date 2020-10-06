@@ -53,7 +53,7 @@ app.include_router(
 )
 app.include_router(company.router, tags=["Company"])
 app.include_router(
-    jobs.router, tags=["Jobs"], dependencies=[Depends(get_current_active_user)]
+    jobs.router, tags=["Jobs"]
 )
 app.include_router(
     job_user.router,

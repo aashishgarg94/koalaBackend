@@ -2,6 +2,8 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Security
+
+from koala.authentication.authentication_company import get_current_active_user_company
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.jobs import JobCollection
@@ -29,8 +31,8 @@ DUMMY_COMPANY_ID = "100-workforce"
     response_model=BaseIsCreated,
     dependencies=[
         Security(
-            get_current_active_user,
-            scopes=["company:read", "company:write", "master:write"],
+            get_current_active_user_company,
+            scopes=["company:read", "company:write"],
         )
     ],
 )
