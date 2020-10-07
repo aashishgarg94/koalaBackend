@@ -500,7 +500,7 @@ class JobUser:
         try:
             self.collection(JOBS)
             filter_condition = {
-                "$or": [
+                "$and": [
                     {"city": city},
                     {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
                     {
