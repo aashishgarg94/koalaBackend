@@ -239,3 +239,29 @@ async def job_all_matched():
     except Exception as e:
         logging.error(f"Error while applying action: ERROR: {e}")
         raise e
+
+
+@router.post(
+    "/jobs/all/filter",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def job_all_filter(
+    city: str = None,
+    job_type: str = None,
+    salary_start_range: int = 0,
+    salary_end_range: int = 0,
+    area: str = None,
+):
+    try:
+        job_user = JobUser()
+        result = await job_user.get_all_jobs_by_filter(
+            city=city,
+            job_type=job_type,
+            salary_start_range=salary_start_range,
+            salary_end_range=salary_end_range,
+            area=area,
+        )
+        return result
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
+        raise e

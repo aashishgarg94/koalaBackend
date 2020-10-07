@@ -10,6 +10,7 @@ from koala.constants import (
     APPLIED_JOBS,
     BOOKMARKED,
     EMBEDDED_COLLECTION_LIMIT,
+    FILTERED_JOBS,
     FRESHERS_JOBS,
     REJECTED,
     SAVED_JOBS,
@@ -484,6 +485,43 @@ class JobUser:
                 return freshers_jobs
 
             return freshers_jobs
+        except Exception as e:
+            logging.error(f"Error while applying job action. ERROR: {e}")
+            raise e
+
+    async def get_all_jobs_by_filter(
+        self,
+        city: str,
+        job_type: str,
+        salary_start_range: int,
+        salary_end_range: int,
+        area: str,
+    ) -> any:
+        try:
+            self.collection(JOBS)
+            filter_condition = {
+                "$or": [
+                    {"city": city},
+                    {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
+                    {
+                        "experience.start_range": salary_start_range,
+                        "experience.end_range": salary_end_range,
+                    },
+                    {"area": area},
+                ]
+            }
+            jobs_data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
+            filtered_jobs = {FILTERED_JOBS: []}
+            if len(jobs_data) > 0:
+                for jobs in jobs_data:
+                    filtered_jobs.get(FILTERED_JOBS).append(jobs)
+                return filtered_jobs
+
+            return filtered_jobs
         except Exception as e:
             logging.error(f"Error while applying job action. ERROR: {e}")
             raise e

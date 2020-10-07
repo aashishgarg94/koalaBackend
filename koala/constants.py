@@ -20,6 +20,7 @@ ALL_JOBS = "all_jobs"
 APPLIED_JOBS = "applied_jobs"
 SAVED_JOBS = "saved_jobs"
 FRESHERS_JOBS = "freshers_jobs"
+FILTERED_JOBS = "filtered_jobs"
 
 GOLD = "gold"
 NORMAL = "normal"
