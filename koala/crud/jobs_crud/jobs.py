@@ -51,7 +51,6 @@ class JobCollection:
         try:
             filter_condition = {"is_deleted": False}
             count = await self.collection.count(filter_condition)
-            logging.info(f"Job count fetched successfully")
             return count if count else 0
         except Exception as e:
             logging.error(f"Error: Job count {e}")
@@ -69,7 +68,6 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            logging.info(f"Job get all successfully")
             return data if data else None
         except Exception as e:
             logging.error(f"Error: Get all {e}")
@@ -85,7 +83,6 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobListOutModel,
             )
-            logging.info(f"Job get all successfully")
             return data if data else []
         except Exception as e:
             logging.error(f"Error: Get all {e}")
@@ -97,7 +94,6 @@ class JobCollection:
             job = await self.collection.find_one(
                 finder=finder, return_doc_id=True, extended_class_model=JobOutModel
             )
-            logging.info(f"Job get by id successfully")
             return job if job else None
         except Exception as e:
             logging.error(f"Error: Get by id {e}")
@@ -122,7 +118,6 @@ class JobCollection:
                 extended_class_model=JobOutModel,
                 return_updated_document=True,
             )
-            logging.info(f"Job find one and modify successfully")
             return updated_job if updated_job else None
         except Exception as e:
             logging.error(f"Error: Find one and modify {e}")
@@ -155,7 +150,6 @@ class JobCollection:
                 extended_class_model=JobOutModel,
                 return_updated_document=True,
             )
-            logging.info(f"Job delete by id successfully")
             return result if result else None
         except Exception as e:
             logging.error(f"Error: Delete by id {e}")
@@ -178,7 +172,6 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            logging.info(f"Job delete by id successfully")
             return result if result else None
         except Exception as e:
             logging.error(f"Error: Delete by id {e}")

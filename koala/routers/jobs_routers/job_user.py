@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
+from koala.authentication.authentication_company import get_current_active_user_company
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.job_user import JobUser
@@ -22,7 +23,11 @@ router = APIRouter()
 
 
 # Apply for job
-@router.post("/job/apply", response_model=BaseIsApplied)
+@router.post(
+    "/job/apply",
+    response_model=BaseIsApplied,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
 async def job_apply(
     job_id: str, current_user: UserModel = Depends(get_current_active_user)
 ):
@@ -34,7 +39,11 @@ async def job_apply(
         raise HTTPException(status_code=500, detail="Error while processing request")
 
 
-@router.get("/user/jobs/count", response_model=BaseJobCount)
+@router.get(
+    "/user/jobs/count",
+    response_model=BaseJobCount,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def user_get_user_jobs_count(
     current_user: UserModel = Depends(get_current_active_user),
 ):
@@ -48,7 +57,10 @@ async def user_get_user_jobs_count(
         raise e
 
 
-@router.get("/user/jobs/recent")
+@router.get(
+    "/user/jobs/recent",
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def user_get_user_jobs_recent(
     current_user: UserModel = Depends(get_current_active_user),
 ):
@@ -61,7 +73,10 @@ async def user_get_user_jobs_recent(
 
 
 # Get all applied jobs, get user from token
-@router.get("/user/jobs")
+@router.get(
+    "/user/jobs",
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def get_user_all_jobs(
     page_no: Optional[int] = 1,
     current_user: UserModel = Depends(get_current_active_user),
@@ -87,7 +102,11 @@ async def get_user_all_jobs(
         raise e
 
 
-@router.post("/job/applicant/count", response_model=BaseApplicantCount)
+@router.post(
+    "/job/applicant/count",
+    response_model=BaseApplicantCount,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def get_job_applicant_count(job_id: str):
     try:
         job_user = JobUser()
@@ -99,7 +118,10 @@ async def get_job_applicant_count(job_id: str):
         raise e
 
 
-@router.get("/jobs/applicant/recent")
+@router.get(
+    "/jobs/applicant/recent",
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def get_jos_applicant_recent(job_id: str):
     try:
         job_user = JobUser()
@@ -111,7 +133,10 @@ async def get_jos_applicant_recent(job_id: str):
 
 
 # , response_model=JobApplicantOutWithPagination
-@router.post("/job/applicant")
+@router.post(
+    "/job/applicant",
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def get_job_all_applicants(job_info: BaseJobApplicant):
     try:
         job_user = JobUser()
@@ -140,7 +165,11 @@ async def get_job_all_applicants(job_info: BaseJobApplicant):
         raise e
 
 
-@router.post("/job/application/action", response_model=BaseIsUpdated)
+@router.post(
+    "/job/application/action",
+    response_model=BaseIsUpdated,
+    dependencies=[Security(get_current_active_user_company, scopes=["company:read"])],
+)
 async def job_applicant_action(
     applicant_status: AllowedActionModel, job_applicant_detail: JobApplicantAction
 ):
@@ -151,6 +180,62 @@ async def job_applicant_action(
         )
         result = await job_user.apply_job_action(job_user_map)
         return result if result else None
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
+        raise e
+
+
+@router.post(
+    "/jobs/user_op_jobs",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def user_action_jobs(current_user: UserModel = Depends(get_current_active_user),):
+    try:
+        job_user = JobUser()
+        result = await job_user.get_user_action_jobs(user_id=current_user.id)
+        return result
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
+        raise e
+
+
+@router.post(
+    "/jobs/all_matched",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def job_all_matched():
+    try:
+        job_user = JobUser()
+        result = await job_user.get_all_matched_jobs()
+        return result
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
+        raise e
+
+
+@router.post(
+    "/jobs/all_matched",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def job_all_matched():
+    try:
+        job_user = JobUser()
+        result = await job_user.get_all_matched_jobs()
+        return result
+    except Exception as e:
+        logging.error(f"Error while applying action: ERROR: {e}")
+        raise e
+
+
+@router.post(
+    "/jobs/freshers_jobs",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def job_all_matched():
+    try:
+        job_user = JobUser()
+        result = await job_user.get_all_freshers_jobs()
+        return result
     except Exception as e:
         logging.error(f"Error while applying action: ERROR: {e}")
         raise e

@@ -6,9 +6,13 @@ from bson import ObjectId
 from koala.config.collections import JOB_APPLICANTS, JOBS, USER_JOBS, USERS
 from koala.constants import (
     ALL,
+    ALL_JOBS,
+    APPLIED_JOBS,
     BOOKMARKED,
     EMBEDDED_COLLECTION_LIMIT,
+    FRESHERS_JOBS,
     REJECTED,
+    SAVED_JOBS,
     SHORTLISTED,
 )
 from koala.models.jobs_models.job_user import (
@@ -406,6 +410,80 @@ class JobUser:
                 if on_job_collection_result and on_job_applicants_collection_result
                 else None
             )
+        except Exception as e:
+            logging.error(f"Error while applying job action. ERROR: {e}")
+            raise e
+
+    async def get_user_action_jobs(self, user_id: str) -> any:
+        try:
+            self.collection(JOBS)
+            filter_condition = {
+                "$or": [
+                    {"saved_by": {"$elemMatch": {"user_id": ObjectId(user_id)}}},
+                    {
+                        "applicants_details.applicants": {
+                            "$elemMatch": {"user_id": ObjectId(user_id)}
+                        }
+                    },
+                ]
+            }
+            jobs_data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
+            action_jobs = {APPLIED_JOBS: [], SAVED_JOBS: []}
+            if len(jobs_data) > 0:
+                for jobs in jobs_data:
+                    for job in jobs.applicants_details.applicants:
+                        if user_id == job.user_id:
+                            action_jobs.get(APPLIED_JOBS).append(jobs)
+                    for job in jobs.saved_by:
+                        if user_id == job.user_id:
+                            action_jobs.get(SAVED_JOBS).append(jobs)
+                return action_jobs
+
+            return action_jobs
+        except Exception as e:
+            logging.error(f"Error while applying job action. ERROR: {e}")
+            raise e
+
+    async def get_all_matched_jobs(self) -> any:
+        try:
+            self.collection(JOBS)
+            filter_condition = {}
+            jobs_data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
+            all_matched_jobs = {ALL_JOBS: [], FRESHERS_JOBS: []}
+            if len(jobs_data) > 0:
+                for jobs in jobs_data:
+                    all_matched_jobs.get(ALL_JOBS).append(jobs)
+                return all_matched_jobs
+
+            return all_matched_jobs
+        except Exception as e:
+            logging.error(f"Error while applying job action. ERROR: {e}")
+            raise e
+
+    async def get_all_freshers_jobs(self) -> any:
+        try:
+            self.collection(JOBS)
+            filter_condition = {"experience.start_range": 0, "experience.end_range": 0}
+            jobs_data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
+            freshers_jobs = {FRESHERS_JOBS: []}
+            if len(jobs_data) > 0:
+                for jobs in jobs_data:
+                    freshers_jobs.get(FRESHERS_JOBS).append(jobs)
+                return freshers_jobs
+
+            return freshers_jobs
         except Exception as e:
             logging.error(f"Error while applying job action. ERROR: {e}")
             raise e
