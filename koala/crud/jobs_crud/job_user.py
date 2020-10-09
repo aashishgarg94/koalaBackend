@@ -496,6 +496,7 @@ class JobUser:
         salary_start_range: int,
         salary_end_range: int,
         area: str,
+        title: str,
     ) -> any:
         try:
             self.collection(JOBS)
@@ -508,6 +509,7 @@ class JobUser:
                         "experience.end_range": salary_end_range,
                     },
                     {"area": area},
+                    {"title": title},
                 ]
             }
             jobs_data = await self.collection.find(
