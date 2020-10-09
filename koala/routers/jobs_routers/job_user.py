@@ -252,6 +252,7 @@ async def job_all_filter(
     salary_end_range: int = 0,
     area: str = None,
     title: str = None,
+    company_name: str = None,
 ):
     try:
         job_user = JobUser()
@@ -262,6 +263,7 @@ async def job_all_filter(
             salary_end_range=salary_end_range,
             area=area,
             title=title,
+            company_name=company_name,
         )
         return result
     except Exception as e:
