@@ -56,12 +56,7 @@ app.include_router(jobs.router, tags=["Jobs"])
 app.include_router(job_user.router, tags=["Users & Jobs"])
 
 # SOCIAL ROUTERS
-app.include_router(
-    groups.router,
-    prefix="/group",
-    tags=["Social Groups"],
-    dependencies=[Depends(get_current_active_user)],
-)
+app.include_router(groups.router, prefix="/group", tags=["Social Groups"])
 
 app.include_router(users.router, prefix="/user", tags=["Social Users"])
 

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.social.groups import SocialGroupsCollection
@@ -24,7 +24,11 @@ from koala.routers.social.users import get_user_model
 router = APIRouter()
 
 
-@router.post("/create", response_model=BaseIsCreated)
+@router.post(
+    "/create",
+    response_model=BaseIsCreated,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
 async def create_group(
     group_details: BaseSocialGroup,
     current_user: UserModel = Depends(get_current_active_user),
@@ -43,7 +47,11 @@ async def create_group(
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.get("/get_all", response_model=GroupsWithPaginationModel)
+@router.get(
+    "/get_all",
+    response_model=GroupsWithPaginationModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
 async def get_all_groups(page_no: Optional[int] = 1):
     try:
         social_groups_collection = SocialGroupsCollection()
@@ -64,7 +72,11 @@ async def get_all_groups(page_no: Optional[int] = 1):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/group_by_id", response_model=SocialGroupCreateOut)
+@router.post(
+    "/group_by_id",
+    response_model=SocialGroupCreateOut,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
 async def get_group_by_id(group_id: str):
     try:
         social_groups_collection = SocialGroupsCollection()
@@ -73,7 +85,11 @@ async def get_group_by_id(group_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/follow_group", response_model=BaseIsFollowed)
+@router.post(
+    "/follow_group",
+    response_model=BaseIsFollowed,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
 async def make_user_follow_group(
     group_id: str, current_user: UserModel = Depends(get_current_active_user),
 ):
@@ -88,7 +104,11 @@ async def make_user_follow_group(
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/all_users", response_model=FollowerModel)
+@router.post(
+    "/all_users",
+    response_model=FollowerModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
 async def get_group_users(group_id: str):
     try:
         social_groups_collection = SocialGroupsCollection()
@@ -97,7 +117,11 @@ async def get_group_users(group_id: str):
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
-@router.post("/posts", response_model=CreatePostModelOutList)
+@router.post(
+    "/posts",
+    response_model=CreatePostModelOutList,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
 async def get_user_following(group_id: str, page_no: Optional[int] = 1):
     try:
         social_posts_collection = SocialPostsCollection()
