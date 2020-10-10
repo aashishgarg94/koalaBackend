@@ -62,6 +62,11 @@ class BaseLikeModel(MongoModel):
     liked_by: Optional[List[OID]] = []
 
 
+class BasePostReportModel(MongoModel):
+    total_report: int = 0
+    reported_by: Optional[List[OID]] = []
+
+
 class BaseFullDetailPostModel(BaseCreatePostModel):
     is_group_post: bool = False
     group_id: Optional[OID]
@@ -70,6 +75,7 @@ class BaseFullDetailPostModel(BaseCreatePostModel):
     comments: Optional[List[BaseCommentsModel]] = []
     shares: Optional[BaseShare]
     followers: Optional[FollowerModel]
+    post_report: Optional[BasePostReportModel]
 
 
 class CreatePostModelIn(BaseFullDetailPostModel):

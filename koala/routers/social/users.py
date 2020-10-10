@@ -16,6 +16,7 @@ from koala.models.social.users import (
     BaseIsFollowed,
     BaseLikeModel,
     BasePostOwnerModel,
+    BasePostReportModel,
     BaseShare,
     BaseShareModel,
     CommentInModel,
@@ -78,12 +79,15 @@ async def create_post(
 
         likes = BaseLikeModel(total_likes=0, liked_by=[])
 
+        post_report = BasePostReportModel(total_report=0, reported_by=[])
+
         return await social_posts_collection.create_post(
             post_details=post_details,
             is_group_post=is_group_post,
             group_id=group_id,
             shares=shares,
             likes=likes,
+            post_report=post_report,
         )
     except Exception as e:
         logging.error(e)
@@ -284,6 +288,25 @@ async def get_user_following(
         )
         return await social_posts_collection.post_action(
             post_id=post_id, comments=comments, user_id=current_user.id
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/action/report",
+    response_model=BaseIsUpdated,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def get_user_following(
+    post_id: str,
+    report_post: bool = False,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.post_action(
+            post_id=post_id, report_post=report_post, user_id=current_user.id
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

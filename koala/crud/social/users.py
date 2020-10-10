@@ -13,6 +13,7 @@ from koala.models.social.users import (
     BaseFollowerModel,
     BaseIsFollowed,
     BaseLikeModel,
+    BasePostReportModel,
     BaseShare,
     BaseShareModel,
     CreatePostModelIn,
@@ -36,6 +37,7 @@ class SocialPostsCollection:
         group_id: str,
         shares: BaseShare,
         likes: BaseLikeModel,
+        post_report: BasePostReportModel,
     ) -> any:
         try:
             post_details.created_on = datetime.now()
@@ -46,6 +48,8 @@ class SocialPostsCollection:
             post_details.shares = shares
 
             post_details.like = likes
+
+            post_details.post_report = post_report
 
             insert_id = await self.collection.insert_one(
                 post_details.dict(),
@@ -261,6 +265,7 @@ class SocialPostsCollection:
         comments: BaseCommentsModel = None,
         like: int = None,
         share: str = None,
+        report_post: bool = False,
     ) -> BaseIsUpdated:
         try:
             finder = {"_id": ObjectId(post_id)}
@@ -284,9 +289,17 @@ class SocialPostsCollection:
                         "shares.whatsapp.shared_by": {"$each": [ObjectId(user_id)]}
                     },
                 }
-            elif comments.comments.comment is not None:
+            elif comments is not None:
+                # elif comments.comments.comment is not None:
                 updater = {
                     "$push": {"comments": {"$each": [comments.dict()]}},
+                }
+            elif report_post is True:
+                updater = {
+                    "$inc": {"post_report.total_report": 1},
+                    "$push": {
+                        "post_report.reported_by": {"$each": [ObjectId(user_id)]}
+                    },
                 }
 
             result = await self.collection.find_one_and_modify(
