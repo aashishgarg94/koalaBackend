@@ -121,14 +121,36 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
 
 
 @router.post(
-    "/post_by_id",
+    "/post_by_post_id",
     response_model=CreatePostModelOut,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
-async def get_user_post_by_id(post_id: str):
+async def get_user_post_by_post_id(post_id: str):
     try:
         social_posts_collection = SocialPostsCollection()
-        return await social_posts_collection.get_user_post_by_id(post_id=post_id)
+        return await social_posts_collection.get_user_post_by_post_id(post_id=post_id)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/post_by_user_id",
+    response_model=CreatePostModelOutList,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_user_post_by_user_id(user_id: str):
+    try:
+        social_posts_collection = SocialPostsCollection()
+
+        user_post_count = await social_posts_collection.get_user_post_count_by_user_id(
+            user_id=user_id
+        )
+        if user_post_count > 0:
+            return await social_posts_collection.get_user_post_by_user_id(
+                user_id=user_id
+            )
+        else:
+            return CreatePostModelOutList(post_list=[])
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 

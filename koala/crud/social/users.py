@@ -111,7 +111,7 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
 
-    async def get_user_post_by_id(self, post_id: str) -> any:
+    async def get_user_post_by_post_id(self, post_id: str) -> any:
         try:
             post_id_obj = ObjectId(post_id)
             return await self.collection.find_one(
@@ -121,6 +121,36 @@ class SocialPostsCollection:
             )
         except Exception as e:
             logging.error(f"Error: Get user post by id {e}")
+
+    async def get_user_post_by_post_id(self, post_id: str) -> any:
+        try:
+            post_id_obj = ObjectId(post_id)
+            return await self.collection.find_one(
+                {"_id": post_id_obj},
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+        except Exception as e:
+            logging.error(f"Error: Get user post by id {e}")
+
+    async def get_user_post_count_by_user_id(self, user_id: str) -> int:
+        try:
+            finder = {"owner.user_id": ObjectId(user_id)}
+            return await self.collection.count(filter_condition=finder)
+        except Exception as e:
+            logging.error(f"Error: Get user post count by user id {e}")
+
+    async def get_user_post_by_user_id(self, user_id: str) -> CreatePostModelOutList:
+        try:
+            finder = {"owner.user_id": ObjectId(user_id)}
+            post_data = await self.collection.find(
+                finder=finder,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+            return CreatePostModelOutList(post_list=post_data)
+        except Exception as e:
+            logging.error(f"Error: Get user post by user id {e}")
 
     async def get_user_followed_groups(self, user_id: str) -> GroupsFollowed:
         try:
