@@ -9,6 +9,9 @@ from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import (
+    BaseGroupMemberCountListModel,
+    BaseGroupMemberCountModel,
+    BaseGroupMemberModel,
     BaseSocialGroup,
     SocialGroupCreateIn,
     SocialGroupCreateOut,
@@ -135,3 +138,44 @@ class SocialGroupsCollection:
             )
         except Exception as e:
             logging.error(f"Error: Get group users {e}")
+
+    async def get_groups_by_user_id(self, user_id: str,) -> any:
+        try:
+            filter_condition = {"_id": ObjectId(user_id)}
+
+            self.collection(USERS)
+            return await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=False,
+                projection={"groups_followed": 1, "_id": 0},
+            )
+        except Exception as e:
+            logging.error(f"Error: Get group count by user_id {e}")
+
+    async def get_group_details(
+        self, groups_list: list
+    ) -> BaseGroupMemberCountListModel:
+        try:
+            filter_condition = {"_id": {"$in": groups_list}}
+            self.collection(SOCIAL_GROUPS)
+
+            user_group_list = await self.collection.find(
+                finder=filter_condition,
+                projection={"groupName": 1, "followers": 1},
+                return_doc_id=True,
+                extended_class_model=BaseGroupMemberModel,
+            )
+            user_group_data = []
+            if len(user_group_list) > 0:
+                for group in user_group_list:
+                    user_group_data.append(
+                        BaseGroupMemberCountModel(
+                            id=group.id,
+                            group_name=group.groupName,
+                            total_followers=group.followers.total_followers,
+                        )
+                    )
+
+            return BaseGroupMemberCountListModel(user_groups=user_group_data)
+        except Exception as e:
+            logging.error(f"Error: Get group count by user_id {e}")

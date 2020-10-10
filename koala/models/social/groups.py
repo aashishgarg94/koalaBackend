@@ -45,3 +45,19 @@ class GroupsFollowed(MongoModel):
 class UsersFollowed(MongoModel):
     total_users: int = 0
     user_list: Optional[List[OID]] = []
+
+
+class BaseGroupMemberModel(MongoModel):
+    id: OID = Field()
+    groupName: str
+    followers: Optional[FollowerModel]
+
+
+class BaseGroupMemberCountModel(BaseModel):
+    id: OID = Field()
+    group_name: str
+    total_followers: int
+
+
+class BaseGroupMemberCountListModel(MongoModel):
+    user_groups: Optional[List[BaseGroupMemberCountModel]]

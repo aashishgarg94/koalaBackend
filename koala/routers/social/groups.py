@@ -8,6 +8,7 @@ from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserModel
 from koala.models.social.groups import (
+    BaseGroupMemberCountListModel,
     BaseSocialGroup,
     BaseSocialPostModel,
     GroupsWithPaginationModel,
@@ -135,5 +136,33 @@ async def get_user_following(group_id: str, page_no: Optional[int] = 1):
             )
         else:
             return CreatePostModelOutList(post_list=[])
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/groups_by_user_id",
+    response_model=BaseGroupMemberCountListModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def groups_by_user_id(
+    user_id: str = None, current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_groups_collection = SocialGroupsCollection()
+
+        search_user_id = user_id
+        if user_id is None:
+            search_user_id = current_user.id
+        user_groups = await social_groups_collection.get_groups_by_user_id(
+            user_id=search_user_id
+        )
+
+        if len(user_groups) > 0:
+            return await social_groups_collection.get_group_details(
+                groups_list=user_groups[0].get("groups_followed")
+            )
+
+        return BaseGroupMemberCountListModel(user_groups=[])
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
