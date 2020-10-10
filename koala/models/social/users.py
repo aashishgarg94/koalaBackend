@@ -121,3 +121,19 @@ class UsersFollowing(MongoModel):
 class ShareModel(str, Enum):
     whatsapp = "Whatsapp"
     in_app = "In App"
+
+
+class BasePostMemberModel(MongoModel):
+    id: OID = Field()
+    full_name: BaseFullNameModel
+    users_following: Optional[FollowerModel]
+
+
+class BasePostMemberCountModel(BaseModel):
+    id: OID = Field()
+    full_name: BaseFullNameModel
+    total_followers: int
+
+
+class BasePostMemberCountListModel(MongoModel):
+    users: Optional[List[BasePostMemberCountModel]]

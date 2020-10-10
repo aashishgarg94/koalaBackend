@@ -15,6 +15,7 @@ from koala.models.social.users import (
     BaseFollowerModel,
     BaseIsFollowed,
     BaseLikeModel,
+    BasePostMemberCountListModel,
     BasePostOwnerModel,
     BasePostReportModel,
     BaseShare,
@@ -346,3 +347,20 @@ async def user_bio_fetch(user_id: str = None):
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
         raise e
+
+
+@router.post(
+    "/same_company_users",
+    response_model=BasePostMemberCountListModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_user_following(
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_users_in_same_company(
+            current_company=current_user.bio.current_company
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
