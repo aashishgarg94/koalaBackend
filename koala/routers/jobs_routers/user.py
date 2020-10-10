@@ -102,28 +102,6 @@ async def user_bio_fetch(
         raise e
 
 
-# Get social bio
-@router.get(
-    "/social/users/bio",
-    response_model=BioUpdateOutModel,
-    response_model_include={
-        "id",
-        "qualifications",
-        "experience",
-        "work_history",
-        "current_company",
-    },
-    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
-)
-async def user_bio_fetch(user_id: str = None):
-    try:
-        user_db = MongoDBUserDatabase(UserInModel)
-        return await user_db.user_bio_fetch(user_id=user_id)
-    except Exception as e:
-        logging.error(f"Error while processing this request {e}")
-        raise e
-
-
 # Update user bio for creating it's profile
 @router.post(
     "/user/bio/update",

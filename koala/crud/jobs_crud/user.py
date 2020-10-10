@@ -3,7 +3,7 @@ from typing import Optional, Type
 
 from bson import ObjectId
 from fastapi import HTTPException
-from koala.config.collections import USERS
+from koala.config.collections import SOCIAL_POSTS, USERS
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
 from koala.models.jobs_models.user import (
     UD,
@@ -17,6 +17,7 @@ from koala.models.jobs_models.user import (
 )
 from pydantic import EmailStr
 
+from ..social.users import SocialPostsCollection
 from .mongo_base import MongoBase, return_id_transformation
 
 
@@ -122,6 +123,50 @@ class MongoDBUserDatabase:
                     extended_class_model=BioUpdateOutModel, result=custom_bio_dict
                 )
                 return result_transformation
+
+            raise HTTPException(status_code=200, detail="Bio not available")
+        except Exception as e:
+            raise e
+
+    async def user_social_bio_fetch(
+        self, email: EmailStr = None, user_id: str = None
+    ) -> any:
+        try:
+            if user_id is None:
+                result = await self.collection.find_one({"email": email})
+            else:
+                result = await self.collection.find_one({"_id": ObjectId(user_id)})
+
+            if result:
+                bio_dict = result.get("bio")
+                users_followed_count = (
+                    len(result.get("users_followed"))
+                    if result.get("users_followed") is not None
+                    else 0
+                )
+                users_following_count = (
+                    result.get("users_following.total_followers")
+                    if result.get("users_following.total_followers")
+                    else 0
+                )
+
+                self.collection(SOCIAL_POSTS)
+                social_post_collection = SocialPostsCollection()
+                like_count = await social_post_collection.post_likes_count_by_user_id(
+                    user_id=user_id
+                )
+
+                social_profile_data = {
+                    "qualifications": bio_dict.get("qualifications"),
+                    "experience": bio_dict.get("experience"),
+                    "work_history": bio_dict.get("work_history"),
+                    "current_company": bio_dict.get("current_company"),
+                    "following": users_following_count,
+                    "followers": users_followed_count,
+                    "likes": like_count,
+                }
+
+                return social_profile_data
 
             raise HTTPException(status_code=200, detail="Bio not available")
         except Exception as e:

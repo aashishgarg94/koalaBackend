@@ -310,3 +310,17 @@ async def get_user_following(
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+# Get social bio
+@router.get(
+    "/social/bio",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def user_bio_fetch(user_id: str = None):
+    try:
+        user_db = MongoDBUserDatabase(UserInModel)
+        return await user_db.user_social_bio_fetch(user_id=user_id)
+    except Exception as e:
+        logging.error(f"Error while processing this request {e}")
+        raise e

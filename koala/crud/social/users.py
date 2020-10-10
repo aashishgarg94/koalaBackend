@@ -313,3 +313,15 @@ class SocialPostsCollection:
             return BaseIsUpdated(id=result.id, is_updated=True)
         except Exception as e:
             logging.error(f"Error: Get user followed {e}")
+
+    async def post_likes_count_by_user_id(self, user_id: str,) -> int:
+        try:
+            filter_condition = {"like.liked_by": {"$all": [ObjectId(user_id)]}}
+
+            result = await self.collection.find(
+                finder=filter_condition, return_doc_id=False,
+            )
+
+            return len(result)
+        except Exception as e:
+            logging.error(f"Error: Get like count by user_id {e}")
