@@ -40,3 +40,8 @@ class GroupsWithPaginationModel(MongoModel):
 class GroupsFollowed(MongoModel):
     total_groups: int = 0
     group_list: Optional[List[OID]] = []
+
+
+class UsersFollowed(MongoModel):
+    total_users: int = 0
+    user_list: Optional[List[OID]] = []

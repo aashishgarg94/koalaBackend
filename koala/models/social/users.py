@@ -29,11 +29,6 @@ class BasePostOwnerModel(BaseModel):
     user_id: OID = Field()
 
 
-class BaseShareModel(BaseModel):
-    whatsapp: int = 0
-    in_app_share: int = 0
-
-
 class BaseFollowerModel(BaseModel):
     name: BaseFullNameModel
     email: Optional[EmailStr]
@@ -52,13 +47,28 @@ class BaseCreatePostModel(MongoModel):
     content: str
 
 
+class BaseShareModel(MongoModel):
+    total_share: int = 0
+    shared_by: Optional[List[OID]] = []
+
+
+class BaseShare(BaseModel):
+    whatsapp: BaseShareModel
+    in_app_share: BaseShareModel
+
+
+class BaseLikeModel(MongoModel):
+    total_likes: int = 0
+    liked_by: Optional[List[OID]] = []
+
+
 class BaseFullDetailPostModel(BaseCreatePostModel):
     is_group_post: bool = False
     group_id: Optional[OID]
     owner: BasePostOwnerModel
-    like: int = 0
+    like: Optional[BaseLikeModel]
     comments: Optional[List[BaseCommentsModel]] = []
-    shares: Optional[BaseShareModel]
+    shares: Optional[BaseShare]
     followers: Optional[FollowerModel]
 
 

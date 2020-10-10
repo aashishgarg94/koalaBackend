@@ -32,7 +32,14 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
         return False
 
     # Applicant scopes
-    scopes = ["applicant:read", "applicant:write", "applicant:apply", "hiring:read"]
+    scopes = [
+        "applicant:read",
+        "applicant:write",
+        "applicant:apply",
+        "hiring:read",
+        "social:read",
+        "social:write",
+    ]
     return user, scopes
 
 

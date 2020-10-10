@@ -7,11 +7,13 @@ from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.models.jobs_models.user import UserUpdateOutModel
-from koala.models.social.groups import GroupsFollowed
+from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
     BaseCommentsModel,
     BaseFollowerModel,
     BaseIsFollowed,
+    BaseLikeModel,
+    BaseShare,
     BaseShareModel,
     CreatePostModelIn,
     CreatePostModelOut,
@@ -32,7 +34,8 @@ class SocialPostsCollection:
         post_details: CreatePostModelIn,
         is_group_post: bool,
         group_id: str,
-        shares: BaseShareModel,
+        shares: BaseShare,
+        likes: BaseLikeModel,
     ) -> any:
         try:
             post_details.created_on = datetime.now()
@@ -41,6 +44,8 @@ class SocialPostsCollection:
                 post_details.group_id = ObjectId(group_id)
 
             post_details.shares = shares
+
+            post_details.like = likes
 
             insert_id = await self.collection.insert_one(
                 post_details.dict(),
@@ -184,16 +189,18 @@ class SocialPostsCollection:
 
     async def get_user_followed(
         self, user_id: ObjectId, skip: int, limit: int
-    ) -> CreatePostModelOutList:
+    ) -> UsersFollowed:
         try:
-            social_data = await self.collection.find(
-                finder={"owner.user_id": user_id},
-                skip=skip,
-                limit=limit,
-                return_doc_id=True,
-                extended_class_model=CreatePostModelOut,
+            self.collection(USERS)
+            data = await self.collection.find(
+                finder={"_id": ObjectId(user_id)},
+                projection={"users_followed": 1, "_id": 0},
+                return_doc_id=False,
             )
-            return CreatePostModelOutList(post_list=social_data)
+            return UsersFollowed(
+                total_users=len(data[0]["users_followed"]),
+                user_list=data[0]["users_followed"],
+            )
         except Exception as e:
             logging.error(f"Error: Get user followed {e}")
 
@@ -226,10 +233,16 @@ class SocialPostsCollection:
         self, skip: int, limit: int, group_id: str = None
     ) -> CreatePostModelOutList:
         try:
-            finder = {
-                "$query": {"group_id": ObjectId(group_id), "is_deleted": False},
-                "$orderby": {"created_on": -1},
-            }
+            if group_id:
+                finder = {
+                    "$query": {"group_id": ObjectId(group_id), "is_deleted": False},
+                    "$orderby": {"created_on": -1},
+                }
+            else:
+                finder = {
+                    "$query": {"is_deleted": False},
+                    "$orderby": {"created_on": -1},
+                }
             social_data = await self.collection.find(
                 finder=finder,
                 skip=skip,
@@ -239,11 +252,12 @@ class SocialPostsCollection:
             )
             return CreatePostModelOutList(post_list=social_data)
         except Exception as e:
-            logging.error(f"Error: Get user followed {e}")
+            logging.error(f"Error: Get user feed {e}")
 
     async def post_action(
         self,
         post_id: str,
+        user_id: str,
         comments: BaseCommentsModel = None,
         like: int = None,
         share: str = None,
@@ -252,11 +266,24 @@ class SocialPostsCollection:
             finder = {"_id": ObjectId(post_id)}
             updater = {}
             if like is True:
-                updater = {"$inc": {"like": 1}}
+                updater = {
+                    "$inc": {"like.total_likes": 1},
+                    "$push": {"like.liked_by": {"$each": [ObjectId(user_id)]}},
+                }
             elif share is ShareModel.whatsapp:
-                updater = {"$inc": {"shares.whatsapp": 1}}
+                updater = {
+                    "$inc": {"shares.whatsapp.total_share": 1},
+                    "$push": {
+                        "shares.whatsapp.shared_by": {"$each": [ObjectId(user_id)]}
+                    },
+                }
             elif share is ShareModel.in_app:
-                updater = {"$inc": {"shares.in_app_share": 1}}
+                updater = {
+                    "$inc": {"shares.in_app_share.total_share": 1},
+                    "$push": {
+                        "shares.whatsapp.shared_by": {"$each": [ObjectId(user_id)]}
+                    },
+                }
             elif comments.comments.comment is not None:
                 updater = {
                     "$push": {"comments": {"$each": [comments.dict()]}},

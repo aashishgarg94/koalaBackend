@@ -63,12 +63,7 @@ app.include_router(
     dependencies=[Depends(get_current_active_user)],
 )
 
-app.include_router(
-    users.router,
-    prefix="/user",
-    tags=["Social Users"],
-    dependencies=[Depends(get_current_active_user)],
-)
+app.include_router(users.router, prefix="/user", tags=["Social Users"])
 
 # Website API's
 app.include_router(
