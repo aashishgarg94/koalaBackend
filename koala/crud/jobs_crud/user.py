@@ -69,14 +69,15 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
-    async def disable_one(self, user: UserUpdateCls) -> BaseIsDisabled:
+    async def disable_one(self, user_email: str) -> BaseIsDisabled:
         try:
-            find = {"email": user.email}
-            user.is_disabled = True
-            user.disabled_on = datetime.now()
+            find = {"email": user_email}
+            updater = {"$set": {"is_disabled": True, "disabled_on": datetime.now()}}
+            # user.is_disabled = True
+            # user.disabled_on = datetime.now()
             result = await self.collection.find_one_and_modify(
                 find,
-                {"$set": user.dict(exclude_unset=True)},
+                update=updater,
                 return_doc_id=True,
                 extended_class_model=BaseIsDisabled,
             )

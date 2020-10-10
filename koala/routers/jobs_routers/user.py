@@ -24,7 +24,11 @@ Create User will be done from registration
 
 
 # API -  Get Current User
-@router.get("/user/me", response_model=UserModel)
+@router.get(
+    "/user/me",
+    response_model=UserModel,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
 async def read_user_me(
     current_user: UserModel = Security(
         get_current_active_user, scopes=["applicant:read"],
@@ -38,7 +42,11 @@ async def read_user_me(
 
 
 # API - Update User
-@router.post("/user/update/me", response_model=UserUpdateOutModel)
+@router.post(
+    "/user/update/me",
+    response_model=UserUpdateOutModel,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
 async def update_user_me(
     update_user: UserUpdateModel,
     current_user: UserModel = Security(
@@ -55,7 +63,11 @@ async def update_user_me(
 
 
 # API - Delete User
-@router.get("/user/disable/me", response_model=BaseIsDisabled)
+@router.get(
+    "/user/disable/me",
+    response_model=BaseIsDisabled,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
 async def disable_user_me(
     current_user: UserModel = Security(
         get_current_active_user, scopes=["applicant:write"],
@@ -63,8 +75,8 @@ async def disable_user_me(
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
-        user = UserUpdateCls(**current_user.dict(exclude_unset=True))
-        response = await user_db.disable_one(user)
+        # user = UserUpdateCls(**current_user.dict(exclude_unset=True))
+        response = await user_db.disable_one(current_user.email)
         return response
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
@@ -72,7 +84,11 @@ async def disable_user_me(
 
 
 # Get user bio
-@router.get("/user/bio", response_model=BioUpdateOutModel)
+@router.get(
+    "/user/bio",
+    response_model=BioUpdateOutModel,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
 async def user_bio_fetch(
     current_user: UserModel = Security(
         get_current_active_user, scopes=["applicant:read"],
@@ -87,7 +103,11 @@ async def user_bio_fetch(
 
 
 # Update user bio for creating it's profile
-@router.post("/user/bio/update", response_model=BioUpdateOutModel)
+@router.post(
+    "/user/bio/update",
+    response_model=BioUpdateOutModel,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
 async def user_bio_update(
     user_bio_updates: UserBioModel,
     current_user: UserModel = Security(

@@ -44,9 +44,26 @@ class UserProof(BaseModel):
     is_uploaded: Optional[bool] = False
 
 
+class BaseWorkHistoryModel(BaseModel):
+    company_name: str
+    title: str
+    from_year: int
+    to_year: int
+    role: str
+
+
+class BaseQualificationModel(BaseModel):
+    level: str
+    year: int
+    institute: str
+
+
 # NOTE: Created bio so on first iteration we don't have to MINE the complete user object
 class UserBioModel(BaseModel):
+    qualifications: Optional[List[BaseQualificationModel]]
     experience: float
+    work_history: Optional[List[BaseWorkHistoryModel]]
+    current_company: str = None
     current_salary: Optional[BaseRangeModel]
     expected_salary: Optional[BaseRangeModel]
     preferred_city: Optional[str]
