@@ -106,9 +106,14 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
-    async def user_bio_fetch(self, email: EmailStr) -> Optional[BioUpdateOutModel]:
+    async def user_bio_fetch(
+        self, email: EmailStr = None, user_id: str = None
+    ) -> Optional[BioUpdateOutModel]:
         try:
-            result = await self.collection.find_one({"email": email})
+            if user_id is None:
+                result = await self.collection.find_one({"email": email})
+            else:
+                result = await self.collection.find_one({"_id": ObjectId(user_id)})
 
             if result.get("bio"):
                 custom_bio_dict = result.get("bio")
