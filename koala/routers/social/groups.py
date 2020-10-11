@@ -123,7 +123,7 @@ async def get_group_users(group_id: str):
     response_model=CreatePostModelOutList,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
-async def get_user_following(group_id: str, page_no: Optional[int] = 1):
+async def get_group_posts(group_id: str, page_no: Optional[int] = 1):
     try:
         social_posts_collection = SocialPostsCollection()
         post_count = await social_posts_collection.get_feed_count(is_group_post=True)
@@ -131,7 +131,7 @@ async def get_user_following(group_id: str, page_no: Optional[int] = 1):
         if post_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            return await social_posts_collection.get_user_feed(
+            return await social_posts_collection.get_group_posts(
                 group_id=group_id, skip=skip, limit=REQUEST_LIMIT
             )
         else:

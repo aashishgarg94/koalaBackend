@@ -249,20 +249,36 @@ async def get_user_following(
     response_model=CreatePostModelOutList,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
-async def get_user_following(page_no: Optional[int] = 1):
+async def user_feed_by_groups_and_users_following(
+    page_no: Optional[int] = 1,
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
         social_posts_collection = SocialPostsCollection()
         post_count = await social_posts_collection.get_feed_count()
 
+        groups_followed_list = current_user.groups_followed
+
+        user_followed_list = []
+        for user_dict in current_user.users_following.followers_list:
+            user_followed_list.append(user_dict.user_id)
+
+        logging.info(groups_followed_list)
+        logging.info(user_followed_list)
+
         if post_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            return await social_posts_collection.get_user_feed(
-                skip=skip, limit=REQUEST_LIMIT
+            return await social_posts_collection.get_user_feed_by_groups_and_users_following(
+                skip=skip,
+                limit=REQUEST_LIMIT,
+                groups_followed_list=groups_followed_list,
+                user_followed_list=user_followed_list,
             )
         else:
             return CreatePostModelOutList(post_list=[])
-    except Exception:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -271,7 +287,7 @@ async def get_user_following(page_no: Optional[int] = 1):
     response_model=BaseIsUpdated,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
-async def get_user_following(
+async def user_action_like(
     post_id: str,
     like: bool = False,
     current_user: UserModel = Depends(get_current_active_user),
@@ -290,7 +306,7 @@ async def get_user_following(
     response_model=BaseIsUpdated,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
-async def get_user_following(
+async def user_action_share(
     post_id: str,
     share: ShareModel = ShareModel.whatsapp,
     current_user: UserModel = Depends(get_current_active_user),
@@ -309,7 +325,7 @@ async def get_user_following(
     response_model=BaseIsUpdated,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
-async def get_user_following(
+async def user_action_comment(
     post_id: str,
     comments: CommentInModel,
     current_user: UserModel = Depends(get_current_active_user),
@@ -331,7 +347,7 @@ async def get_user_following(
     response_model=BaseIsUpdated,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
-async def get_user_following(
+async def user_action_report(
     post_id: str,
     report_post: bool = False,
     current_user: UserModel = Depends(get_current_active_user),

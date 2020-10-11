@@ -266,7 +266,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Feed count {e}")
             raise e
 
-    async def get_user_feed(
+    async def get_group_posts(
         self, skip: int, limit: int, group_id: str = None
     ) -> CreatePostModelOutList:
         try:
@@ -280,6 +280,31 @@ class SocialPostsCollection:
                     "$query": {"is_deleted": False},
                     "$orderby": {"created_on": -1},
                 }
+            social_data = await self.collection.find(
+                finder=finder,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+            return CreatePostModelOutList(post_list=social_data)
+        except Exception as e:
+            logging.error(f"Error: Get user feed {e}")
+
+    async def get_user_feed_by_groups_and_users_following(
+        self,
+        skip: int,
+        limit: int,
+        groups_followed_list: list,
+        user_followed_list: list,
+    ) -> CreatePostModelOutList:
+        try:
+            finder = {
+                "$or": [
+                    {"group_id": {"$in": groups_followed_list}},
+                    {"owner.user_id": {"$in": user_followed_list}},
+                ]
+            }
             social_data = await self.collection.find(
                 finder=finder,
                 skip=skip,
