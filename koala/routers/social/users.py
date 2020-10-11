@@ -38,12 +38,22 @@ def get_user_model(current_user: UserModel, get_type: str):
         user_name = current_user.full_name
         user_email = current_user.email
         user_id = current_user.id
+        current_city = current_user.current_city
+        current_company = current_user.bio.current_company
+        total_followers = current_user.users_following.total_followers
 
         if get_type == "id":
             return user_id
         elif get_type == "owner":
             # Update owner
-            return BasePostOwnerModel(name=user_name, email=user_email, user_id=user_id)
+            return BasePostOwnerModel(
+                name=user_name,
+                email=user_email,
+                user_id=user_id,
+                current_city=current_city,
+                current_company=current_company,
+                total_followers=total_followers,
+            )
         elif get_type == "follower":
             # Update follower
             data = BaseFollowerModel(name=user_name, email=user_email, user_id=user_id)

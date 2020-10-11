@@ -27,6 +27,9 @@ class BasePostOwnerModel(BaseModel):
     name: BaseFullNameModel
     email: Optional[EmailStr]
     user_id: OID = Field()
+    current_city: str
+    current_company: str
+    total_followers: int
 
 
 class BaseFollowerModel(BaseModel):
