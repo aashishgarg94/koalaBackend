@@ -333,6 +333,11 @@ class SocialPostsCollection:
                     "$inc": {"like.total_likes": 1},
                     "$push": {"like.liked_by": {"$each": [ObjectId(user_id)]}},
                 }
+            if like is False:
+                updater = {
+                    "$inc": {"like.total_likes": -1},
+                    "$pull": {"like.liked_by": ObjectId(user_id)},
+                }
             elif share is ShareModel.whatsapp:
                 updater = {
                     "$inc": {"shares.whatsapp.total_share": 1},
