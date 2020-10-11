@@ -84,17 +84,6 @@ class BaseIsSaved(MongoModel):
     is_saved: bool
 
 
-# in user collections
-# {
-#     level: "12th",
-#     year: "2020",
-#     institute: 'sfdf'
-#
-# },
-# {
-#     name: "12th",
-#     value: "2020"
-# }
 class BaseKeyValueModel(BaseModel):
     name: str
 

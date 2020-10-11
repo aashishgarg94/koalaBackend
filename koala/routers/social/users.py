@@ -10,6 +10,7 @@ from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
+    BaseCommentIsUpdated,
     BaseCommentsModel,
     BaseCreatePostModel,
     BaseFollowerModel,
@@ -322,7 +323,7 @@ async def user_action_share(
 
 @router.post(
     "/action/comment",
-    response_model=BaseIsUpdated,
+    response_model=BaseCommentIsUpdated,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def user_action_comment(

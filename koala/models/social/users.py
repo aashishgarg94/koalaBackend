@@ -140,3 +140,9 @@ class BasePostMemberCountModel(BaseModel):
 
 class BasePostMemberCountListModel(MongoModel):
     users: Optional[List[BasePostMemberCountModel]]
+
+
+class BaseCommentIsUpdated(MongoModel):
+    id: OID = Field()
+    is_updated: bool
+    comment: BaseCommentsModel

@@ -9,6 +9,7 @@ from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
+    BaseCommentIsUpdated,
     BaseCommentsModel,
     BaseFollowerModel,
     BaseIsFollowed,
@@ -324,7 +325,7 @@ class SocialPostsCollection:
         like: int = None,
         share: str = None,
         report_post: bool = False,
-    ) -> BaseIsUpdated:
+    ) -> any:
         try:
             finder = {"_id": ObjectId(post_id)}
             updater = {}
@@ -353,10 +354,20 @@ class SocialPostsCollection:
                     },
                 }
             elif comments is not None:
-                # elif comments.comments.comment is not None:
                 updater = {
                     "$push": {"comments": {"$each": [comments.dict()]}},
                 }
+                result = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_doc_id=True,
+                    extended_class_model=CreatePostModelOut,
+                    insert_if_not_found=True,
+                    return_updated_document=True,
+                )
+                return BaseCommentIsUpdated(
+                    id=result.id, is_updated=True, comment=comments
+                )
             elif report_post is True:
                 updater = {
                     "$inc": {"post_report.total_report": 1},
