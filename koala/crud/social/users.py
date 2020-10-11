@@ -350,7 +350,7 @@ class SocialPostsCollection:
                 updater = {
                     "$inc": {"shares.in_app_share.total_share": 1},
                     "$push": {
-                        "shares.whatsapp.shared_by": {"$each": [ObjectId(user_id)]}
+                        "shares.in_app_share.shared_by": {"$each": [ObjectId(user_id)]}
                     },
                 }
             elif comments is not None:
