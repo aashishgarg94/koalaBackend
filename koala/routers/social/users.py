@@ -186,7 +186,8 @@ async def get_user_followed_groups(user_id: str):
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def make_user_follow_group(
-    user_id: str, current_user: UserModel = Depends(get_current_active_user),
+    user_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         user_map = get_user_model(current_user, "follower")

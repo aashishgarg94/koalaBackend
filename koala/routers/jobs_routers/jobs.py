@@ -32,7 +32,8 @@ DUMMY_COMPANY_ID = "100-workforce"
     response_model=BaseIsCreated,
     dependencies=[
         Security(
-            get_current_active_user_company, scopes=["company:read", "company:write"],
+            get_current_active_user_company,
+            scopes=["company:read", "company:write"],
         )
     ],
 )
@@ -53,7 +54,12 @@ async def job_create(job_info: BaseJobModel):
 @router.get(
     "/jobs/all/full_detail",
     response_model=JobOutWithPagination,
-    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["hiring:read"],
+        )
+    ],
 )
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
@@ -79,7 +85,12 @@ async def job_get_all(page_no: Optional[int] = 1):
 @router.get(
     "/jobs/all",
     response_model=JobListOutWithPaginationModel,
-    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["hiring:read"],
+        )
+    ],
 )
 async def job_get_all(page_no: Optional[int] = 1):
     job_collection = JobCollection()
@@ -105,7 +116,12 @@ async def job_get_all(page_no: Optional[int] = 1):
 @router.get(
     "/jobs/get/{job_id}",
     response_model=JobOutModel,
-    dependencies=[Security(get_current_active_user_company, scopes=["hiring:read"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["hiring:read"],
+        )
+    ],
 )
 async def get_job_by_id(job_id: str):
     job_collection = JobCollection()
@@ -118,7 +134,12 @@ async def get_job_by_id(job_id: str):
 @router.post(
     "/jobs/update/{job_id}",
     response_model=BaseIsUpdated,
-    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["company:write"],
+        )
+    ],
 )
 async def job_update(job_id: str, job_detail: BaseJobModel):
     # Anything can be update regarding a job from here
@@ -135,7 +156,12 @@ async def job_update(job_id: str, job_detail: BaseJobModel):
 @router.get(
     "/jobs/close/{job_id}",
     response_model=BaseIsJobClosed,
-    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["company:write"],
+        )
+    ],
 )
 async def job_delete_by_id(job_id: str):
     job_collection = JobCollection()
@@ -153,7 +179,12 @@ async def job_delete_by_id(job_id: str):
 @router.post(
     "/jobs/delete/{job_id}",
     response_model=BaseIsDeleted,
-    dependencies=[Security(get_current_active_user_company, scopes=["company:write"],)],
+    dependencies=[
+        Security(
+            get_current_active_user_company,
+            scopes=["company:write"],
+        )
+    ],
 )
 async def job_delete_by_id(job_id: str):
     job_collection = JobCollection()
@@ -171,7 +202,12 @@ async def job_delete_by_id(job_id: str):
 @router.post(
     "/jobs/save/{job_id}",
     response_model=BaseIsSaved,
-    dependencies=[Security(get_current_active_user, scopes=["applicant:write"],)],
+    dependencies=[
+        Security(
+            get_current_active_user,
+            scopes=["applicant:write"],
+        )
+    ],
 )
 async def job_save_by_id(
     job_id: str, current_user: UserModel = Depends(get_current_active_user)

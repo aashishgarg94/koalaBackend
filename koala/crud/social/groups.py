@@ -104,7 +104,11 @@ class SocialGroupsCollection:
             if group_result.id:
                 finder = {"_id": user_map.user_id}
                 updater = {
-                    "$push": {"groups_followed": {"$each": [group_id_obj],}},
+                    "$push": {
+                        "groups_followed": {
+                            "$each": [group_id_obj],
+                        }
+                    },
                 }
 
                 self.collection(USERS)
@@ -139,7 +143,10 @@ class SocialGroupsCollection:
         except Exception as e:
             logging.error(f"Error: Get group users {e}")
 
-    async def get_groups_by_user_id(self, user_id: str,) -> any:
+    async def get_groups_by_user_id(
+        self,
+        user_id: str,
+    ) -> any:
         try:
             filter_condition = {"_id": ObjectId(user_id)}
 

@@ -189,7 +189,9 @@ async def job_applicant_action(
     "/jobs/user_op_jobs",
     dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
 )
-async def user_action_jobs(current_user: UserModel = Depends(get_current_active_user),):
+async def user_action_jobs(
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
         job_user = JobUser()
         result = await job_user.get_user_action_jobs(user_id=current_user.id)

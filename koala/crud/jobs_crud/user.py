@@ -30,7 +30,9 @@ class MongoDBUserDatabase:
     async def find_by_object_id(self, user_id: ObjectId) -> Optional[UD]:
         try:
             return await self.collection.find_one(
-                {"_id": user_id}, return_doc_id=True, extended_class_model=UserOutModel,
+                {"_id": user_id},
+                return_doc_id=True,
+                extended_class_model=UserOutModel,
             )
         except Exception as e:
             raise e
@@ -38,7 +40,9 @@ class MongoDBUserDatabase:
     async def find_by_email(self, email: str) -> Optional[UD]:
         try:
             return await self.collection.find_one(
-                {"email": email}, return_doc_id=True, extended_class_model=UserOutModel,
+                {"email": email},
+                return_doc_id=True,
+                extended_class_model=UserOutModel,
             )
         except Exception as e:
             raise e
@@ -94,7 +98,8 @@ class MongoDBUserDatabase:
             find = {"email": current_user.email}
             bio_updates.updated_on = datetime.now()
             result = await self.collection.find_one_and_modify(
-                find, {"$set": {"bio": bio_updates.dict(exclude_unset=True)}},
+                find,
+                {"$set": {"bio": bio_updates.dict(exclude_unset=True)}},
             )
 
             custom_bio_dict = result.get("bio")

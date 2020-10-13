@@ -1,3 +1,5 @@
+import logging
+
 import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +9,7 @@ from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.routers.jobs_routers import (
     auth,
     company,
+    image_uploads,
     job_user,
     jobs,
     master,
@@ -17,6 +20,34 @@ from koala.routers.jobs_routers import (
 from koala.routers.social import groups, users
 
 app = FastAPI()
+
+
+def config_logging(level=logging.INFO):
+    # When run by 'uvicorn ...', a root handler is already
+    # configured and the basicConfig below does nothing.
+    # To get the desired formatting:
+    logging.getLogger().handlers.clear()
+
+    # 'uvicorn --log-config' is broken so we configure in the app.
+    #   https://github.com/encode/uvicorn/issues/511
+    logging.basicConfig(
+        # match gunicorn format
+        format="%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+        datefmt="[%Y-%m-%d %H:%M:%S %z]",
+        level=level,
+    )
+
+    # When run by 'gunicorn -k uvicorn.workers.UvicornWorker ...',
+    # These loggers are already configured and propogating.
+    # So we have double logging with a root logger.
+    # (And setting propagate = False hurts the other usage.)
+    logging.getLogger("uvicorn.access").handlers.clear()
+    logging.getLogger("uvicorn.error").handlers.clear()
+    logging.getLogger("uvicorn.access").propagate = True
+    logging.getLogger("uvicorn.error").propagate = True
+
+
+config_logging()
 
 origins = [
     "https://koala.bharatworks.co",
@@ -60,9 +91,12 @@ app.include_router(groups.router, prefix="/group", tags=["Social Groups"])
 
 app.include_router(users.router, prefix="/user", tags=["Social Users"])
 
+app.include_router(image_uploads.router, prefix="/upload", tags=["Image Upload"])
+
 # Website API's
 app.include_router(
-    website.router, tags=["Website APIs"],
+    website.router,
+    tags=["Website APIs"],
 )
 
 if __name__ == "__main__":

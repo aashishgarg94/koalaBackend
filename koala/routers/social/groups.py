@@ -92,7 +92,8 @@ async def get_group_by_id(group_id: str):
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def make_user_follow_group(
-    group_id: str, current_user: UserModel = Depends(get_current_active_user),
+    group_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         user_map = get_user_model(current_user, "follower")
@@ -146,7 +147,8 @@ async def get_group_posts(group_id: str, page_no: Optional[int] = 1):
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
 async def groups_by_user_id(
-    user_id: str = None, current_user: UserModel = Depends(get_current_active_user),
+    user_id: str = None,
+    current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         social_groups_collection = SocialGroupsCollection()

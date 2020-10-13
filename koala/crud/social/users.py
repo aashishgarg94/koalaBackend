@@ -19,13 +19,11 @@ from koala.models.social.users import (
     BasePostMemberModel,
     BasePostReportModel,
     BaseShare,
-    BaseShareModel,
     CreatePostModelIn,
     CreatePostModelOut,
     CreatePostModelOutList,
     FollowerModel,
     ShareModel,
-    UserFollowed,
 )
 
 
@@ -204,7 +202,11 @@ class SocialPostsCollection:
             if user_following.id:
                 finder = {"_id": user_map.user_id}
                 updater = {
-                    "$push": {"users_followed": {"$each": [user_id_obj],}},
+                    "$push": {
+                        "users_followed": {
+                            "$each": [user_id_obj],
+                        }
+                    },
                 }
 
                 self.collection(USERS)
@@ -388,12 +390,16 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: Get user followed {e}")
 
-    async def post_likes_count_by_user_id(self, user_id: str,) -> int:
+    async def post_likes_count_by_user_id(
+        self,
+        user_id: str,
+    ) -> int:
         try:
             filter_condition = {"like.liked_by": {"$all": [ObjectId(user_id)]}}
 
             result = await self.collection.find(
-                finder=filter_condition, return_doc_id=False,
+                finder=filter_condition,
+                return_doc_id=False,
             )
 
             return len(result)

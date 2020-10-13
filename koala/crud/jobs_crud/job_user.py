@@ -401,8 +401,8 @@ class JobUser:
             on_job_collection_result = await self.apply_action_on_job(
                 job_user_map=job_user_map
             )
-            on_job_applicants_collection_result = await self.apply_action_on_job_applicants(
-                job_user_map=job_user_map
+            on_job_applicants_collection_result = (
+                await self.apply_action_on_job_applicants(job_user_map=job_user_map)
             )
             logging.info(on_job_collection_result)
             logging.info(on_job_applicants_collection_result)

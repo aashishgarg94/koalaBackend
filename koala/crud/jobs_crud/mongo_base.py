@@ -213,7 +213,8 @@ class MongoBase:
             raise e
 
     async def count(
-        self, filter_condition: dict,
+        self,
+        filter_condition: dict,
     ):
         try:
             logging.info(f"Mongo base: Fetching count...")

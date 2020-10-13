@@ -31,7 +31,8 @@ Create User will be done from registration
 )
 async def read_user_me(
     current_user: UserModel = Security(
-        get_current_active_user, scopes=["applicant:read"],
+        get_current_active_user,
+        scopes=["applicant:read"],
     )
 ):
     try:
@@ -50,7 +51,8 @@ async def read_user_me(
 async def update_user_me(
     update_user: UserUpdateModel,
     current_user: UserModel = Security(
-        get_current_active_user, scopes=["applicant:write"],
+        get_current_active_user,
+        scopes=["applicant:write"],
     ),
 ):
     try:
@@ -70,7 +72,8 @@ async def update_user_me(
 )
 async def disable_user_me(
     current_user: UserModel = Security(
-        get_current_active_user, scopes=["applicant:write"],
+        get_current_active_user,
+        scopes=["applicant:write"],
     )
 ):
     try:
@@ -91,7 +94,8 @@ async def disable_user_me(
 )
 async def user_bio_fetch(
     current_user: UserModel = Security(
-        get_current_active_user, scopes=["applicant:read"],
+        get_current_active_user,
+        scopes=["applicant:read"],
     )
 ):
     try:
@@ -111,7 +115,8 @@ async def user_bio_fetch(
 async def user_bio_update(
     user_bio_updates: UserBioModel,
     current_user: UserModel = Security(
-        get_current_active_user, scopes=["applicant:write"],
+        get_current_active_user,
+        scopes=["applicant:write"],
     ),
 ):
     try:
