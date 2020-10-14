@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Security
@@ -53,17 +54,22 @@ async def create_group(
     response_model=GroupsWithPaginationModel,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
-async def get_all_groups(page_no: Optional[int] = 1):
+async def get_all_groups(
+    page_no: Optional[int] = 1,
+    current_user: UserModel = Depends(get_current_active_user),
+):
     try:
         social_groups_collection = SocialGroupsCollection()
-        groups_count = await social_groups_collection.get_count()
+        groups_count = await social_groups_collection.get_count(
+            current_groups=current_user.groups_followed
+        )
 
         group_list = []
         if groups_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
             group_list = await social_groups_collection.get_all_groups(
-                skip, REQUEST_LIMIT
+                skip, REQUEST_LIMIT, current_groups=current_user.groups_followed
             )
 
         return GroupsWithPaginationModel(
@@ -102,7 +108,8 @@ async def make_user_follow_group(
         return await social_groups_collection.followGroup(
             group_id=group_id, user_map=user_map
         )
-    except Exception:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 

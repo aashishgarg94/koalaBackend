@@ -36,18 +36,20 @@ class SocialGroupsCollection:
         except Exception as e:
             logging.error(f"Error: Create group error {e}")
 
-    async def get_count(self) -> int:
+    async def get_count(self, current_groups: list = None) -> int:
         try:
-            filter_condition = {"is_deleted": False}
+            filter_condition = {"is_deleted": False, "_id": {"$nin": current_groups}}
             count = await self.collection.count(filter_condition)
             return count if count else 0
         except Exception as e:
             logging.error(f"Error: Get Count {e}")
             raise e
 
-    async def get_all_groups(self, skip: int, limit: int) -> List[SocialGroupListOut]:
+    async def get_all_groups(
+        self, skip: int, limit: int, current_groups: list = None
+    ) -> List[SocialGroupListOut]:
         try:
-            filter_condition = {"is_deleted": False}
+            filter_condition = {"is_deleted": False, "_id": {"$nin": current_groups}}
             data = await self.collection.find(
                 finder=filter_condition,
                 skip=skip,
