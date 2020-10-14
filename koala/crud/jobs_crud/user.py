@@ -162,6 +162,9 @@ class MongoDBUserDatabase:
                 )
 
                 social_profile_data = {
+                    "name": result.get("full_name"),
+                    "current_city": result.get("current_city"),
+                    "about_me": bio_dict.get("about_me"),
                     "qualifications": bio_dict.get("qualifications"),
                     "experience": bio_dict.get("experience"),
                     "work_history": bio_dict.get("work_history"),

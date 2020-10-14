@@ -61,6 +61,7 @@ class BaseQualificationModel(BaseModel):
 
 # NOTE: Created bio so on first iteration we don't have to MINE the complete user object
 class UserBioModel(BaseModel):
+    about_me: Optional[str] = None
     qualifications: Optional[List[BaseQualificationModel]]
     experience: float
     work_history: Optional[List[BaseWorkHistoryModel]]
