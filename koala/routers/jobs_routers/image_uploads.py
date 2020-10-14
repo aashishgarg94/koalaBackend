@@ -1,53 +1,107 @@
 import logging
+from datetime import datetime
+from uuid import uuid4
 
 import boto3
-from botocore.exceptions import ClientError
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from koala.constants import (
+    S3_IMAGE_BUCKET_COMPANY_PROFILE,
+    S3_IMAGE_BUCKET_POSTS,
+    S3_IMAGE_BUCKET_PROFILE,
+)
 
 router = APIRouter()
 
+s3_client = boto3.client("s3")
 
-def upload_file(file_name, bucket, object_name=None):
-    """Upload a file to an S3 bucket
 
-    :param file_name: File to upload
-    :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
-    :return: True if file was uploaded, else False
-    """
+def get_s3_resource_url(bucket_name, object_name):
+    location = s3_client.get_bucket_location(Bucket=bucket_name)["LocationConstraint"]
+    return "https://%s.s3.%s.amazonaws.com/%s" % (bucket_name, location, object_name)
+    # return f"https://{bucket_name}.s3.{location}.amazonaws.com/{object_name}" -- keeping it for now
 
-    # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = file_name
 
-    # Upload the file
-    s3_client = boto3.client("s3")
+def generate_unique_name(name_type: str = None):
+    return f"{name_type}-{datetime.now().strftime('%Y%m-%d%H-%M%S-')}{str(uuid4())}.png"
+
+
+async def upload_files(upload_file, bucket, object_name):
     try:
-        # with open(file_name, "rb") as f:
-        # with file_name as f:
-        #     f.seek(0)
-        s3_client.upload_fileobj(file_name, bucket, object_name)
-    except ClientError as e:
+        upload_file.file.seek(0)
+        s3_client.upload_fileobj(
+            upload_file.file,
+            bucket,
+            object_name,
+            ExtraArgs={"ContentType": "image/png", "ACL": "public-read"},
+        )
+    except Exception as e:
         logging.error(e)
         return False
-    return response
+    return True
 
 
 @router.post("/profile_image")
-async def profile_image(file: UploadFile = File(...)):
+async def upload_profile_image(file: UploadFile = File(...)):
     try:
-        logging.info({"filename": file.filename})
-        logging.info(file)
-        logging.info(file.file)
-        logging.info("image upload check")
-        # contents = await file.read()
-        # logging.info(contents)
-
-        # s3 = boto3.resource('s3')
-        # for bucket in s3.buckets.all():
-        #     print(bucket.name)
-        s3_upload = upload_file(file.file, "koala-profile-images")
+        object_name = generate_unique_name(name_type="profile-img")
+        s3_upload = await upload_files(
+            upload_file=file, bucket=S3_IMAGE_BUCKET_PROFILE, object_name=object_name
+        )
         logging.info(s3_upload)
+        if s3_upload is True:
+            return {
+                "image_upload": True,
+                "image_url": get_s3_resource_url(
+                    bucket_name=S3_IMAGE_BUCKET_PROFILE, object_name=object_name
+                ),
+            }
+        else:
+            return {"image_upload": False}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail="Something went wrong while ")
+
+
+@router.post("/company_profile_image")
+async def upload_company_profile_image(file: UploadFile = File(...)):
+    try:
+        object_name = generate_unique_name(name_type="company-profile-img")
+        s3_upload = await upload_files(
+            upload_file=file,
+            bucket=S3_IMAGE_BUCKET_COMPANY_PROFILE,
+            object_name=object_name,
+        )
+        logging.info(s3_upload)
+        if s3_upload is True:
+            return {
+                "image_upload": True,
+                "image_url": get_s3_resource_url(
+                    bucket_name=S3_IMAGE_BUCKET_COMPANY_PROFILE, object_name=object_name
+                ),
+            }
+        else:
+            return {"image_upload": False}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail="Something went wrong while ")
+
+
+async def upload_social_post_image(file: UploadFile = File(...)):
+    try:
+        object_name = generate_unique_name(name_type="social-post-img")
+        s3_upload = await upload_files(
+            upload_file=file, bucket=S3_IMAGE_BUCKET_POSTS, object_name=object_name
+        )
+        logging.info(s3_upload)
+        if s3_upload is True:
+            return {
+                "image_upload": True,
+                "image_url": get_s3_resource_url(
+                    bucket_name=S3_IMAGE_BUCKET_POSTS, object_name=object_name
+                ),
+            }
+        else:
+            return {"image_upload": False}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong while ")
