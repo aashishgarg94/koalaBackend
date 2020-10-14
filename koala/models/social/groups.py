@@ -17,7 +17,7 @@ class BaseSocialPostModel(BaseModel):
 
 
 class SocialGroupCreateIn(BaseSocialGroup):
-    owner: BasePostOwnerModel
+    owner: Optional[BasePostOwnerModel]
     posts: Optional[BaseSocialPostModel]
     followers: Optional[FollowerModel]
     is_updated: Optional[bool] = False
@@ -31,10 +31,19 @@ class SocialGroupCreateOut(SocialGroupCreateIn):
     id: OID = Field()
 
 
+class SocialGroupInfo(BaseSocialGroup):
+    owner: Optional[BasePostOwnerModel]
+    followers: Optional[FollowerModel]
+
+
+class SocialGroupListOut(SocialGroupInfo):
+    id: OID = Field()
+
+
 class GroupsWithPaginationModel(MongoModel):
     current_page: int
     total_groups: int
-    groups: List[SocialGroupCreateOut]
+    groups: List[SocialGroupListOut]
 
 
 class GroupsFollowed(MongoModel):

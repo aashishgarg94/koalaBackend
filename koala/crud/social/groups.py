@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from bson import ObjectId
 from koala.config.collections import SOCIAL_GROUPS, USERS
@@ -12,9 +12,9 @@ from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
     BaseGroupMemberCountModel,
     BaseGroupMemberModel,
-    BaseSocialGroup,
     SocialGroupCreateIn,
     SocialGroupCreateOut,
+    SocialGroupListOut,
 )
 from koala.models.social.users import BaseFollowerModel, BaseIsFollowed, FollowerModel
 
@@ -45,9 +45,7 @@ class SocialGroupsCollection:
             logging.error(f"Error: Get Count {e}")
             raise e
 
-    async def get_all_groups(
-        self, skip: int, limit: int
-    ) -> Optional[List[BaseSocialGroup]]:
+    async def get_all_groups(self, skip: int, limit: int) -> List[SocialGroupListOut]:
         try:
             filter_condition = {"is_deleted": False}
             data = await self.collection.find(
@@ -55,7 +53,14 @@ class SocialGroupsCollection:
                 skip=skip,
                 limit=limit,
                 return_doc_id=True,
-                extended_class_model=SocialGroupCreateOut,
+                extended_class_model=SocialGroupListOut,
+                projection={
+                    "_id": 1,
+                    "groupName": 1,
+                    "groupDescription": 1,
+                    "owner": 1,
+                    "followers": 1,
+                },
             )
             return data if data else None
         except Exception as e:
