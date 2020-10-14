@@ -455,10 +455,12 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: Get group count by user_id {e}")
 
-    async def get_users_to_follow(self, user_id: str) -> BasePostMemberCountListModel:
+    async def get_users_to_follow(
+        self, current_followed_users: list
+    ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
-                "_id": {"$nin": [ObjectId(user_id)]},
+                "_id": {"$nin": current_followed_users},
             }
 
             self.collection(USERS)

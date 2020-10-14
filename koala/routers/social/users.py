@@ -409,9 +409,16 @@ async def get_users_to_follow(
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
+        user_db = MongoDBUserDatabase(UserInModel)
+        current_user_followed_list = await user_db.find_user_followed_by_email(
+            current_user.email
+        )
+        current_followed_users = current_user_followed_list[0]["users_followed"]
+        current_followed_users.append(current_user.id)
+
         social_posts_collection = SocialPostsCollection()
         return await social_posts_collection.get_users_to_follow(
-            user_id=current_user.id
+            current_followed_users=current_user_followed_list[0]["users_followed"]
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
