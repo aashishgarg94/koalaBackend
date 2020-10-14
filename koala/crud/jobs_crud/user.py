@@ -47,6 +47,16 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
+    async def find_groups_followed_by_email(self, email: str) -> Optional[UD]:
+        try:
+            return await self.collection.find(
+                finder={"email": email},
+                projection={"groups_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+        except Exception as e:
+            raise e
+
     async def create_user(self, user: UserInModel) -> BaseIsCreated:
         try:
             user.created_on = datetime.now()

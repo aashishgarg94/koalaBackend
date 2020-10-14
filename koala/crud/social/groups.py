@@ -27,7 +27,10 @@ class SocialGroupsCollection:
         self.collection(SOCIAL_GROUPS)
 
     async def create_group(
-        self, group_details: SocialGroupCreateIn, file: UploadFile = File(...)
+        self,
+        user_id: str,
+        group_details: SocialGroupCreateIn,
+        file: UploadFile = File(...),
     ) -> any:
         try:
             # Upload image to get S3 url
@@ -44,7 +47,32 @@ class SocialGroupsCollection:
                 return_doc_id=True,
                 extended_class_model=BaseIsCreated,
             )
-            return BaseIsCreated(id=result, is_created=True) if result else None
+
+            # Updating User collection
+            if result:
+                finder = {"_id": ObjectId(user_id)}
+                updater = {
+                    "$push": {
+                        "groups_followed": {
+                            "$each": [ObjectId(result)],
+                        }
+                    },
+                }
+
+                self.collection(USERS)
+                user_result = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_updated_document=True,
+                    return_doc_id=True,
+                    extended_class_model=UserUpdateOutModel,
+                )
+
+                return (
+                    BaseIsCreated(id=result, is_created=True)
+                    if result and user_result
+                    else None
+                )
         except Exception as e:
             logging.error(f"Error: Create group error {e}")
 

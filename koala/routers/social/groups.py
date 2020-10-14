@@ -5,10 +5,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Security, UploadFile
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.groups import SocialGroupsCollection
 from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.master import BaseIsCreated
-from koala.models.jobs_models.user import UserModel
+from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
     BaseSocialPostModel,
@@ -63,7 +64,7 @@ async def create_group(
 
         social_groups_collection = SocialGroupsCollection()
         return await social_groups_collection.create_group(
-            group_details=group_details, file=file
+            group_details=group_details, file=file, user_id=current_user.id
         )
     except Exception as e:
         logging.error(e)
@@ -80,21 +81,26 @@ async def get_all_groups(
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
-        social_groups_collection = SocialGroupsCollection()
-        groups_count = await social_groups_collection.get_count(
-            current_groups=current_user.groups_followed
+        user_db = MongoDBUserDatabase(UserInModel)
+        user_current_group_list = await user_db.find_groups_followed_by_email(
+            email=current_user.email
         )
 
         group_list = []
-        if groups_count > 0:
+        if len(user_current_group_list[0].get("groups_followed")) > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
+            social_groups_collection = SocialGroupsCollection()
             group_list = await social_groups_collection.get_all_groups(
-                skip, REQUEST_LIMIT, current_groups=current_user.groups_followed
+                skip,
+                REQUEST_LIMIT,
+                current_groups=user_current_group_list[0].get("groups_followed"),
             )
 
         return GroupsWithPaginationModel(
-            total_groups=groups_count, current_page=page_no, groups=group_list
+            total_groups=len(user_current_group_list[0].get("groups_followed")),
+            current_page=page_no,
+            groups=group_list,
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
