@@ -82,12 +82,18 @@ class SocialPostsCollection:
                 )
 
                 return (
-                    BaseIsCreated(id=insert_id, is_created=True)
+                    await self.get_user_post_by_post_id(post_id=insert_id)
                     if insert_id and group_result
                     else None
                 )
-            return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
+
+            return (
+                await self.get_user_post_by_post_id(post_id=insert_id)
+                if insert_id
+                else None
+            )
         except Exception as e:
+            logging.error(e)
             logging.error(f"Error: Create social users error {e}")
 
     async def get_count(self) -> int:
@@ -115,6 +121,7 @@ class SocialPostsCollection:
 
     async def get_user_post_by_post_id(self, post_id: str) -> any:
         try:
+            self.collection(SOCIAL_POSTS)
             post_id_obj = ObjectId(post_id)
             return await self.collection.find_one(
                 {"_id": post_id_obj},
@@ -124,16 +131,16 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: Get user post by id {e}")
 
-    async def get_user_post_by_post_id(self, post_id: str) -> any:
-        try:
-            post_id_obj = ObjectId(post_id)
-            return await self.collection.find_one(
-                {"_id": post_id_obj},
-                return_doc_id=True,
-                extended_class_model=CreatePostModelOut,
-            )
-        except Exception as e:
-            logging.error(f"Error: Get user post by id {e}")
+    # async def get_user_post_by_post_id(self, post_id: str) -> any:
+    #     try:
+    #         post_id_obj = ObjectId(post_id)
+    #         return await self.collection.find_one(
+    #             {"_id": post_id_obj},
+    #             return_doc_id=True,
+    #             extended_class_model=CreatePostModelOut,
+    #         )
+    #     except Exception as e:
+    #         logging.error(f"Error: Get user post by id {e}")
 
     async def get_user_post_count_by_user_id(self, user_id: str) -> int:
         try:
