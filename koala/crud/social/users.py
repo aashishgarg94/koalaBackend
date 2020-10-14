@@ -407,10 +407,13 @@ class SocialPostsCollection:
             logging.error(f"Error: Get like count by user_id {e}")
 
     async def get_users_in_same_company(
-        self, current_company: str
+        self, current_company: str, user_id: str
     ) -> BasePostMemberCountListModel:
         try:
-            filter_condition = {"bio.current_company": current_company}
+            filter_condition = {
+                "bio.current_company": current_company,
+                "_id": {"$nin": [ObjectId(user_id)]},
+            }
 
             self.collection(USERS)
             users_list = await self.collection.find(

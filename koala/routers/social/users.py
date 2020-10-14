@@ -388,7 +388,7 @@ async def get_user_following(
     try:
         social_posts_collection = SocialPostsCollection()
         return await social_posts_collection.get_users_in_same_company(
-            current_company=current_user.bio.current_company
+            current_company=current_user.bio.current_company, user_id=current_user.id
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
