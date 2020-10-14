@@ -33,6 +33,7 @@ class UserModel(BaseModel):
     current_area: Optional[str] = None
     current_gigtype: Optional[str] = None
     gps: Optional[GpsModel] = None
+    profile_image: Optional[str] = None
 
 
 class UserRegisterModel(UserModel):

@@ -3,12 +3,15 @@ from datetime import datetime
 from uuid import uuid4
 
 import boto3
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Security, UploadFile
+from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import (
     S3_IMAGE_BUCKET_COMPANY_PROFILE,
     S3_IMAGE_BUCKET_POSTS,
     S3_IMAGE_BUCKET_PROFILE,
 )
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.user import UserInModel, UserModel
 
 router = APIRouter()
 
@@ -19,6 +22,10 @@ def get_s3_resource_url(bucket_name, object_name):
     location = s3_client.get_bucket_location(Bucket=bucket_name)["LocationConstraint"]
     return "https://%s.s3.%s.amazonaws.com/%s" % (bucket_name, location, object_name)
     # return f"https://{bucket_name}.s3.{location}.amazonaws.com/{object_name}" -- keeping it for now
+
+
+def delete_s3_resource(bucket_name, object_name):
+    return s3_client.delete_object(Bucket=bucket_name, Key=object_name)
 
 
 def generate_unique_name(name_type: str = None):
@@ -40,23 +47,44 @@ async def upload_files(upload_file, bucket, object_name):
     return True
 
 
-@router.post("/profile_image")
-async def upload_profile_image(file: UploadFile = File(...)):
+@router.post(
+    "/profile_image",
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
+async def upload_profile_image(
+    file: UploadFile = File(...),
+    current_user: UserModel = Security(
+        get_current_active_user,
+        scopes=["applicant:write"],
+    ),
+):
     try:
         object_name = generate_unique_name(name_type="profile-img")
+        s3_resource_url = get_s3_resource_url(
+            bucket_name=S3_IMAGE_BUCKET_PROFILE, object_name=object_name
+        )
+
         s3_upload = await upload_files(
             upload_file=file, bucket=S3_IMAGE_BUCKET_PROFILE, object_name=object_name
         )
-        logging.info(s3_upload)
         if s3_upload is True:
-            return {
-                "image_upload": True,
-                "image_url": get_s3_resource_url(
+            logging.info(current_user)
+            user_db = MongoDBUserDatabase(UserInModel)
+            user_update_result = await user_db.update_profile_image_path(
+                user_id=current_user.id, s3_path=s3_resource_url
+            )
+
+            if user_update_result.get("is_profile_image_updated") is True:
+                return {
+                    "image_upload": True,
+                    "image_url": s3_resource_url,
+                }
+            else:
+                delete_s3_resource(
                     bucket_name=S3_IMAGE_BUCKET_PROFILE, object_name=object_name
-                ),
-            }
-        else:
-            return {"image_upload": False}
+                )
+
+        return {"image_upload": False}
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong while ")
@@ -71,7 +99,7 @@ async def upload_company_profile_image(file: UploadFile = File(...)):
             bucket=S3_IMAGE_BUCKET_COMPANY_PROFILE,
             object_name=object_name,
         )
-        logging.info(s3_upload)
+
         if s3_upload is True:
             return {
                 "image_upload": True,
@@ -92,7 +120,7 @@ async def upload_social_post_image(file: UploadFile = File(...)):
         s3_upload = await upload_files(
             upload_file=file, bucket=S3_IMAGE_BUCKET_POSTS, object_name=object_name
         )
-        logging.info(s3_upload)
+
         if s3_upload is True:
             return {
                 "image_upload": True,
