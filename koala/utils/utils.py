@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import boto3
 from fastapi import File, HTTPException, UploadFile
-from koala.constants import S3_IMAGE_BUCKET_POSTS
+from koala.constants import S3_IMAGE_BUCKET_GROUPS, S3_IMAGE_BUCKET_POSTS
 
 s3_client = boto3.client("s3")
 
@@ -55,6 +55,31 @@ async def upload_social_post_image(file: UploadFile = File(...)):
             }
         else:
             return {"is_post_image_upload": False}
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Something went wrong while uploading social post image",
+        )
+
+
+async def upload_social_group_image(file: UploadFile = File(...)):
+    try:
+        object_name = generate_unique_name(name_type="soc-gro-img")
+        s3_resource_url = get_s3_resource_url(
+            bucket_name=S3_IMAGE_BUCKET_GROUPS, object_name=object_name
+        )
+
+        s3_upload = await upload_files(
+            upload_file=file, bucket=S3_IMAGE_BUCKET_GROUPS, object_name=object_name
+        )
+        if s3_upload is True:
+            return {
+                "is_group_image_upload": True,
+                "group_image_url": s3_resource_url,
+            }
+        else:
+            return {"is_group_image_upload": False}
     except Exception as e:
         logging.error(e)
         raise HTTPException(

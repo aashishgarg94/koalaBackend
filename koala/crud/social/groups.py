@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List
 
 from bson import ObjectId
+from fastapi import File, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
@@ -17,6 +18,7 @@ from koala.models.social.groups import (
     SocialGroupListOut,
 )
 from koala.models.social.users import BaseFollowerModel, BaseIsFollowed, FollowerModel
+from koala.utils.utils import upload_social_group_image
 
 
 class SocialGroupsCollection:
@@ -24,8 +26,18 @@ class SocialGroupsCollection:
         self.collection = MongoBase()
         self.collection(SOCIAL_GROUPS)
 
-    async def create_group(self, group_details: SocialGroupCreateIn) -> any:
+    async def create_group(
+        self, group_details: SocialGroupCreateIn, file: UploadFile = File(...)
+    ) -> any:
         try:
+            # Upload image to get S3 url
+            group_image_upload_result = await upload_social_group_image(file=file)
+            s3_post_url = ""
+            if group_image_upload_result.get("is_group_image_upload") is True:
+                s3_post_url = group_image_upload_result.get("group_image_url")
+
+            group_details.group_image = s3_post_url
+
             group_details.created_on = datetime.now()
             result = await self.collection.insert_one(
                 group_details.dict(),

@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Security, UploadFile
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.social.groups import SocialGroupsCollection
@@ -11,7 +11,6 @@ from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
-    BaseSocialGroup,
     BaseSocialPostModel,
     GroupsWithPaginationModel,
     SocialGroupCreateIn,
@@ -34,7 +33,10 @@ router = APIRouter()
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def create_group(
-    group_details: BaseSocialGroup,
+    # group_details: BaseSocialGroup,
+    file: UploadFile = File(...),
+    group_name: str = Form(...),
+    group_description: str = Form(...),
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
@@ -52,11 +54,17 @@ async def create_group(
             ],
         )
         group_details = SocialGroupCreateIn(
-            **group_details.dict(), posts=posts, owner=user_map, followers=followers
+            groupName=group_name,
+            groupDescription=group_description,
+            posts=posts,
+            owner=user_map,
+            followers=followers,
         )
 
         social_groups_collection = SocialGroupsCollection()
-        return await social_groups_collection.create_group(group_details=group_details)
+        return await social_groups_collection.create_group(
+            group_details=group_details, file=file
+        )
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
