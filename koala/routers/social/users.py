@@ -392,3 +392,20 @@ async def get_user_following(
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/users_to_follow",
+    response_model=BasePostMemberCountListModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_users_to_follow(
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_users_to_follow(
+            user_id=current_user.id
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")

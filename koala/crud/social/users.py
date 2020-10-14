@@ -443,3 +443,31 @@ class SocialPostsCollection:
             return BasePostMemberCountListModel(users=users_data)
         except Exception as e:
             logging.error(f"Error: Get group count by user_id {e}")
+
+    async def get_users_to_follow(self, user_id: str) -> BasePostMemberCountListModel:
+        try:
+            filter_condition = {
+                "_id": {"$nin": [ObjectId(user_id)]},
+            }
+
+            self.collection(USERS)
+            users_list = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                projection={"full_name": 1, "users_following": 1, "_id": 1},
+                extended_class_model=BasePostMemberModel,
+            )
+
+            users_data = []
+            if len(users_list) > 0:
+                for user in users_list:
+                    users_data.append(
+                        BasePostMemberCountModel(
+                            id=user.id,
+                            full_name=user.full_name,
+                            total_followers=user.users_following.total_followers,
+                        )
+                    )
+            return BasePostMemberCountListModel(users=users_data)
+        except Exception as e:
+            logging.error(f"Error: Get group count by user_id {e}")
