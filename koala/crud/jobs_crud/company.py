@@ -81,3 +81,39 @@ class CompanyCollection:
         except Exception as e:
             logging.error(f"Error: Delete by id {e}")
             raise e
+
+    async def update_profile_image_path(self, user_id, s3_path):
+        try:
+            find = {"_id": ObjectId(user_id)}
+            user = await self.collection.find_one_and_modify(
+                find,
+                {"$set": {"profile_image": s3_path}},
+                return_doc_id=False,
+                return_updated_document=True,
+            )
+
+            return (
+                {"is_profile_image_updated": True}
+                if user
+                else {"is_profile_image_updated": False}
+            )
+        except Exception as e:
+            raise e
+
+    async def update_banner_image_path(self, user_id, s3_path):
+        try:
+            find = {"_id": ObjectId(user_id)}
+            user = await self.collection.find_one_and_modify(
+                find,
+                {"$set": {"company_banner": s3_path}},
+                return_doc_id=False,
+                return_updated_document=True,
+            )
+
+            return (
+                {"is_company_banner_updated": True}
+                if user
+                else {"is_company_banner_updated": False}
+            )
+        except Exception as e:
+            raise e

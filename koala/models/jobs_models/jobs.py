@@ -20,6 +20,8 @@ class BaseCompanyModel(BaseModel):
     contact_name: BaseFullNameModel
     contact_email: EmailStr
     contact_number: int
+    profile_image: Optional[str] = None
+    company_banner: Optional[str] = None
 
 
 class CompanyModelPassword(BaseCompanyModel):
