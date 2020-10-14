@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
+from fastapi import File, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
@@ -25,6 +26,7 @@ from koala.models.social.users import (
     FollowerModel,
     ShareModel,
 )
+from koala.utils.utils import upload_social_post_image
 
 
 class SocialPostsCollection:
@@ -40,8 +42,17 @@ class SocialPostsCollection:
         shares: BaseShare,
         likes: BaseLikeModel,
         post_report: BasePostReportModel,
+        file: UploadFile = File(...),
     ) -> any:
         try:
+            # Upload image to get S3 url
+            post_image_upload_result = await upload_social_post_image(file=file)
+            s3_post_url = ""
+            if post_image_upload_result.get("is_post_image_upload") is True:
+                s3_post_url = post_image_upload_result.get("post_image_url")
+
+            post_details.post_image = s3_post_url
+
             post_details.created_on = datetime.now()
             if is_group_post is True:
                 post_details.is_group_post = True

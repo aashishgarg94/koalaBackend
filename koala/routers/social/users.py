@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Security
+from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
+from fastapi.params import File
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
@@ -12,7 +13,6 @@ from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
     BaseCommentIsUpdated,
     BaseCommentsModel,
-    BaseCreatePostModel,
     BaseFollowerModel,
     BaseIsFollowed,
     BaseLikeModel,
@@ -69,9 +69,12 @@ def get_user_model(current_user: UserModel, get_type: str):
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def create_post(
-    post_details: BaseCreatePostModel,
     is_group_post: bool,
     group_id: Optional[str] = None,
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    content: str = Form(...),
     current_user: UserModel = Depends(get_current_active_user),
 ):
     if is_group_post is True and group_id is None:
@@ -82,7 +85,9 @@ async def create_post(
         social_posts_collection = SocialPostsCollection()
 
         user_map = get_user_model(current_user, "owner")
-        post_details = CreatePostModelIn(**post_details.dict(), owner=user_map)
+        post_details = CreatePostModelIn(
+            title=title, description=description, content=content, owner=user_map
+        )
 
         shares = BaseShare(
             whatsapp=BaseShareModel(total_share=0, shared_by=[]),
@@ -100,6 +105,7 @@ async def create_post(
             shares=shares,
             likes=likes,
             post_report=post_report,
+            file=file,
         )
     except Exception as e:
         logging.error(e)
