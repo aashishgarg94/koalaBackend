@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Security
@@ -17,6 +18,7 @@ from koala.models.social.groups import (
     SocialGroupCreateOut,
 )
 from koala.models.social.users import (
+    BaseFollowerModel,
     BaseIsFollowed,
     CreatePostModelOutList,
     FollowerModel,
@@ -38,14 +40,25 @@ async def create_group(
     try:
         user_map = get_user_model(current_user, "owner")
         posts = BaseSocialPostModel()
-        followers = FollowerModel()
+        followers = FollowerModel(
+            total_followers=1,
+            followers_list=[
+                BaseFollowerModel(
+                    name=current_user.full_name,
+                    email=current_user.email,
+                    user_id=current_user.id,
+                    followed_on=datetime.now(),
+                )
+            ],
+        )
         group_details = SocialGroupCreateIn(
             **group_details.dict(), posts=posts, owner=user_map, followers=followers
         )
 
         social_groups_collection = SocialGroupsCollection()
         return await social_groups_collection.create_group(group_details=group_details)
-    except Exception:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
