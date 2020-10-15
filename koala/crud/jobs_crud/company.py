@@ -44,6 +44,17 @@ class CompanyCollection:
         except Exception as e:
             raise e
 
+    async def find_banner_by_email(self, email: str) -> any:
+        try:
+            data = await self.collection.find(
+                finder={"contact_email": email},
+                projection={"company_banner": 1, "_id": 0},
+                return_doc_id=False,
+            )
+            return data
+        except Exception as e:
+            raise e
+
     async def create_user(self, user: CompanyInPasswordModel) -> BaseIsCreated:
         try:
             user.created_on = datetime.now()

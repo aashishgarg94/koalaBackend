@@ -2,12 +2,17 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Security
-from koala.authentication.authentication_company import get_current_active_user_company
+from koala.authentication.authentication_company import (
+    get_current_active_user_company,
+    get_current_user_company,
+)
 from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.company import CompanyCollection
 from koala.crud.jobs_crud.jobs import JobCollection
 from koala.models.jobs_models.jobs import (
     BaseJobModel,
+    CompanyInPasswordModel,
     JobInModel,
     JobListOutWithPaginationModel,
     JobOutModel,
@@ -37,9 +42,19 @@ DUMMY_COMPANY_ID = "100-workforce"
         )
     ],
 )
-async def job_create(job_info: BaseJobModel):
+async def job_create(
+    job_info: BaseJobModel,
+    current_user: CompanyInPasswordModel = Depends(get_current_user_company),
+):
     try:
+        # Get company banner image
+        company_collection = CompanyCollection()
+        banner_url = await company_collection.find_banner_by_email(
+            current_user.contact_email
+        )
+
         job_detail = JobInModel(**job_info.dict(), applicants_details={})
+        job_detail.company_banner = banner_url[0]["company_banner"]
         job_collection = JobCollection()
         result = await job_collection.create(job_detail)
         if result is False:

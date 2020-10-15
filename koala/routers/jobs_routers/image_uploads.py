@@ -157,28 +157,3 @@ async def upload_company_banner_image(
         raise HTTPException(
             status_code=500, detail="Something went wrong while uploading banner image"
         )
-
-
-# async def upload_social_post_image(file: UploadFile = File(...)):
-#     try:
-#         object_name = generate_unique_name(name_type="soc-pos-img")
-#         s3_resource_url = get_s3_resource_url(
-#             bucket_name=S3_IMAGE_BUCKET_POSTS, object_name=object_name
-#         )
-#
-#         s3_upload = await upload_files(
-#             upload_file=file, bucket=S3_IMAGE_BUCKET_POSTS, object_name=object_name
-#         )
-#         if s3_upload is True:
-#             return {
-#                 "is_post_image_upload": True,
-#                 "post_image_url": s3_resource_url,
-#             }
-#         else:
-#             return {"is_post_image_upload": False}
-#     except Exception as e:
-#         logging.error(e)
-#         raise HTTPException(
-#             status_code=500,
-#             detail="Something went wrong while uploading social post image",
-#         )

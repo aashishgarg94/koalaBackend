@@ -90,6 +90,7 @@ class BaseJobModel(MongoModel):
     experience: BaseRangeModel
     job_info: BaseJobMaster
     more_info: Optional[BaseJobMoreInfoModel] = None
+    company_banner: Optional[str] = None
 
 
 class SavedByObjectId(MongoModel):
