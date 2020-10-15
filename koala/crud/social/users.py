@@ -485,3 +485,26 @@ class SocialPostsCollection:
             return BasePostMemberCountListModel(users=users_data)
         except Exception as e:
             logging.error(f"Error: Get group count by user_id {e}")
+
+    async def get_posts_by_tags(
+        self, tags: list, skip: int, limit: int
+    ) -> CreatePostModelOutList:
+        try:
+            self.collection(SOCIAL_POSTS)
+
+            finder = {"tags": {"$in": tags}}
+            tags_post_list = await self.collection.find(
+                finder=finder,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+
+            if len(tags_post_list) > 0:
+                return CreatePostModelOutList(post_list=tags_post_list)
+
+            return CreatePostModelOutList(post_list=[])
+        except Exception as e:
+            logging.error(e)
+            logging.error(f"Error: Get user followed {e}")

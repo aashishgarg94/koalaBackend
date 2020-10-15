@@ -148,3 +148,7 @@ class BaseCommentIsUpdated(MongoModel):
     id: OID = Field()
     is_updated: bool
     comment: BaseCommentsModel
+
+
+class PostByTagInModel(BaseModel):
+    tags: List

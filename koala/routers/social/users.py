@@ -27,6 +27,7 @@ from koala.models.social.users import (
     CreatePostModelOutList,
     CreatePostModelPaginationModel,
     FollowerModel,
+    PostByTagInModel,
     ShareModel,
 )
 
@@ -426,4 +427,23 @@ async def get_users_to_follow(
             current_followed_users=current_user_followed_list[0]["users_followed"]
         )
     except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/post_by_tags",
+    response_model=CreatePostModelOutList,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_user_followed(posts_tags: PostByTagInModel, page_no: Optional[int] = 1):
+    try:
+        adjusted_page_number = page_no - 1
+        skip = adjusted_page_number * REQUEST_LIMIT
+
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.get_posts_by_tags(
+            tags=posts_tags.tags, skip=skip, limit=REQUEST_LIMIT
+        )
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
