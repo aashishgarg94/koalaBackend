@@ -33,11 +33,12 @@ class SocialGroupsCollection:
         file: UploadFile = File(...),
     ) -> any:
         try:
-            # Upload image to get S3 url
-            group_image_upload_result = await upload_social_group_image(file=file)
             s3_post_url = ""
-            if group_image_upload_result.get("is_group_image_upload") is True:
-                s3_post_url = group_image_upload_result.get("group_image_url")
+            if file is not None:
+                # Upload image to get S3 url
+                group_image_upload_result = await upload_social_group_image(file=file)
+                if group_image_upload_result.get("is_group_image_upload") is True:
+                    s3_post_url = group_image_upload_result.get("group_image_url")
 
             group_details.group_image = s3_post_url
 

@@ -45,11 +45,12 @@ class SocialPostsCollection:
         file: UploadFile = File(...),
     ) -> any:
         try:
-            # Upload image to get S3 url
-            post_image_upload_result = await upload_social_post_image(file=file)
             s3_post_url = ""
-            if post_image_upload_result.get("is_post_image_upload") is True:
-                s3_post_url = post_image_upload_result.get("post_image_url")
+            # Upload image to get S3 url
+            if file is not None:
+                post_image_upload_result = await upload_social_post_image(file=file)
+                if post_image_upload_result.get("is_post_image_upload") is True:
+                    s3_post_url = post_image_upload_result.get("post_image_url")
 
             post_details.post_image = s3_post_url
 

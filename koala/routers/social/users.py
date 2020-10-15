@@ -71,7 +71,7 @@ def get_user_model(current_user: UserModel, get_type: str):
 async def create_post(
     is_group_post: bool,
     group_id: Optional[str] = None,
-    file: UploadFile = File(...),
+    file: UploadFile = File(None),
     title: str = Form(...),
     description: str = Form(...),
     content: str = Form(...),

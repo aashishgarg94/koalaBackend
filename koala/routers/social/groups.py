@@ -35,7 +35,7 @@ router = APIRouter()
 )
 async def create_group(
     # group_details: BaseSocialGroup,
-    file: UploadFile = File(...),
+    file: UploadFile = File(None),
     group_name: str = Form(...),
     group_description: str = Form(...),
     current_user: UserModel = Depends(get_current_active_user),
