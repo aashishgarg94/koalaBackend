@@ -75,6 +75,7 @@ async def create_post(
     title: str = Form(...),
     description: str = Form(...),
     content: str = Form(...),
+    tags: list = Form(...),
     current_user: UserModel = Depends(get_current_active_user),
 ):
     if is_group_post is True and group_id is None:
@@ -86,7 +87,11 @@ async def create_post(
 
         user_map = get_user_model(current_user, "owner")
         post_details = CreatePostModelIn(
-            title=title, description=description, content=content, owner=user_map
+            title=title,
+            description=description,
+            tags=tags,
+            content=content,
+            owner=user_map,
         )
 
         shares = BaseShare(

@@ -48,6 +48,7 @@ class BaseCreatePostModel(MongoModel):
     title: str
     description: str
     content: str
+    tags: Optional[List[str]] = None
 
 
 class BaseShareModel(MongoModel):
