@@ -6,6 +6,7 @@ from koala.models.jobs_models.master import (
     JobMasterModel,
     OpAreaModel,
     OpCityModel,
+    SocialTagsModel,
 )
 
 router = APIRouter()
@@ -71,5 +72,18 @@ async def get_job_master():
         master_collection = MasterCollections()
         result = await master_collection.get_job_master()
         return result
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.get(
+    "/social/tags",
+    response_model=SocialTagsModel,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
+)
+async def get_social_post_tags():
+    try:
+        master_collection = MasterCollections()
+        return await master_collection.get_social_tags()
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

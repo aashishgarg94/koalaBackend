@@ -38,6 +38,10 @@ class OpAreaModel(MongoModel):
     op_areas: List[BaseNameModel] = []
 
 
+class SocialTagsModel(MongoModel):
+    tags: List[BaseNameModel] = []
+
+
 class GlobalSequenceIn(BaseModel):
     _id: str
 

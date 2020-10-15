@@ -11,6 +11,7 @@ from koala.config.collections import (
     OP_CITIES,
     QUALIFICATIONS,
     SKILLS,
+    TAGS,
 )
 from koala.models.jobs_models.master import (
     BaseNameModel,
@@ -19,6 +20,7 @@ from koala.models.jobs_models.master import (
     LanguageBaseNameModel,
     OpAreaModel,
     OpCityModel,
+    SocialTagsModel,
 )
 
 from .mongo_base import MongoBase
@@ -194,4 +196,19 @@ class MasterCollections:
             return job_master
         except Exception as e:
             logging.error(f"Error: Assembling job master {e}")
+            raise e
+
+    async def get_social_tags(self):
+        try:
+            self.collection(TAGS)
+            logging.info(f"fetching tags...")
+            result = await self.collection.find(
+                finder={},
+                return_doc_id=True,
+                extended_class_model=BaseNameModel,
+                only_list_without_id=False,
+            )
+            return SocialTagsModel(tags=result)
+        except Exception as e:
+            logging.error(f"Error: fetching skills {e}")
             raise e

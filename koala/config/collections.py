@@ -15,6 +15,7 @@ JOB_TYPES = "job_types"
 LANGUAGES = "languages"
 QUALIFICATIONS = "qualifications"
 SKILLS = "skills"
+TAGS = "tags"
 
 # Job and Users - Apply
 USER_JOBS = "user_jobs"
