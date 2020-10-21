@@ -170,8 +170,8 @@ class MongoDBUserDatabase:
                     else 0
                 )
                 users_following_count = (
-                    result.get("users_following.total_followers")
-                    if result.get("users_following.total_followers")
+                    result.get("users_following").get("total_followers")
+                    if result.get("users_following")
                     else 0
                 )
 
@@ -189,8 +189,8 @@ class MongoDBUserDatabase:
                     "experience": bio_dict.get("experience"),
                     "work_history": bio_dict.get("work_history"),
                     "current_company": bio_dict.get("current_company"),
-                    "following": users_following_count,
-                    "followers": users_followed_count,
+                    "following": users_followed_count,
+                    "followers": users_following_count,
                     "likes": like_count,
                 }
 

@@ -63,7 +63,7 @@ class BaseQualificationModel(BaseModel):
 class UserBioModel(BaseModel):
     about_me: Optional[str] = None
     qualifications: Optional[List[BaseQualificationModel]]
-    experience: float
+    experience: float = 0
     work_history: Optional[List[BaseWorkHistoryModel]]
     current_company: str = None
     current_salary: Optional[BaseRangeModel]
@@ -74,8 +74,8 @@ class UserBioModel(BaseModel):
     job_preference: Optional[List[str]]  # Will create the options for this on frontend
     job_types: Optional[List[BaseKeyValueModel]]
     previous_worked_area: Optional[List[str]] = None
-    id_proof: UserProof
-    address_proof: UserProof
+    id_proof: Optional[UserProof]
+    address_proof: Optional[UserProof]
     other_documents: Optional[List[UserProof]]
     is_resume_uploaded: bool = False
 
