@@ -15,6 +15,7 @@ JOB_TYPES = "job_types"
 LANGUAGES = "languages"
 QUALIFICATIONS = "qualifications"
 SKILLS = "skills"
+TAGS = "tags"
 
 # Job and Users - Apply
 USER_JOBS = "user_jobs"
@@ -24,3 +25,8 @@ JOB_APPLICANTS = "job_applicants"
 # WEBSITE
 WEBSITE_APPLICANT = "website_applicant"
 WEBSITE_PROVIDER = "website_provider"
+
+
+# GROUPS
+SOCIAL_GROUPS = "social_groups"
+SOCIAL_POSTS = "social_posts"

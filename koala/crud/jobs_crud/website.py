@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 
 from koala.config.collections import WEBSITE_APPLICANT, WEBSITE_PROVIDER
+from koala.models.jobs_models.master import BaseIsCreated
 
-from ..models.master import BaseIsCreated
 from .mongo_base import MongoBase
 
 

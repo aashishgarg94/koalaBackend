@@ -16,10 +16,9 @@ import logging
 from typing import List
 
 from fastapi import HTTPException
+from koala.constants import REQUEST_LIMIT, REQUEST_SKIP_DEFAULT
+from koala.db.mongodb import get_collection
 from pymongo import ReturnDocument
-
-from ..constants import REQUEST_LIMIT, REQUEST_SKIP_DEFAULT
-from ..db.mongodb import get_collection
 
 
 # Keeping is static for exceptional cases where we might need to transform the data explicitly
@@ -169,6 +168,7 @@ class MongoBase:
     async def find(
         self,
         finder: dict,
+        projection: dict = None,
         return_doc_id=False,
         extended_class_model=None,
         skip: int = REQUEST_SKIP_DEFAULT,
@@ -185,7 +185,11 @@ class MongoBase:
             raise e
         logging.info(f"Pre flight operations looks good ;)")
         try:
-            result = self.collection.find(finder).skip(skip).limit(limit)
+            result = (
+                self.collection.find(filter=finder, projection=projection)
+                .skip(skip)
+                .limit(limit)
+            )
             logging.info(
                 f"Mongo base: Item fetched. Checking if transformation required..."
             )
@@ -209,7 +213,8 @@ class MongoBase:
             raise e
 
     async def count(
-        self, filter_condition: dict,
+        self,
+        filter_condition: dict,
     ):
         try:
             logging.info(f"Mongo base: Fetching count...")

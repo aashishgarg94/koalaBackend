@@ -1,8 +1,18 @@
 from typing import List, Optional
 
+from koala.core.mongo_model import OID, MongoModel
 from pydantic import BaseModel, Field
 
-from ..core.mongo_model import OID, MongoModel
+
+class GpsModel(BaseModel):
+    latitude: float
+    longitude: float
+
+
+class BaseFullNameModel(BaseModel):
+    first_name: str
+    middle_name: Optional[str] = ""
+    last_name: Optional[str] = ""
 
 
 class BaseNameModel(MongoModel):
@@ -26,6 +36,10 @@ class OpCityModel(MongoModel):
 
 class OpAreaModel(MongoModel):
     op_areas: List[BaseNameModel] = []
+
+
+class SocialTagsModel(MongoModel):
+    tags: List[BaseNameModel] = []
 
 
 class GlobalSequenceIn(BaseModel):
@@ -69,6 +83,11 @@ class BaseIsUpdated(MongoModel):
     is_updated: bool
 
 
+class BaseIsSaved(MongoModel):
+    id: OID = Field()
+    is_saved: bool
+
+
 class BaseKeyValueModel(BaseModel):
     name: str
 
@@ -81,3 +100,17 @@ class JobMasterModel(MongoModel):
     languages: List[LanguageBaseNameModel]
     qualifications: List[BaseNameModel]
     skills: List[BaseNameModel]
+
+
+class BaseAddress(BaseModel):
+    building_number: Optional[str]
+    street: Optional[str]
+    area: Optional[str]
+    city: Optional[str]
+    landmark: Optional[str]
+    location_coordinates: Optional[GpsModel]
+
+
+class BaseNotFound(BaseModel):
+    status_code: int = 404
+    message: str = "Record not found"

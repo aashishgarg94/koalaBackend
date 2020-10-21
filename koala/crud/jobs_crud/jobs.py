@@ -3,10 +3,16 @@ from datetime import datetime
 from typing import List, Optional
 
 from bson import ObjectId
+from koala.config.collections import JOBS
+from koala.models.jobs_models.jobs import (
+    JobInModel,
+    JobListOutModel,
+    JobOutModel,
+    SavedByObjectId,
+)
+from koala.models.jobs_models.master import BaseIsCreated
 
-from ..config.collections import JOBS
-from ..models.jobs import JobInModel, JobListOutModel, JobOutModel
-from ..models.master import BaseIsCreated
+from .company import CompanyCollection
 from .mongo_base import MongoBase
 
 
@@ -25,6 +31,17 @@ class JobCollection:
             )
             data = BaseIsCreated(id=result, is_created=True) if result else None
             logging.info(f"Job created fetched successfully")
+
+            # Updating company details
+            company_details = job_detail.job_info.company_details
+            company_collection = CompanyCollection()
+            update_company = await company_collection.find_one_and_modify(
+                company_details=company_details
+            )
+            if update_company.is_updated is not True:
+                logging.info(
+                    f"Not able to update company details while creating the job"
+                )
             return data
         except Exception as e:
             logging.error(f"Error: Job creation {e}")
@@ -34,7 +51,6 @@ class JobCollection:
         try:
             filter_condition = {"is_deleted": False}
             count = await self.collection.count(filter_condition)
-            logging.info(f"Job count fetched successfully")
             return count if count else 0
         except Exception as e:
             logging.error(f"Error: Job count {e}")
@@ -52,7 +68,6 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )
-            logging.info(f"Job get all successfully")
             return data if data else None
         except Exception as e:
             logging.error(f"Error: Get all {e}")
@@ -68,7 +83,6 @@ class JobCollection:
                 return_doc_id=True,
                 extended_class_model=JobListOutModel,
             )
-            logging.info(f"Job get all successfully")
             return data if data else []
         except Exception as e:
             logging.error(f"Error: Get all {e}")
@@ -80,7 +94,6 @@ class JobCollection:
             job = await self.collection.find_one(
                 finder=finder, return_doc_id=True, extended_class_model=JobOutModel
             )
-            logging.info(f"Job get by id successfully")
             return job if job else None
         except Exception as e:
             logging.error(f"Error: Get by id {e}")
@@ -105,7 +118,6 @@ class JobCollection:
                 extended_class_model=JobOutModel,
                 return_updated_document=True,
             )
-            logging.info(f"Job find one and modify successfully")
             return updated_job if updated_job else None
         except Exception as e:
             logging.error(f"Error: Find one and modify {e}")
@@ -138,7 +150,28 @@ class JobCollection:
                 extended_class_model=JobOutModel,
                 return_updated_document=True,
             )
-            logging.info(f"Job delete by id successfully")
+            return result if result else None
+        except Exception as e:
+            logging.error(f"Error: Delete by id {e}")
+            raise e
+
+    async def save_job_by_id(self, job_id: str, user_id: str) -> Optional[JobOutModel]:
+        try:
+            finder = {"_id": ObjectId(job_id)}
+            updater = {
+                "$push": {
+                    "saved_by": {
+                        "$each": [SavedByObjectId(user_id=ObjectId(user_id)).dict()],
+                    }
+                }
+            }
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_updated_document=True,
+                return_doc_id=True,
+                extended_class_model=JobOutModel,
+            )
             return result if result else None
         except Exception as e:
             logging.error(f"Error: Delete by id {e}")

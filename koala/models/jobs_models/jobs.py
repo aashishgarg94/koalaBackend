@@ -1,12 +1,56 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from koala.core.mongo_model import OID, MongoModel
+from koala.models.jobs_models.master import (
+    BaseAddress,
+    BaseKeyValueModel,
+    BaseRangeModel,
+)
+from pydantic import BaseModel, EmailStr, Field, SecretStr
 
-from ..core.mongo_model import OID, MongoModel
-from ..models.master import BaseKeyValueModel, BaseRangeModel
 from .job_user import BaseApplicantApplied
 from .user import BaseFullNameModel
+
+
+class BaseCompanyModel(BaseModel):
+    company_name: str
+    industry: str
+    address: BaseAddress
+    contact_name: BaseFullNameModel
+    contact_email: EmailStr
+    contact_number: int
+    profile_image: Optional[str] = None
+    company_banner: Optional[str] = None
+
+
+class CompanyModelPassword(BaseCompanyModel):
+    password: SecretStr
+
+
+class CompanyInModel(BaseCompanyModel):
+    created_on: Optional[datetime]
+    is_updated: Optional[bool] = False
+    updated_on: Optional[datetime]
+    is_disabled: Optional[bool] = False
+    disabled_on: Optional[datetime]
+    is_deleted: Optional[bool] = False
+    deleted_on: Optional[datetime]
+
+
+class CompanyInPasswordModel(CompanyInModel):
+    hashed_password: str
+
+
+class CompanyOutPasswordModel(CompanyInModel, MongoModel):
+    id: OID = Field()
+    hashed_password: str
+
+
+# Not is use, can be used if we need to pass company id in some other collection,
+# currently company details are embedded in every job
+class CompanyOutModel(BaseCompanyModel, MongoModel):
+    id: OID = Field()
 
 
 class BaseLanguageProficiency(BaseModel):
@@ -28,9 +72,7 @@ class BaseJobMaster(BaseModel):
     hiring_type: Optional[List[BaseKeyValueModel]]
     benefits: Optional[List[BaseKeyValueModel]]
     working_days: int
-    contact_name: BaseFullNameModel
-    contact_email: EmailStr
-    contact_number: int
+    company_details: CompanyOutModel
 
 
 class BaseJobModel(MongoModel):
@@ -48,10 +90,16 @@ class BaseJobModel(MongoModel):
     experience: BaseRangeModel
     job_info: BaseJobMaster
     more_info: Optional[BaseJobMoreInfoModel] = None
+    company_banner: Optional[str] = None
+
+
+class SavedByObjectId(MongoModel):
+    user_id: OID = Field()
 
 
 class JobInModel(BaseJobModel):
-    applicants_details: BaseApplicantApplied
+    saved_by: List[SavedByObjectId] = []
+    applicants_details: Optional[BaseApplicantApplied]
     is_updated: Optional[bool] = False
     is_closed: Optional[bool] = False
     is_deleted: Optional[bool] = False

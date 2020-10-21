@@ -38,7 +38,11 @@ class MongoModel(BaseModel):
         exclude_unset = kwargs.pop("exclude_unset", True)
         by_alias = kwargs.pop("by_alias", True)
 
-        parsed = self.dict(exclude_unset=exclude_unset, by_alias=by_alias, **kwargs,)
+        parsed = self.dict(
+            exclude_unset=exclude_unset,
+            by_alias=by_alias,
+            **kwargs,
+        )
 
         # Mongo uses `_id` as default key. We should stick to that as well.
         if "_id" not in parsed and "id" in parsed:

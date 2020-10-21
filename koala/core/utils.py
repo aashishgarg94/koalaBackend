@@ -9,11 +9,11 @@
 # }
 import logging
 
+from koala.models.jobs_models.master import GlobalSequenceIn
 from pymongo import ReturnDocument
 
 from ..config.collections import SEQUENCE
 from ..db.mongodb import db
-from ..models.master import GlobalSequenceIn
 
 # TODO: Do I need to add decrement also for failed cases ???
 

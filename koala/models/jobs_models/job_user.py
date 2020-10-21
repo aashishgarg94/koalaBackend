@@ -2,10 +2,9 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
+from koala.constants import BOOKMARKED, REJECTED, SHORTLISTED
+from koala.core.mongo_model import OID, MongoModel
 from pydantic import BaseModel, Field
-
-from ..constants import BOOKMARKED, REJECTED, SHORTLISTED
-from ..core.mongo_model import OID, MongoModel
 
 
 class UserJobsRelationModel(MongoModel):

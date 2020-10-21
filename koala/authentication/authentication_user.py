@@ -1,12 +1,17 @@
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+    SecurityScopes,
+)
 from jwt import PyJWTError
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.user import UserInModel
+from pydantic import ValidationError
 
 from ..authentication.jwt_handler import TokenData, pwd_context
 from ..constants import ALGORITHM, SECRET_KEY
-from ..crud.user import MongoDBUserDatabase
-from ..models.user import UserInModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
@@ -26,10 +31,26 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
     if not verify_password(credentials.password, user.hashed_password):
         return False
 
-    return user
+    # Applicant scopes
+    scopes = [
+        "applicant:read",
+        "applicant:write",
+        "applicant:apply",
+        "hiring:read",
+        "social:read",
+        "social:write",
+    ]
+    return user, scopes
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
+):
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = f"Bearer"
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -41,8 +62,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         username: str = payload.get("email")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
-    except PyJWTError:
+
+        token_scopes = payload.get("scopes", [])
+        token_data = TokenData(username=username, scopes=token_scopes)
+    except (PyJWTError, ValidationError):
         raise credentials_exception
 
     user_db = MongoDBUserDatabase(UserInModel)
@@ -50,6 +73,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
     if user is None:
         raise credentials_exception
+
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
     return user
 
 

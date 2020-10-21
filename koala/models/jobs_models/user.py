@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional, TypeVar
 
+from koala.core.mongo_model import OID, MongoModel
+from koala.models.jobs_models.master import BaseKeyValueModel, BaseRangeModel
 from pydantic import BaseModel, EmailStr, Field, SecretStr
 
-from ..core.mongo_model import OID, MongoModel
-from ..models.master import BaseKeyValueModel, BaseRangeModel
+from ..social.users import FollowerModel
 from .job_user import UserJobsRelationModel
 
 
@@ -32,6 +33,7 @@ class UserModel(BaseModel):
     current_area: Optional[str] = None
     current_gigtype: Optional[str] = None
     gps: Optional[GpsModel] = None
+    profile_image: Optional[str] = None
 
 
 class UserRegisterModel(UserModel):
@@ -43,9 +45,27 @@ class UserProof(BaseModel):
     is_uploaded: Optional[bool] = False
 
 
+class BaseWorkHistoryModel(BaseModel):
+    company_name: str
+    title: str
+    from_year: int
+    to_year: int
+    role: str
+
+
+class BaseQualificationModel(BaseModel):
+    level: str
+    year: int
+    institute: str
+
+
 # NOTE: Created bio so on first iteration we don't have to MINE the complete user object
 class UserBioModel(BaseModel):
-    experience: float
+    about_me: Optional[str] = None
+    qualifications: Optional[List[BaseQualificationModel]]
+    experience: float = 0
+    work_history: Optional[List[BaseWorkHistoryModel]]
+    current_company: str = None
     current_salary: Optional[BaseRangeModel]
     expected_salary: Optional[BaseRangeModel]
     preferred_city: Optional[str]
@@ -54,8 +74,8 @@ class UserBioModel(BaseModel):
     job_preference: Optional[List[str]]  # Will create the options for this on frontend
     job_types: Optional[List[BaseKeyValueModel]]
     previous_worked_area: Optional[List[str]] = None
-    id_proof: UserProof
-    address_proof: UserProof
+    id_proof: Optional[UserProof]
+    address_proof: Optional[UserProof]
     other_documents: Optional[List[UserProof]]
     is_resume_uploaded: bool = False
 
@@ -65,6 +85,9 @@ class UserInModel(UserModel):
     is_disabled: Optional[bool] = False
     is_updated: Optional[bool] = False
     is_deleted: Optional[bool] = False
+    groups_followed: Optional[List[OID]] = []
+    users_followed: Optional[List[OID]] = []  # Users followed by this user
+    users_following: Optional[FollowerModel]  # Users following this user
     created_on: Optional[datetime]
     updated_on: Optional[datetime]
     disabled_on: Optional[datetime]

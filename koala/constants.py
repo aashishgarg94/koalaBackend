@@ -16,3 +16,17 @@ ALL = "all"
 BOOKMARKED = "bookmarked"
 SHORTLISTED = "shortlisted"
 REJECTED = "rejected"
+ALL_JOBS = "all_jobs"
+APPLIED_JOBS = "applied_jobs"
+SAVED_JOBS = "saved_jobs"
+FRESHERS_JOBS = "freshers_jobs"
+FILTERED_JOBS = "filtered_jobs"
+
+GOLD = "gold"
+NORMAL = "normal"
+
+# S3 Constants
+S3_IMAGE_BUCKET_PROFILE = "koala-profile-images"
+S3_IMAGE_BUCKET_POSTS = "koala-posts-images"
+S3_IMAGE_BUCKET_COMPANY_BANNER = "koala-company-banners"
+S3_IMAGE_BUCKET_GROUPS = "koala-groups-images"
