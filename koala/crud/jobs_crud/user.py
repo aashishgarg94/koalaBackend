@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Optional, Type
 
@@ -183,17 +184,18 @@ class MongoDBUserDatabase:
 
                 social_profile_data = {
                     "name": result.get("full_name"),
-                    "current_city": result.get("current_city"),
-                    "about_me": bio_dict.get("about_me"),
-                    "qualifications": bio_dict.get("qualifications"),
-                    "experience": bio_dict.get("experience"),
-                    "work_history": bio_dict.get("work_history"),
-                    "current_company": bio_dict.get("current_company"),
+                    "current_city": result.get("current_city") if result.get("current_city") else None,
+                    "about_me": bio_dict.get("about_me") if bio_dict else None,
+                    "qualifications": bio_dict.get("qualifications") if bio_dict else None,
+                    "experience": bio_dict.get("experience") if bio_dict else None,
+                    "work_history": bio_dict.get("work_history") if bio_dict else None,
+                    "current_company": bio_dict.get("current_company") if bio_dict else None,
                     "following": users_followed_count,
                     "followers": users_following_count,
                     "likes": like_count,
                 }
 
+                logging.info(social_profile_data)
                 return social_profile_data
 
             raise HTTPException(status_code=200, detail="Bio not available")
