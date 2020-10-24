@@ -3,11 +3,12 @@ import logging
 from fastapi import APIRouter, Security
 from koala.authentication.authentication_user import get_current_active_user
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
-from koala.models.jobs_models.master import BaseIsDisabled
+from koala.models.jobs_models.master import BaseIsDisabled, BaseIsUpdated
 from koala.models.jobs_models.user import (
     BioUpdateInModel,
     BioUpdateOutModel,
     UserBioModel,
+    UserCreateBioModel,
     UserInModel,
     UserModel,
     UserUpdateCls,
@@ -114,6 +115,28 @@ async def user_bio_fetch(
 )
 async def user_bio_update(
     user_bio_updates: UserBioModel,
+    current_user: UserModel = Security(
+        get_current_active_user,
+        scopes=["applicant:write"],
+    ),
+):
+    try:
+        user_db = MongoDBUserDatabase(UserInModel)
+        bio_updates = BioUpdateInModel(**user_bio_updates.dict(exclude_unset=True))
+        return await user_db.user_bio_update(bio_updates, current_user)
+    except Exception as e:
+        logging.error(f"Error while processing this request {e}")
+        raise e
+
+
+# Update user bio for creating it's profile
+@router.post(
+    "/user/create_profile",
+    response_model=BaseIsUpdated,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
+async def user_bio_update(
+    user_profile_details: UserCreateBioModel,
     current_user: UserModel = Security(
         get_current_active_user,
         scopes=["applicant:write"],

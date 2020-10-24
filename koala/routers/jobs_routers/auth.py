@@ -27,7 +27,7 @@ async def login_user(credentials: OAuth2PasswordRequestForm = Depends()):
         )
         return {"access_token": access_token, "token_type": "bearer"}
     except Exception:
-        raise HTTPException(status_code=500, detail="Something went wrong while ")
+        raise HTTPException(status_code=500, detail="Something went wrong while login ")
 
 
 @router.post("/login/company", response_model=Token)

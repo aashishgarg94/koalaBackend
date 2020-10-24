@@ -24,16 +24,17 @@ class GpsModel(BaseModel):
 
 # Will try to get it either using GPS or fields, needs to decide later, keeping it alive for now
 class UserModel(BaseModel):
-    username: str
+    username: Optional[str] = None
     full_name: BaseFullNameModel
     email: Optional[EmailStr]
     mobile_number: int
-    gender: str
+    gender: Optional[str] = None
     current_city: Optional[str] = None
     current_area: Optional[str] = None
     current_gigtype: Optional[str] = None
     gps: Optional[GpsModel] = None
     profile_image: Optional[str] = None
+    true_caller_data: Optional[str] = None
 
 
 class UserRegisterModel(UserModel):
@@ -131,3 +132,14 @@ class BioUpdateInModel(UserBioModel):
 
 class BioUpdateOutModel(BioUpdateInModel, MongoModel):
     id: OID = Field()
+
+
+class UserCreateBioModel(BaseModel):
+    gender: Optional[int] = None
+    current_city: Optional[str] = None
+    current_area: Optional[str] = None
+    fresher: Optional[bool] = None
+    current_company: Optional[str] = None
+    education: Optional[str] = None
+    experience: Optional[str] = None
+    job_type: Optional[str] = None
