@@ -5,7 +5,7 @@ from typing import Optional, Type
 from bson import ObjectId
 from fastapi import HTTPException
 from koala.config.collections import SOCIAL_POSTS, USERS
-from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled, BaseIsUpdated
 from koala.models.jobs_models.user import (
     UD,
     BioUpdateInModel,
@@ -238,5 +238,35 @@ class MongoDBUserDatabase:
                 if user
                 else {"is_profile_image_updated": False}
             )
+        except Exception as e:
+            raise e
+
+    async def update_create_user_profile_details(
+        self, profile_details
+    ) -> BaseIsUpdated:
+        try:
+            updater = {
+                "$set": {
+                    "gender": profile_details.gender,
+                    "current_city": profile_details.current_city,
+                    "current_area": profile_details.current_area,
+                    "bio.is_fresher": profile_details.is_fresher,
+                    "bio.last_institute_name": profile_details.last_institute_name,
+                    "bio.education": profile_details.education,
+                    "bio.job_type": profile_details.job_type,
+                    "bio.current_company": profile_details.recent_company_name,
+                    "bio.experience_range": profile_details.experience_range,
+                }
+            }
+            find = {"_id": ObjectId(profile_details.user_id)}
+            user = await self.collection.find_one_and_modify(
+                find,
+                update=updater,
+                return_doc_id=False,
+                return_updated_document=True,
+            )
+
+            data = BaseIsUpdated(id=str(user.get("_id")), is_updated=True)
+            return data
         except Exception as e:
             raise e

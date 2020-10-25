@@ -62,6 +62,11 @@ class BaseQualificationModel(BaseModel):
 
 # NOTE: Created bio so on first iteration we don't have to MINE the complete user object
 class UserBioModel(BaseModel):
+    is_fresher: Optional[bool] = None
+    last_institute_name: Optional[str] = None
+    education: Optional[str] = None
+    job_type: Optional[str] = None
+    experience_range: Optional[str] = None
     about_me: Optional[str] = None
     qualifications: Optional[List[BaseQualificationModel]]
     experience: float = 0
@@ -135,11 +140,13 @@ class BioUpdateOutModel(BioUpdateInModel, MongoModel):
 
 
 class UserCreateBioModel(BaseModel):
-    gender: Optional[int] = None
+    gender: Optional[str] = None
     current_city: Optional[str] = None
     current_area: Optional[str] = None
-    fresher: Optional[bool] = None
-    current_company: Optional[str] = None
+    is_fresher: Optional[bool] = None
+    last_institute_name: Optional[str] = None
     education: Optional[str] = None
-    experience: Optional[str] = None
     job_type: Optional[str] = None
+    recent_company_name: Optional[str] = None
+    experience_range: Optional[str] = None
+    user_id: str

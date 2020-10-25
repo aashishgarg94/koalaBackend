@@ -133,19 +133,16 @@ async def user_bio_update(
 @router.post(
     "/user/create_profile",
     response_model=BaseIsUpdated,
-    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
 )
-async def user_bio_update(
-    user_profile_details: UserCreateBioModel,
-    current_user: UserModel = Security(
-        get_current_active_user,
-        scopes=["applicant:write"],
-    ),
-):
+async def user_bio_update(user_profile_details: UserCreateBioModel):
     try:
+
         user_db = MongoDBUserDatabase(UserInModel)
-        bio_updates = BioUpdateInModel(**user_bio_updates.dict(exclude_unset=True))
-        return await user_db.user_bio_update(bio_updates, current_user)
+        # bio_updates = BioUpdateInModel(**user_bio_updates.dict(exclude_unset=True))
+        data = await user_db.update_create_user_profile_details(
+            profile_details=user_profile_details
+        )
+        return data
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
         raise e
