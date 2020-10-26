@@ -257,6 +257,8 @@ class MongoDBUserDatabase:
         try:
             updater = {
                 "$set": {
+                    "full_name.first_name": profile_details.name,
+                    "email": profile_details.email,
                     "gender": profile_details.gender,
                     "current_city": profile_details.current_city,
                     "current_area": profile_details.current_area,

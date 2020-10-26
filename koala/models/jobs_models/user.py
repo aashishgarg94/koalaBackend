@@ -140,6 +140,8 @@ class BioUpdateOutModel(BioUpdateInModel, MongoModel):
 
 
 class UserCreateBioModel(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
     gender: Optional[str] = None
     current_city: Optional[str] = None
     current_area: Optional[str] = None
