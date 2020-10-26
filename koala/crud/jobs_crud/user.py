@@ -48,6 +48,16 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
+    async def find_by_username(self, mobile_number: int) -> Optional[UD]:
+        try:
+            return await self.collection.find_one(
+                {"username": mobile_number},
+                return_doc_id=True,
+                extended_class_model=UserOutModel,
+            )
+        except Exception as e:
+            raise e
+
     async def find_groups_followed_by_email(self, email: str) -> Optional[UD]:
         try:
             return await self.collection.find(

@@ -17,10 +17,10 @@ router = APIRouter()
 )
 async def register(user: UserModel):
     user_db = MongoDBUserDatabase(UserInModel)
-    user_db.username = user.email
+    user_db.username = user.mobile_number
     user_db.password = "Pragaty@123"
     # Check if user already exists
-    existing_user = await user_db.find_by_email(user.email)
+    existing_user = await user_db.find_by_username(user.mobile_number)
 
     if existing_user is not None:
         raise HTTPException(
@@ -32,7 +32,6 @@ async def register(user: UserModel):
     hashed_password = get_password_hash(user_db.password)
     users_following = FollowerModel()
     user_bio = UserBioModel()
-    user.username = user.email
     db_user = UserInModel(
         **user.dict(),
         hashed_password=hashed_password,

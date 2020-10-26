@@ -23,7 +23,7 @@ def verify_password(plain_password, hashed_password):
 
 async def authenticate(credentials: OAuth2PasswordRequestForm):
     user_db = MongoDBUserDatabase(UserInModel)
-    user = await user_db.find_by_email(credentials.username)
+    user = await user_db.find_by_username(int(credentials.username))
 
     if not user:
         return False
@@ -59,7 +59,7 @@ async def get_current_user(
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("email")
+        username: str = payload.get("username")
         if username is None:
             raise credentials_exception
 
@@ -69,7 +69,7 @@ async def get_current_user(
         raise credentials_exception
 
     user_db = MongoDBUserDatabase(UserInModel)
-    user = await user_db.find_by_email(token_data.username)
+    user = await user_db.find_by_username(int(token_data.username))
 
     if user is None:
         raise credentials_exception
