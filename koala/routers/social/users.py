@@ -43,6 +43,7 @@ def get_user_model(current_user: UserModel, get_type: str):
         current_city = current_user.current_city
         current_company = current_user.bio.current_company
         total_followers = current_user.users_following.total_followers
+        profile_image = current_user.profile_image
 
         if get_type == "id":
             return user_id
@@ -55,6 +56,7 @@ def get_user_model(current_user: UserModel, get_type: str):
                 current_city=current_city,
                 current_company=current_company,
                 total_followers=total_followers,
+                profile_pic=profile_image,
             )
         elif get_type == "follower":
             # Update follower

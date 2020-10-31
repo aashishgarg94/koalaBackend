@@ -139,6 +139,12 @@ class BioUpdateOutModel(BioUpdateInModel, MongoModel):
     id: OID = Field()
 
 
+class BioUpdateWithUserDetailOutModel(BioUpdateInModel, MongoModel):
+    id: OID = Field()
+    profile_image: Optional[str] = None
+    first_name: Optional[str] = None
+
+
 class UserCreateBioModel(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None

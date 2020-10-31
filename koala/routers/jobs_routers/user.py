@@ -7,6 +7,7 @@ from koala.models.jobs_models.master import BaseIsDisabled, BaseIsUpdated
 from koala.models.jobs_models.user import (
     BioUpdateInModel,
     BioUpdateOutModel,
+    BioUpdateWithUserDetailOutModel,
     UserBioModel,
     UserCreateBioModel,
     UserInModel,
@@ -90,7 +91,7 @@ async def disable_user_me(
 # Get user bio
 @router.get(
     "/user/bio",
-    response_model=BioUpdateOutModel,
+    response_model=BioUpdateWithUserDetailOutModel,
     dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
 )
 async def user_bio_fetch(

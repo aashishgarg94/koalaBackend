@@ -30,6 +30,7 @@ class BasePostOwnerModel(BaseModel):
     current_city: str
     current_company: str
     total_followers: int
+    profile_pic: Optional[str] = None
 
 
 class BaseFollowerModel(BaseModel):
@@ -45,8 +46,8 @@ class FollowerModel(MongoModel):
 
 
 class BaseCreatePostModel(MongoModel):
-    title: str
-    description: str
+    title: Optional[str] = None
+    description: Optional[str] = None
     content: str
     tags: Optional[List[str]] = None
 

@@ -10,6 +10,7 @@ from koala.models.jobs_models.user import (
     UD,
     BioUpdateInModel,
     BioUpdateOutModel,
+    BioUpdateWithUserDetailOutModel,
     UserInModel,
     UserModel,
     UserOutModel,
@@ -145,7 +146,7 @@ class MongoDBUserDatabase:
 
     async def user_bio_fetch(
         self, email: EmailStr = None, user_id: str = None
-    ) -> Optional[BioUpdateOutModel]:
+    ) -> Optional[BioUpdateWithUserDetailOutModel]:
         try:
             if user_id is None:
                 result = await self.collection.find_one({"email": email})
@@ -155,8 +156,11 @@ class MongoDBUserDatabase:
             if result.get("bio"):
                 custom_bio_dict = result.get("bio")
                 custom_bio_dict["_id"] = result.get("_id")
+                custom_bio_dict["profile_image"] = result.get("profile_image")
+                custom_bio_dict["name"] = result.get("full_name").get("first_name")
                 result_transformation = return_id_transformation(
-                    extended_class_model=BioUpdateOutModel, result=custom_bio_dict
+                    extended_class_model=BioUpdateWithUserDetailOutModel,
+                    result=custom_bio_dict,
                 )
                 return result_transformation
 
