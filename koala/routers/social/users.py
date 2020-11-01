@@ -425,9 +425,10 @@ async def get_users_to_follow(
         current_followed_users.append(current_user.id)
 
         social_posts_collection = SocialPostsCollection()
-        return await social_posts_collection.get_users_to_follow(
+        data = await social_posts_collection.get_users_to_follow(
             current_followed_users=current_user_followed_list[0]["users_followed"]
         )
+        return data
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 

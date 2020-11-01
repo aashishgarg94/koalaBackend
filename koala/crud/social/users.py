@@ -438,7 +438,12 @@ class SocialPostsCollection:
             users_list = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,
-                projection={"full_name": 1, "users_following": 1, "_id": 1},
+                projection={
+                    "profile_image": 1,
+                    "full_name": 1,
+                    "users_following": 1,
+                    "_id": 1,
+                },
                 extended_class_model=BasePostMemberModel,
             )
 
@@ -449,6 +454,7 @@ class SocialPostsCollection:
                         BasePostMemberCountModel(
                             id=user.id,
                             full_name=user.full_name,
+                            profile_image=user.profile_image,
                             total_followers=user.users_following.total_followers,
                         )
                     )
@@ -468,7 +474,12 @@ class SocialPostsCollection:
             users_list = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,
-                projection={"full_name": 1, "users_following": 1, "_id": 1},
+                projection={
+                    "profile_image": 1,
+                    "full_name": 1,
+                    "users_following": 1,
+                    "_id": 1,
+                },
                 extended_class_model=BasePostMemberModel,
             )
 
@@ -479,6 +490,7 @@ class SocialPostsCollection:
                         BasePostMemberCountModel(
                             id=user.id,
                             full_name=user.full_name,
+                            profile_image=user.profile_image,
                             total_followers=user.users_following.total_followers,
                         )
                     )

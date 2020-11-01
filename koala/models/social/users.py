@@ -131,12 +131,14 @@ class ShareModel(str, Enum):
 
 class BasePostMemberModel(MongoModel):
     id: OID = Field()
+    profile_image: Optional[str] = None
     full_name: BaseFullNameModel
     users_following: Optional[FollowerModel]
 
 
 class BasePostMemberCountModel(BaseModel):
     id: OID = Field()
+    profile_image: Optional[str] = None
     full_name: BaseFullNameModel
     total_followers: int
 
