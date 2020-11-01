@@ -1,0 +1,1 @@
+docker run -d -e AWS_ACCESS_KEY_ID=AKIAI64HBG42EP5VHIVQ -e AWS_SECRET_ACCESS_KEY=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 --name koala -p 9000:80 -e APP_MODULE="koala.main:app" udayshankarsingh/koala-backend:born
