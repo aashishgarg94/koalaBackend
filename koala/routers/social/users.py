@@ -349,7 +349,10 @@ async def user_action_comment(
     try:
         social_posts_collection = SocialPostsCollection()
         comments = BaseCommentsModel(
-            name=current_user.full_name, email=current_user.email, comments=comments
+            name=current_user.full_name,
+            email=current_user.email,
+            comments=comments,
+            profile_image=current_user.profile_image,
         )
         return await social_posts_collection.post_action(
             post_id=post_id, comments=comments, user_id=current_user.id

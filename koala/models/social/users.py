@@ -21,6 +21,7 @@ class BaseCommentsModel(BaseModel):
     name: BaseFullNameModel
     email: Optional[EmailStr]
     comments: Optional[CommentInModel]
+    profile_image: Optional[str]
 
 
 class BasePostOwnerModel(BaseModel):
