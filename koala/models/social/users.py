@@ -49,7 +49,7 @@ class FollowerModel(MongoModel):
 class BaseCreatePostModel(MongoModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    content: str
+    content: Optional[str] = None
     tags: Optional[List[str]] = None
 
 

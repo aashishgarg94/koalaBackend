@@ -75,10 +75,10 @@ async def create_post(
     is_group_post: bool,
     group_id: Optional[str] = None,
     file: UploadFile = File(None),
-    title: str = Form(...),
-    description: str = Form(...),
-    content: str = Form(...),
-    tags: list = Form(...),
+    title: str = Form(None),
+    description: str = Form(None),
+    content: str = Form(None),
+    tags: list = Form(None),
     current_user: UserModel = Depends(get_current_active_user),
 ):
     if is_group_post is True and group_id is None:
