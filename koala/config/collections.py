@@ -1,4 +1,4 @@
-DB_NAME = "koala-development"
+DB_NAME = "koala-production"
 USERS = "users"
 GIG_TYPE = "gig-types"
 OP_CITIES = "op-cities"
