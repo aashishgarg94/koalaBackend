@@ -4,7 +4,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from .mongodb import db
 
-# mongodb+srv://uday:koala1mongo@cluster0.ca4yg.mongodb.net/production?retryWrites=true&w=majority
+# mongodb+srv://uday:koala1mongo@cluster0.ca4yg.mongodb.net/production?retryWrites=true&w=majority - prod
+# mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?retryWrites=true&w=majority - dev
 async def connect_to_mongo():
     logging.info("Connecting to mongo...")
     db.client = AsyncIOMotorClient(
