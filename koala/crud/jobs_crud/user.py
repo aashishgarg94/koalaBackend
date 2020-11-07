@@ -17,7 +17,6 @@ from koala.models.jobs_models.user import (
     UserUpdateCls,
     UserUpdateOutModel,
 )
-from pydantic import EmailStr
 
 from ..social.users import SocialPostsCollection
 from .mongo_base import MongoBase, return_id_transformation
@@ -49,16 +48,27 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
-    async def find_by_username(self, mobile_number: int) -> Optional[UD]:
+    async def find_by_username(self, username: str) -> Optional[UD]:
         try:
             return await self.collection.find_one(
-                {"username": mobile_number},
+                {"username": username},
                 return_doc_id=True,
                 extended_class_model=UserOutModel,
             )
         except Exception as e:
             raise e
 
+    async def find_by_mobile_number(self, mobile_number: str) -> Optional[UD]:
+        try:
+            return await self.collection.find_one(
+                {"mobile_number": mobile_number},
+                return_doc_id=True,
+                extended_class_model=UserOutModel,
+            )
+        except Exception as e:
+            raise e
+
+    # Not in use currently
     async def find_groups_followed_by_email(self, email: str) -> Optional[UD]:
         try:
             return await self.collection.find(
@@ -69,10 +79,31 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
+    async def find_groups_followed_by_username(self, username: str) -> Optional[UD]:
+        try:
+            return await self.collection.find(
+                finder={"username": username},
+                projection={"groups_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+        except Exception as e:
+            raise e
+
+    # Not in use currently
     async def find_user_followed_by_email(self, email: str) -> Optional[UD]:
         try:
             return await self.collection.find(
                 finder={"email": email},
+                projection={"users_followed": 1, "_id": 0},
+                return_doc_id=False,
+            )
+        except Exception as e:
+            raise e
+
+    async def find_user_followed_by_username(self, username: str) -> Optional[UD]:
+        try:
+            return await self.collection.find(
+                finder={"username": username},
                 projection={"users_followed": 1, "_id": 0},
                 return_doc_id=False,
             )
@@ -93,7 +124,7 @@ class MongoDBUserDatabase:
         self, user_update: UserUpdateCls, current_user: UserModel
     ) -> UserUpdateOutModel:
         try:
-            find = {"email": current_user.email}
+            find = {"username": current_user.username}
             user_update.is_updated = True
             user_update.updated_on = datetime.now()
             user = await self.collection.find_one_and_modify(
@@ -106,9 +137,9 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
-    async def disable_one(self, user_email: str) -> BaseIsDisabled:
+    async def disable_one(self, username: str) -> BaseIsDisabled:
         try:
-            find = {"email": user_email}
+            find = {"username": username}
             updater = {"$set": {"is_disabled": True, "disabled_on": datetime.now()}}
             # user.is_disabled = True
             # user.disabled_on = datetime.now()
@@ -127,7 +158,7 @@ class MongoDBUserDatabase:
         self, bio_updates: BioUpdateInModel, current_user: UserModel
     ) -> BioUpdateOutModel:
         try:
-            find = {"email": current_user.email}
+            find = {"username": current_user.username}
             bio_updates.updated_on = datetime.now()
             result = await self.collection.find_one_and_modify(
                 find,
@@ -145,11 +176,11 @@ class MongoDBUserDatabase:
             raise e
 
     async def user_bio_fetch(
-        self, email: EmailStr = None, user_id: str = None
+        self, username: str, user_id: str = None
     ) -> Optional[BioUpdateWithUserDetailOutModel]:
         try:
             if user_id is None:
-                result = await self.collection.find_one({"email": email})
+                result = await self.collection.find_one({"username": username})
             else:
                 result = await self.collection.find_one({"_id": ObjectId(user_id)})
 
@@ -168,14 +199,9 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
-    async def user_social_bio_fetch(
-        self, email: EmailStr = None, user_id: str = None
-    ) -> any:
+    async def user_social_bio_fetch(self, user_id: str = None) -> any:
         try:
-            if user_id is None:
-                result = await self.collection.find_one({"email": email})
-            else:
-                result = await self.collection.find_one({"_id": ObjectId(user_id)})
+            result = await self.collection.find_one({"_id": ObjectId(user_id)})
 
             if result:
                 bio_dict = result.get("bio")
@@ -262,7 +288,6 @@ class MongoDBUserDatabase:
             updater = {
                 "$set": {
                     "full_name.first_name": profile_details.name,
-                    "email": profile_details.email,
                     "gender": profile_details.gender,
                     "current_city": profile_details.current_city,
                     "current_area": profile_details.current_area,

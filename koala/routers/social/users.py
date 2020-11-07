@@ -38,7 +38,7 @@ def get_user_model(current_user: UserModel, get_type: str):
     try:
         # Get user
         user_name = current_user.full_name
-        user_email = current_user.email
+        username = current_user.username
         user_id = current_user.id
         current_city = current_user.current_city
         current_company = current_user.bio.current_company
@@ -51,7 +51,7 @@ def get_user_model(current_user: UserModel, get_type: str):
             # Update owner
             return BasePostOwnerModel(
                 name=user_name,
-                email=user_email,
+                username=username,
                 user_id=user_id,
                 current_city=current_city,
                 current_company=current_company,
@@ -60,7 +60,7 @@ def get_user_model(current_user: UserModel, get_type: str):
             )
         elif get_type == "follower":
             # Update follower
-            data = BaseFollowerModel(name=user_name, email=user_email, user_id=user_id)
+            data = BaseFollowerModel(name=user_name, username=username, user_id=user_id)
             return data
     except Exception as e:
         raise e
@@ -350,7 +350,7 @@ async def user_action_comment(
         social_posts_collection = SocialPostsCollection()
         comments = BaseCommentsModel(
             name=current_user.full_name,
-            email=current_user.email,
+            username=current_user.username,
             comments=comments,
             profile_image=current_user.profile_image,
         )
@@ -385,7 +385,7 @@ async def user_action_report(
     "/social/bio",
     dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
 )
-async def user_bio_fetch(user_id: str = None):
+async def user_social_bio_fetch(user_id: str = None):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
         return await user_db.user_social_bio_fetch(user_id=user_id)
@@ -421,8 +421,8 @@ async def get_users_to_follow(
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
-        current_user_followed_list = await user_db.find_user_followed_by_email(
-            current_user.email
+        current_user_followed_list = await user_db.find_user_followed_by_username(
+            current_user.username
         )
         current_followed_users = current_user_followed_list[0]["users_followed"]
         current_followed_users.append(current_user.id)

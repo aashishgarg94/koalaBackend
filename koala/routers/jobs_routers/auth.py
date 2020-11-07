@@ -22,7 +22,11 @@ async def login_user(credentials: OAuth2PasswordRequestForm = Depends()):
             )
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"username": user.username, "email": user.email, "scopes": scopes},
+            data={
+                "username": user.username,
+                "mobile_number": user.mobile_number,
+                "scopes": scopes,
+            },
             expires_delta=access_token_expires,
         )
         return {"access_token": access_token, "token_type": "bearer"}

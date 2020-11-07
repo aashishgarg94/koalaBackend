@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, HTTPException
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
@@ -92,6 +92,8 @@ class SocialPostsCollection:
                     return_updated_document=True,
                     return_doc_id=False,
                 )
+                if group_result is None:
+                    raise HTTPException(status_code=500, detail="group not found")
 
                 return (
                     await self.get_user_post_by_post_id(post_id=insert_id)
@@ -105,8 +107,8 @@ class SocialPostsCollection:
                 else None
             )
         except Exception as e:
-            logging.error(e)
             logging.error(f"Error: Create social users error {e}")
+            raise HTTPException(status_code=500, detail="Something went wrong")
 
     async def get_count(self) -> int:
         try:

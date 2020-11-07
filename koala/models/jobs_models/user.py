@@ -24,10 +24,10 @@ class GpsModel(BaseModel):
 
 # Will try to get it either using GPS or fields, needs to decide later, keeping it alive for now
 class UserModel(BaseModel):
-    username: Optional[int] = None
+    username: str
     full_name: BaseFullNameModel
-    email: Optional[EmailStr]
-    mobile_number: int
+    email: Optional[EmailStr] = None
+    mobile_number: str
     gender: Optional[str] = None
     current_city: Optional[str] = None
     current_area: Optional[str] = None

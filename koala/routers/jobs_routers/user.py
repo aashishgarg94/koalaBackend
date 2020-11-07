@@ -81,7 +81,7 @@ async def disable_user_me(
     try:
         user_db = MongoDBUserDatabase(UserInModel)
         # user = UserUpdateCls(**current_user.dict(exclude_unset=True))
-        response = await user_db.disable_one(current_user.email)
+        response = await user_db.disable_one(current_user.username)
         return response
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
@@ -102,7 +102,7 @@ async def user_bio_fetch(
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
-        return await user_db.user_bio_fetch(current_user.email)
+        return await user_db.user_bio_fetch(current_user.username)
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
         raise e
@@ -135,7 +135,7 @@ async def user_bio_update(
     "/user/create_profile",
     response_model=BaseIsUpdated,
 )
-async def user_bio_update(user_profile_details: UserCreateBioModel):
+async def create_profile(user_profile_details: UserCreateBioModel):
     try:
 
         user_db = MongoDBUserDatabase(UserInModel)

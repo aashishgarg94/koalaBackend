@@ -5,7 +5,7 @@ from typing import List, Optional
 from koala.constants import GOLD, NORMAL
 from koala.core.mongo_model import OID, MongoModel
 from koala.models.jobs_models.master import BaseFullNameModel
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 class AllowedActionModel(str, Enum):
@@ -19,14 +19,14 @@ class CommentInModel(BaseModel):
 
 class BaseCommentsModel(BaseModel):
     name: BaseFullNameModel
-    email: Optional[EmailStr]
+    username: str
     comments: Optional[CommentInModel]
     profile_image: Optional[str]
 
 
 class BasePostOwnerModel(BaseModel):
     name: BaseFullNameModel
-    email: Optional[EmailStr]
+    username: str
     user_id: OID = Field()
     current_city: str
     current_company: str
@@ -36,7 +36,7 @@ class BasePostOwnerModel(BaseModel):
 
 class BaseFollowerModel(BaseModel):
     name: BaseFullNameModel
-    email: Optional[EmailStr]
+    username: str
     user_id: OID = Field()
     followed_on: datetime = None
 

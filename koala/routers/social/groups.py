@@ -48,7 +48,7 @@ async def create_group(
             followers_list=[
                 BaseFollowerModel(
                     name=current_user.full_name,
-                    email=current_user.email,
+                    username=current_user.username,
                     user_id=current_user.id,
                     followed_on=datetime.now(),
                 )
@@ -82,8 +82,8 @@ async def get_all_groups(
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
-        user_current_group_list = await user_db.find_groups_followed_by_email(
-            email=current_user.email
+        user_current_group_list = await user_db.find_groups_followed_by_username(
+            username=current_user.username
         )
 
         group_list = []

@@ -20,7 +20,7 @@ async def register(user: UserModel):
     user_db.username = user.mobile_number
     user_db.password = "Pragaty@123"
     # Check if user already exists
-    existing_user = await user_db.find_by_username(user.mobile_number)
+    existing_user = await user_db.find_by_mobile_number(user.mobile_number)
 
     if existing_user is not None:
         raise HTTPException(
@@ -53,7 +53,7 @@ async def register(user: CompanyModelPassword):
     try:
         company_collection = CompanyCollection()
         # Check if user already exists
-        existing_user = await company_collection.find_by_email(user.contact_email)
+        existing_user = await company_collection.find_by_email(user.contact_email)  # ok
 
         if existing_user is not None:
             raise HTTPException(
