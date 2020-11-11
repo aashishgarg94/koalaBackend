@@ -13,6 +13,7 @@ from koala.routers.jobs_routers import (
     job_user,
     jobs,
     master,
+    otp,
     register,
     user,
     website,
@@ -97,6 +98,12 @@ app.include_router(image_uploads.router, prefix="/upload", tags=["Image Upload"]
 app.include_router(
     website.router,
     tags=["Website APIs"],
+)
+
+# otp
+app.include_router(
+    otp.router,
+    tags=["OTP APIs"],
 )
 
 if __name__ == "__main__":

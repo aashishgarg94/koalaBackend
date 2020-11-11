@@ -10,7 +10,7 @@ from .job_user import UserJobsRelationModel
 
 
 class BaseFullNameModel(BaseModel):
-    first_name: str
+    first_name: Optional[str] = ""
     middle_name: Optional[str] = ""
     last_name: Optional[str] = ""
 
@@ -25,7 +25,7 @@ class GpsModel(BaseModel):
 # Will try to get it either using GPS or fields, needs to decide later, keeping it alive for now
 class UserModel(BaseModel):
     username: str
-    full_name: BaseFullNameModel
+    full_name: Optional[BaseFullNameModel] = None
     email: Optional[EmailStr] = None
     mobile_number: str
     gender: Optional[str] = None

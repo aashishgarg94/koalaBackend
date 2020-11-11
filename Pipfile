@@ -16,6 +16,7 @@ pyjwt = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 motor = "*"
 boto3 = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

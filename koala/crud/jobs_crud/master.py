@@ -1,5 +1,7 @@
 import logging
+import json
 
+import requests
 from koala.config.collections import (
     BENEFITS,
     DOCUMENTS,
@@ -23,7 +25,9 @@ from koala.models.jobs_models.master import (
     SocialTagsModel,
 )
 
+from ...models.jobs_models.user import UserInModel
 from .mongo_base import MongoBase
+from .user import MongoDBUserDatabase
 
 
 class MasterCollections:
@@ -212,3 +216,29 @@ class MasterCollections:
         except Exception as e:
             logging.error(f"Error: fetching skills {e}")
             raise e
+
+    async def generate_otp(self, mobile_number):
+        user_db = MongoDBUserDatabase(UserInModel)
+        existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
+        if existing_user is not None:
+            return {"type": "failure", "reason": "user already exists"}
+        url = f"https://api.msg91.com/api/v5/otp?authkey=346625Ax7oGJre0NBr5fa798e1P1&template_id=5fa91058dcd361333a02e410&mobile=+91{mobile_number}"
+
+        payload = {}
+        headers = {"content-type": "application/json"}
+
+        response = requests.request("GET", url, headers=headers, data=payload)
+        return json.loads(response.text)
+
+        # return {"request_id": "306b6c626174373236333339", "type": "success"}
+
+    async def verify_otp(self, mobile_number, otp):
+        url = f"https://api.msg91.com/api/v5/otp/verify?mobile=+91{mobile_number}&otp={otp}&authkey=346625Ax7oGJre0NBr5fa798e1P1"
+
+        payload = {}
+        headers = {}
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+        return json.loads(response.text)
+
+        # return {"message": "OTP verified success", "type": "success"}
