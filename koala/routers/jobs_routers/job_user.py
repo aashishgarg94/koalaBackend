@@ -250,8 +250,8 @@ async def job_all_matched():
 async def job_all_filter(
     city: str = None,
     job_type: str = None,
-    salary_start_range: int = 0,
-    salary_end_range: int = 0,
+    salary_start_range: int = None,
+    salary_end_range: int = None,
     area: str = None,
     title: str = None,
     company_name: str = None,

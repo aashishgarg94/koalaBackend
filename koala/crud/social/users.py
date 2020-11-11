@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
-from fastapi import File, UploadFile, HTTPException
+from fastapi import File, HTTPException, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase

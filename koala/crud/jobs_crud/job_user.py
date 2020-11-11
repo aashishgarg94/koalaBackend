@@ -501,25 +501,29 @@ class JobUser:
     ) -> any:
         try:
             self.collection(JOBS)
-            if title is not None or company_name is not None:
-                filter_condition = {
-                    "$or": [
-                        {"title": title},
-                        {"job_info.company_details.company_name": company_name},
-                    ]
-                }
-            else:
-                filter_condition = {
-                    "$and": [
-                        {"city": city},
-                        {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
-                        {
-                            "experience.start_range": salary_start_range,
-                            "experience.end_range": salary_end_range,
-                        },
-                        {"area": area},
-                    ]
-                }
+            # if title is not None or company_name is not None:
+            #     filter_condition = {
+            #         "$or": [
+            #             {"title": title},
+            #             {"job_info.company_details.company_name": company_name},
+            #         ]
+            #     }
+            # else:
+            filter_condition = {
+                "$or": [
+                    {"city": city},
+                    {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
+                    {"area": area},
+                    {"title": title},
+                    {"job_info.company_details.company_name": company_name},
+                ],
+                "experience.start_range": {
+                    "$gte": salary_start_range if salary_start_range else 0
+                },
+                "experience.end_range": {
+                    "$lte": salary_end_range if salary_end_range else 50
+                },
+            }
             jobs_data = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,
