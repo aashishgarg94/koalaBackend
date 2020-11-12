@@ -219,8 +219,10 @@ class MasterCollections:
 
     async def generate_otp(self, mobile_number):
         user_db = MongoDBUserDatabase(UserInModel)
+
         existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
-        if existing_user is not None:
+        existing_user1 = await user_db.find_by_mobile_number(mobile_number)
+        if existing_user is not None or existing_user1 is not None:
             return {"type": "failure", "reason": "user already exists"}
         url = f"https://api.msg91.com/api/v5/otp?authkey=346625Ax7oGJre0NBr5fa798e1P1&template_id=5fa91058dcd361333a02e410&mobile=+91{mobile_number}"
 
