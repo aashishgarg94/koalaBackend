@@ -87,15 +87,15 @@ async def get_all_groups(
         )
 
         group_list = []
-        if len(user_current_group_list[0].get("groups_followed")) > 0:
-            adjusted_page_number = page_no - 1
-            skip = adjusted_page_number * REQUEST_LIMIT
-            social_groups_collection = SocialGroupsCollection()
-            group_list = await social_groups_collection.get_all_groups(
-                skip,
-                REQUEST_LIMIT,
-                current_groups=user_current_group_list[0].get("groups_followed"),
-            )
+        # if len(user_current_group_list[0].get("groups_followed")) > 0:
+        adjusted_page_number = page_no - 1
+        skip = adjusted_page_number * REQUEST_LIMIT
+        social_groups_collection = SocialGroupsCollection()
+        group_list = await social_groups_collection.get_all_groups(
+            skip,
+            REQUEST_LIMIT,
+            current_groups=user_current_group_list[0].get("groups_followed"),
+        )
 
         return GroupsWithPaginationModel(
             total_groups=len(user_current_group_list[0].get("groups_followed")),

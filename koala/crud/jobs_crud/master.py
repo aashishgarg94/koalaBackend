@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 
 import requests
 from koala.config.collections import (
