@@ -130,11 +130,16 @@ class ShareModel(str, Enum):
     in_app = "In App"
 
 
+class PostUserBioModel(BaseModel):
+    current_company: str = None
+
+
 class BasePostMemberModel(MongoModel):
     id: OID = Field()
     profile_image: Optional[str] = None
     full_name: BaseFullNameModel
     users_following: Optional[FollowerModel]
+    bio: Optional[PostUserBioModel] = None
 
 
 class BasePostMemberCountModel(BaseModel):
@@ -142,6 +147,7 @@ class BasePostMemberCountModel(BaseModel):
     profile_image: Optional[str] = None
     full_name: BaseFullNameModel
     total_followers: int
+    current_company: Optional[str] = None
 
 
 class BasePostMemberCountListModel(MongoModel):

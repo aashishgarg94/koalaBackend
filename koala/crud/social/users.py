@@ -444,6 +444,7 @@ class SocialPostsCollection:
                     "profile_image": 1,
                     "full_name": 1,
                     "users_following": 1,
+                    "bio": 1,
                     "_id": 1,
                 },
                 extended_class_model=BasePostMemberModel,
@@ -458,6 +459,7 @@ class SocialPostsCollection:
                             full_name=user.full_name,
                             profile_image=user.profile_image,
                             total_followers=user.users_following.total_followers,
+                            current_company=user.bio.current_company,
                         )
                     )
             return BasePostMemberCountListModel(users=users_data)
@@ -480,6 +482,7 @@ class SocialPostsCollection:
                     "profile_image": 1,
                     "full_name": 1,
                     "users_following": 1,
+                    "bio": 1,
                     "_id": 1,
                 },
                 extended_class_model=BasePostMemberModel,
@@ -494,6 +497,7 @@ class SocialPostsCollection:
                             full_name=user.full_name,
                             profile_image=user.profile_image,
                             total_followers=user.users_following.total_followers,
+                            current_company=user.bio.current_company,
                         )
                     )
             return BasePostMemberCountListModel(users=users_data)
