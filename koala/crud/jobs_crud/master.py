@@ -218,11 +218,17 @@ class MasterCollections:
             raise e
 
     async def generate_otp(self, mobile_number):
-        user_db = MongoDBUserDatabase(UserInModel)
+        # user_db = MongoDBUserDatabase(UserInModel)
 
-        existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
-        existing_user1 = await user_db.find_by_mobile_number(mobile_number)
-        if existing_user is not None or existing_user1 is not None:
+        admin_accounts = ['+911000000000', '+911000000001', '+911000000002', '+911000000003', '+911000000004', '+911000000005', '+911000000006', '+911000000007', '+911000000008', '+911000000009', '+911000000010', '+911000000011', '+911000000012', '+911000000013']
+        admin_accounts1 = ['1000000000', '1000000001', '1000000002', '1000000003', '1000000004', '1000000005', '1000000006', '1000000007', '1000000008', '1000000009', '1000000010', '1000000011', '1000000012', '1000000013']
+
+        # existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
+        # existing_user1 = await user_db.find_by_mobile_number(mobile_number)
+        # if existing_user is not None or existing_user1 is not None:
+        #     return {"type": "failure", "reason": "user already exists"}
+
+        if mobile_number in admin_accounts or mobile_number in admin_accounts1:
             return {"type": "failure", "reason": "user already exists"}
         url = f"https://api.msg91.com/api/v5/otp?authkey=346625Ax7oGJre0NBr5fa798e1P1&template_id=5fa91058dcd361333a02e410&mobile=+91{mobile_number}"
 
