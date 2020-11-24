@@ -10,7 +10,7 @@ class GpsModel(BaseModel):
 
 
 class BaseFullNameModel(BaseModel):
-    first_name: str
+    first_name: Optional[str] = ""
     middle_name: Optional[str] = ""
     last_name: Optional[str] = ""
 

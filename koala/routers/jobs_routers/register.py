@@ -6,6 +6,7 @@ from koala.models.jobs_models.jobs import CompanyInPasswordModel, CompanyModelPa
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserBioModel, UserInModel, UserModel
 from koala.models.social.users import FollowerModel
+from koala.utils.utils import get_random_alphanumeric_string
 
 router = APIRouter()
 
@@ -15,10 +16,10 @@ router = APIRouter()
     response_model=BaseIsCreated,
     status_code=status.HTTP_201_CREATED,
 )
-async def register(user: UserModel):
+async def registerApplicant(user: UserModel):
     user_db = MongoDBUserDatabase(UserInModel)
     user_db.username = user.mobile_number
-    user_db.password = "Pragaty@123"
+    user_db.password = get_random_alphanumeric_string(6, 3)
     # Check if user already exists
     existing_user = await user_db.find_by_mobile_number(user.mobile_number)
 
@@ -49,7 +50,7 @@ async def register(user: UserModel):
     response_model=BaseIsCreated,
     status_code=status.HTTP_201_CREATED,
 )
-async def register(user: CompanyModelPassword):
+async def registerCompany(user: CompanyModelPassword):
     try:
         company_collection = CompanyCollection()
         # Check if user already exists

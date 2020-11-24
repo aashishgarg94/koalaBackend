@@ -10,7 +10,7 @@ from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.models.jobs_models.user import UserInModel
 from pydantic import ValidationError
 
-from ..authentication.jwt_handler import TokenData, pwd_context
+from ..authentication.jwt_handler import TokenData, pwd_context, get_password_hash
 from ..constants import ALGORITHM, SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
@@ -28,7 +28,7 @@ async def authenticate(credentials: OAuth2PasswordRequestForm):
     if not user:
         return False
 
-    if not verify_password(credentials.password, user.hashed_password):
+    if not verify_password(credentials.password, get_password_hash(user.hashed_password)):
         return False
 
     # Applicant scopes

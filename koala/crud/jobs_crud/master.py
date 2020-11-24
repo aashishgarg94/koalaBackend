@@ -2,6 +2,7 @@ import json
 import logging
 
 import requests
+from bson import ObjectId
 from koala.config.collections import (
     BENEFITS,
     DOCUMENTS,
@@ -22,12 +23,13 @@ from koala.models.jobs_models.master import (
     LanguageBaseNameModel,
     OpAreaModel,
     OpCityModel,
-    SocialTagsModel,
+    SocialTagsModel, BaseFullNameModel,
 )
-
-from ...models.jobs_models.user import UserInModel
-from .mongo_base import MongoBase
 from .user import MongoDBUserDatabase
+
+from ...models.jobs_models.user import UserModel, UserInModel
+from .mongo_base import MongoBase
+from ...routers.jobs_routers.register import registerApplicant
 
 
 class MasterCollections:
@@ -218,13 +220,14 @@ class MasterCollections:
             raise e
 
     async def generate_otp(self, mobile_number):
-        user_db = MongoDBUserDatabase(UserInModel)
+        # user_db = MongoDBUserDatabase(UserInModel)
 
-        existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
-        existing_user1 = await user_db.find_by_mobile_number(mobile_number)
-        if existing_user is not None or existing_user1 is not None:
-            return {"type": "failure", "reason": "user already exists"}
-        url = f"https://api.msg91.com/api/v5/otp?authkey=346625Ax7oGJre0NBr5fa798e1P1&template_id=5fa91058dcd361333a02e410&mobile=+91{mobile_number}"
+        # existing_user = await user_db.find_by_mobile_number(f"+91{mobile_number}")
+        # existing_user1 = await user_db.find_by_mobile_number(mobile_number)
+        # if existing_user is not None or existing_user1 is not None:
+        #     return {"type": "failure", "reason": "user already exists"}
+        url = f"https://api.msg91.com/api/v5/otp?authkey=346625Ax7oGJre0NBr5fa798e1P1&" \
+              f"template_id=5fa91058dcd361333a02e410&mobile=+91{mobile_number}"
 
         payload = {}
         headers = {"content-type": "application/json"}
@@ -235,12 +238,34 @@ class MasterCollections:
         # return {"request_id": "306b6c626174373236333339", "type": "success"}
 
     async def verify_otp(self, mobile_number, otp):
-        url = f"https://api.msg91.com/api/v5/otp/verify?mobile=+91{mobile_number}&otp={otp}&authkey=346625Ax7oGJre0NBr5fa798e1P1"
+        url = f"https://api.msg91.com/api/v5/otp/verify?mobile=+91{mobile_number}&" \
+              f"otp={otp}&authkey=346625Ax7oGJre0NBr5fa798e1P1"
 
         payload = {}
         headers = {}
 
         response = requests.request("POST", url, headers=headers, data=payload)
-        return json.loads(response.text)
+        response_builder = json.loads(response.text)
+        if response_builder.get('type') != "success":
+            return response_builder
+
+        # Checking if user exists
+        user_db = MongoDBUserDatabase(UserInModel)
+        try:
+            full_name = BaseFullNameModel(first_name="", middle_name="", last_name="")
+            user_model = UserModel(username=mobile_number, full_name=full_name, mobile_number=mobile_number)
+            register_user = await registerApplicant(user_model)
+
+            user_detail = await user_db.find_by_object_id(ObjectId(register_user.id))
+        except Exception as e:
+            if e.detail == 'REGISTER_USER_ALREADY_EXISTS':
+                user_detail = await user_db.find_by_mobile_number(mobile_number=mobile_number)
+            else:
+                raise e
+
+        response_builder['hash'] = user_detail.hashed_password
+        return response_builder
+
+        # existing_user = await user_db.find_by_mobile_number(user.mobile_number)
 
         # return {"message": "OTP verified success", "type": "success"}

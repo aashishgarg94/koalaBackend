@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 from uuid import uuid4
+import random
+import string
 
 import boto3
 from fastapi import File, HTTPException, UploadFile
@@ -86,3 +88,14 @@ async def upload_social_group_image(file: UploadFile = File(...)):
             status_code=500,
             detail="Something went wrong while uploading social post image",
         )
+
+
+def get_random_alphanumeric_string(letters_count, digits_count):
+    sample_str = ''.join((random.choice(string.ascii_letters) for i in range(letters_count)))
+    sample_str += ''.join((random.choice(string.digits) for i in range(digits_count)))
+
+    # Convert string to list and shuffle it to mix letters and digits
+    sample_list = list(sample_str)
+    random.shuffle(sample_list)
+    final_string = ''.join(sample_list)
+    return final_string
