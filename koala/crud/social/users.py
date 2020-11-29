@@ -336,7 +336,8 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
-            return CreatePostModelOutList(post_list=social_data)
+            # return CreatePostModelOutList(post_list=social_data)
+            return social_data
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
 

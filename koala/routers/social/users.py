@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
@@ -131,16 +132,20 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
 
         post_count = await social_posts_collection.get_count()
 
-        user_list = []
+        more_pages = True
+        post_list = []
         if post_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            user_list = await social_posts_collection.get_user_all_posts(
+            post_list = await social_posts_collection.get_user_all_posts(
                 skip=skip, limit=REQUEST_LIMIT
             )
 
+            if page_no == math.ceil(post_count / REQUEST_LIMIT):
+                more_pages = False
+
         return CreatePostModelPaginationModel(
-            total_posts=post_count, current_page=page_no, posts=user_list
+            more_pages=more_pages, posts=post_list
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
@@ -279,20 +284,24 @@ async def user_feed_by_groups_and_users_following(
         for user_dict in current_user.users_following.followers_list:
             user_followed_list.append(user_dict.user_id)
 
-        logging.info(groups_followed_list)
-        logging.info(user_followed_list)
-
+        more_pages = True
+        post_list = []
         if post_count > 0:
             adjusted_page_number = page_no - 1
             skip = adjusted_page_number * REQUEST_LIMIT
-            return await social_posts_collection.get_user_feed_by_groups_and_users_following(
+            post_list = await social_posts_collection.get_user_feed_by_groups_and_users_following(
                 skip=skip,
                 limit=REQUEST_LIMIT,
                 groups_followed_list=groups_followed_list,
                 user_followed_list=user_followed_list,
             )
-        else:
-            return CreatePostModelOutList(post_list=[])
+
+            if page_no == math.ceil(post_count / REQUEST_LIMIT):
+                more_pages = False
+
+        return CreatePostModelOutList(
+            more_pages=more_pages, posts=post_list
+        )
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")

@@ -98,12 +98,19 @@ class CreatePostModelOut(BaseFullDetailPostModel):
 
 
 class CreatePostModelOutList(MongoModel):
-    post_list: Optional[List[CreatePostModelOut]]
+    # current_page: int
+    # total_posts: int
+    # request_limit: int
+    # posts: List[CreatePostModelOut]
+    more_pages: bool
+    posts: List[CreatePostModelOut]
 
 
 class CreatePostModelPaginationModel(MongoModel):
-    current_page: int
-    total_posts: int
+    # current_page: int
+    # total_posts: int
+    # request_limit: int
+    more_pages: bool
     posts: List[CreatePostModelOut]
 
 
