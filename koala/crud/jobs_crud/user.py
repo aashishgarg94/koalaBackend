@@ -203,6 +203,9 @@ class MongoDBUserDatabase:
         try:
             result = await self.collection.find_one({"_id": ObjectId(user_id)})
 
+            social_posts_collection = SocialPostsCollection()
+            post_results_count = await social_posts_collection.get_user_post_count_by_user_id(user_id=user_id)
+
             if result:
                 bio_dict = result.get("bio")
                 users_followed_count = (
@@ -243,9 +246,9 @@ class MongoDBUserDatabase:
                     "following": users_followed_count,
                     "followers": users_following_count,
                     "likes": like_count,
+                    "posts": post_results_count
                 }
 
-                logging.info(social_profile_data)
                 return social_profile_data
 
             raise HTTPException(status_code=200, detail="Bio not available")
