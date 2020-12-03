@@ -35,14 +35,14 @@ class SocialPostsCollection:
         self.collection(SOCIAL_POSTS)
 
     async def create_post(
-        self,
-        post_details: CreatePostModelIn,
-        is_group_post: bool,
-        group_id: str,
-        shares: BaseShare,
-        likes: BaseLikeModel,
-        post_report: BasePostReportModel,
-        file: UploadFile = File(...),
+            self,
+            post_details: CreatePostModelIn,
+            is_group_post: bool,
+            group_id: str,
+            shares: BaseShare,
+            likes: BaseLikeModel,
+            post_report: BasePostReportModel,
+            file: UploadFile = File(...),
     ) -> any:
         try:
             s3_post_url = ""
@@ -163,6 +163,18 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: Get user post count by user id {e}")
 
+    async def get_user_post_like_count_by_user_id(self, user_id: str) -> int:
+        try:
+            self.collection(SOCIAL_POSTS)
+            aggregate_condition = [
+                {"$match": {"owner.user_id": ObjectId(user_id)}},
+                {"$group": {"_id": ObjectId(user_id), "aggregate_sum": {"$sum": "$like.total_likes"}}}
+            ]
+
+            return await self.collection.aggregate_get_count(aggregate_condition)
+        except Exception as e:
+            logging.error(f"Error: Get user post count by user id {e}")
+
     async def get_user_post_by_user_id(self, user_id: str) -> CreatePostModelOutList:
         try:
             finder = {"owner.user_id": ObjectId(user_id)}
@@ -191,7 +203,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user followed groups {e}")
 
     async def make_user_follow_user(
-        self, user_id: str, user_map=BaseFollowerModel
+            self, user_id: str, user_map=BaseFollowerModel
     ) -> BaseIsFollowed:
         try:
             # Updating User collection for user followers
@@ -249,7 +261,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Make user follow {e}")
 
     async def get_user_followed(
-        self, user_id: ObjectId, skip: int, limit: int
+            self, user_id: ObjectId, skip: int, limit: int
     ) -> UsersFollowed:
         try:
             self.collection(USERS)
@@ -291,7 +303,7 @@ class SocialPostsCollection:
             raise e
 
     async def get_group_posts(
-        self, skip: int, limit: int, group_id: str = None
+            self, skip: int, limit: int, group_id: str = None
     ) -> CreatePostModelOutList:
         try:
             if group_id:
@@ -316,11 +328,11 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user feed {e}")
 
     async def get_user_feed_by_groups_and_users_following(
-        self,
-        skip: int,
-        limit: int,
-        groups_followed_list: list,
-        user_followed_list: list,
+            self,
+            skip: int,
+            limit: int,
+            groups_followed_list: list,
+            user_followed_list: list,
     ) -> CreatePostModelOutList:
         try:
             finder = {
@@ -342,13 +354,13 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user feed {e}")
 
     async def post_action(
-        self,
-        post_id: str,
-        user_id: str,
-        comments: BaseCommentsModel = None,
-        like: int = None,
-        share: str = None,
-        report_post: bool = False,
+            self,
+            post_id: str,
+            user_id: str,
+            comments: BaseCommentsModel = None,
+            like: int = None,
+            share: str = None,
+            report_post: bool = False,
     ) -> any:
         try:
             finder = {"_id": ObjectId(post_id)}
@@ -413,8 +425,8 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user followed {e}")
 
     async def post_likes_count_by_user_id(
-        self,
-        user_id: str,
+            self,
+            user_id: str,
     ) -> int:
         try:
             filter_condition = {"like.liked_by": {"$all": [ObjectId(user_id)]}}
@@ -429,7 +441,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get like count by user_id {e}")
 
     async def get_users_in_same_company(
-        self, current_company: str, user_id: str
+            self, current_company: str, user_id: str
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
@@ -468,7 +480,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get group count by user_id {e}")
 
     async def get_users_to_follow(
-        self, current_followed_users: list
+            self, current_followed_users: list
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
@@ -506,7 +518,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get group count by user_id {e}")
 
     async def get_posts_by_tags(
-        self, tags: list, skip: int, limit: int
+            self, tags: list, skip: int, limit: int
     ) -> CreatePostModelOutList:
         try:
             self.collection(SOCIAL_POSTS)

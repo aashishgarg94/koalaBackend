@@ -206,6 +206,8 @@ class MongoDBUserDatabase:
             social_posts_collection = SocialPostsCollection()
             post_results_count = await social_posts_collection.get_user_post_count_by_user_id(user_id=user_id)
 
+            post_results_like_count = await social_posts_collection.get_user_post_like_count_by_user_id(user_id=user_id)
+
             if result:
                 bio_dict = result.get("bio")
                 users_followed_count = (
@@ -219,11 +221,11 @@ class MongoDBUserDatabase:
                     else 0
                 )
 
-                self.collection(SOCIAL_POSTS)
-                social_post_collection = SocialPostsCollection()
-                like_count = await social_post_collection.post_likes_count_by_user_id(
-                    user_id=user_id
-                )
+                # self.collection(SOCIAL_POSTS)
+                # social_post_collection = SocialPostsCollection()
+                # like_count = await social_post_collection.post_likes_count_by_user_id(
+                #     user_id=user_id
+                # )
 
                 social_profile_data = {
                     "id": str(result.get("_id")),
@@ -245,7 +247,7 @@ class MongoDBUserDatabase:
                     else None,
                     "following": users_followed_count,
                     "followers": users_following_count,
-                    "likes": like_count,
+                    "likes": post_results_like_count,
                     "posts": post_results_count
                 }
 

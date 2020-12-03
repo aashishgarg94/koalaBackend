@@ -233,3 +233,14 @@ class MongoBase:
         except Exception as e:
             logging.error(f"Mongo base: Error while aggregating. Error {e}")
             raise e
+
+    async def aggregate_get_count(self, condition: List):
+        try:
+            result = self.collection.aggregate(condition)
+            result_aggregate_count = 0
+            for document in await result.to_list(length=100):
+                result_aggregate_count = document.get('aggregate_sum')
+            return result_aggregate_count
+        except Exception as e:
+            logging.error(f"Mongo base: Error while aggregating. Error {e}")
+            raise e
