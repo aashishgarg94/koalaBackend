@@ -102,8 +102,8 @@ class CreatePostModelOutList(MongoModel):
     # total_posts: int
     # request_limit: int
     # posts: List[CreatePostModelOut]
-    more_pages: bool
-    posts: List[CreatePostModelOut]
+    more_pages: Optional[bool] = False
+    post_list: List[CreatePostModelOut]
 
 
 class CreatePostModelPaginationModel(MongoModel):
@@ -111,7 +111,7 @@ class CreatePostModelPaginationModel(MongoModel):
     # total_posts: int
     # request_limit: int
     more_pages: bool
-    posts: List[CreatePostModelOut]
+    post_list: List[CreatePostModelOut]
 
 
 class BaseFollowedIdRef(BaseModel):

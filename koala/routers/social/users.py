@@ -145,7 +145,7 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
                 more_pages = False
 
         return CreatePostModelPaginationModel(
-            more_pages=more_pages, posts=post_list
+            more_pages=more_pages, post_list=post_list
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
