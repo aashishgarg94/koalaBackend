@@ -300,7 +300,7 @@ async def user_feed_by_groups_and_users_following(
                 more_pages = False
 
         return CreatePostModelOutList(
-            more_pages=more_pages, posts=post_list
+            more_pages=more_pages, post_list=post_list
         )
     except Exception as e:
         logging.error(e)
