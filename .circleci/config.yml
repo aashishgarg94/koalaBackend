@@ -7,7 +7,7 @@ jobs:
           name: Build Docker Image
           command: |
             echo 'Building docker image'
-            docker build -t udayshankarsingh/koala-backend:born "../Dockerfile.txt"
+            docker build -t udayshankarsingh/koala-backend:born koala-backend/.
             docker login --username udayshankarsingh --password koala1docker
             docker push udayshankarsingh/koala-backend:born
 workflows:
