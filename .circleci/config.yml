@@ -17,4 +17,4 @@ workflows:
       - build-pragaty-docker:
           filters:
             branches:
-              only: development
+              only: staging
