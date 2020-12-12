@@ -11,12 +11,12 @@ autoflake = "*"
 fastapi = "*"
 uvicorn = "*"
 python-multipart = "*"
-fastapi-users = {extras = ["mongodb"], version = "*"}
 pyjwt = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
 motor = "*"
 boto3 = "*"
 requests = "*"
+email-validator = "*"
 
 [requires]
 python_version = "3.8"

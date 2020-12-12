@@ -8,6 +8,7 @@ jobs:
           name: Build Docker Image
           command: |
             echo 'Building docker image'
+            ls -al
             docker build -t udayshankarsingh/koala-backend:born .
             docker login --username udayshankarsingh --password koala1docker
             docker push udayshankarsingh/koala-backend:born
