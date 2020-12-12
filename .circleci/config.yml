@@ -4,12 +4,11 @@ jobs:
     machine: true
     steps:
       - checkout
-      - path: '../'
       - run:
           name: Build Docker Image
           command: |
             echo 'Building docker image'
-            docker build -t udayshankarsingh/koala-backend:born ../
+            docker build -t udayshankarsingh/koala-backend:born .
             docker login --username udayshankarsingh --password koala1docker
             docker push udayshankarsingh/koala-backend:born
 workflows:
