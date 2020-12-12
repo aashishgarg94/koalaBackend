@@ -7,7 +7,7 @@ router = APIRouter()
 @router.get(
     "/generate_otp",
 )
-async def generate_otp(mobile_number: str):
+async def generate_otp(mobile_number: str, is_resend: bool):
     try:
         master_collection = MasterCollections()
         return await master_collection.generate_otp(mobile_number)

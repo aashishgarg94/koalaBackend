@@ -143,6 +143,16 @@ class BioUpdateWithUserDetailOutModel(BioUpdateInModel, MongoModel):
     id: OID = Field()
     profile_image: Optional[str] = None
     first_name: Optional[str] = None
+    full_name: Optional[BaseFullNameModel] = None
+    mobile_number: Optional[str] = None
+    gender: Optional[str] = None
+    current_city: Optional[str] = None
+    current_area: Optional[str] = None
+    is_fresher: Optional[bool] = None
+    education: Optional[str] = None
+    job_type: Optional[str] = None
+    current_company: Optional[str] = None
+    last_institute_name: Optional[str] = None
 
 
 class UserCreateBioModel(BaseModel):
