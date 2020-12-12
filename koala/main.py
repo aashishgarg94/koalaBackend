@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.routers.jobs_routers import (
+    healthcheck,
     auth,
     company,
     image_uploads,
@@ -77,6 +78,7 @@ app.add_event_handler("startup", connect_to_mongo)
 app.add_event_handler("shutdown", close_mongo_connection)
 
 # JOBS ROUTERS
+app.include_router(healthcheck.router, tags=["HealthCheck"])
 app.include_router(register.router, tags=["Register"])
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(user.router, tags=["User"])

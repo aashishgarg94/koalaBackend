@@ -189,6 +189,16 @@ class MongoDBUserDatabase:
                 custom_bio_dict["_id"] = result.get("_id")
                 custom_bio_dict["profile_image"] = result.get("profile_image")
                 custom_bio_dict["name"] = result.get("full_name").get("first_name")
+                custom_bio_dict["full_name"] = result.get("full_name")
+                custom_bio_dict["mobile_number"] = result.get("mobile_number")
+                custom_bio_dict["gender"] = result.get("gender")
+                custom_bio_dict["current_city"] = result.get("current_city")
+                custom_bio_dict["current_area"] = result.get("current_area")
+                # custom_bio_dict["is_fresher"] = result.get("is_fresher")
+                # custom_bio_dict["education"] = result.get("education")
+                # custom_bio_dict["job_type"] = result.get("job_type")
+                # custom_bio_dict["current_company"] = result.get("current_company")
+                # custom_bio_dict["last_institute_name"] = result.get("last_institute_name")
                 result_transformation = return_id_transformation(
                     extended_class_model=BioUpdateWithUserDetailOutModel,
                     result=custom_bio_dict,
