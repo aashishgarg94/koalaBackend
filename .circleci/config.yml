@@ -3,6 +3,7 @@ jobs:
   build-pragaty-docker:
     machine: true
     steps:
+      - checkout
       - run:
           name: Build Docker Image
           command: |
