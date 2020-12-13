@@ -30,25 +30,25 @@ jobs:
             echo pragaty-$CIRCLE_BRANCH
       - run:
           name: Deploying docker image
-          environment-name: pragaty-$CIRCLE_BRANCH
           command: |
             eb use pragaty-$CIRCLE_BRANCH
-            eb deploy
+            eb deploy pragaty-$CIRCLE_BRANCH
             eb status
 workflows:
   version: 2
   elastic-beanstalk-workflow:
     jobs:
-      - build-pragaty-docker:
-          filters:
-            branches:
-              only: staging
+#      - build-pragaty-docker:
+#          filters:
+#            branches:
+#              only: staging
       - eb/deploy:
           context: aws-creds
+          environment-name: pragaty-$CIRCLE_BRANCH
           filters:
             branches:
               only:
                 - staging
-          requires:
-            - build-pragaty-docker
+#          requires:
+#            - build-pragaty-docker
 
