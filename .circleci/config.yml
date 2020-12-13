@@ -45,7 +45,7 @@ workflows:
 #              only: staging
       - eb/deploy:
           context: aws-creds
-          environment-name: pragaty-prod
+          environment-name: $CIRCLE_BRANCH
           filters:
             branches:
               only:
