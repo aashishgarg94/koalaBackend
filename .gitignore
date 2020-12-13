@@ -95,3 +95,7 @@ ENV/
 .pytest_cache
 README1.md
 .DS_Store
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
