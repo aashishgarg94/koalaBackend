@@ -14,7 +14,7 @@ jobs:
           name: Pushing image to dockerhub
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            docker push udayshankarsingh/koala-backend:born
+            docker push udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM
   eb/deploy:
     docker:
       - image: 'udayshankarsingh/koala-backend:born'
@@ -31,9 +31,10 @@ jobs:
       - run:
           name: Deploying docker image
           command: |
+            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+            sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
             eb use pragaty-$CIRCLE_BRANCH
-            eb deploy pragaty-$CIRCLE_BRANCH
-            eb status
+            eb deploy -l $CIRCLE_BUILD_NUM
 workflows:
   version: 2
   elastic-beanstalk-workflow:

@@ -1,9 +1,0 @@
-version: 2.1
-branch-defaults:
-  master:
-    environment: pragaty-$CIRCLE_BRANCH
-global:
-  application_name: pragaty_production
-  default_platform: Docker running on 64bit Amazon Linux 2
-  default_region: ap-south-1
-  sc: git
