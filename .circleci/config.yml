@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  eb: circleci/aws-elastic-beanstalk@1.0.0
 jobs:
   build-pragaty-docker:
     machine: true
@@ -15,7 +13,7 @@ jobs:
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM
-  eb/deploy:
+  deploy:
     docker:
       - image: 'udayshankarsingh/koala-backend:born'
         auth:
@@ -43,9 +41,8 @@ workflows:
 #          filters:
 #            branches:
 #              only: staging
-      - eb/deploy:
+      - deploy:
           context: aws-creds
-          environment-name: pragaty-$CIRCLE_BRANCH
           filters:
             branches:
               only:
