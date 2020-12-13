@@ -43,12 +43,7 @@ workflows:
               only: staging
       - eb/deploy:
           context: aws-creds
-          environment-name: pragaty-$CIRCLE_BRANCH
-          filters:
-            branches:
-              only:
-                - staging
-          label: version-$CIRCLE_BUILD_NUM
+          label: version-<<pipeline.number>>
           requires:
             - build-pragaty-docker
 
