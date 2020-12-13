@@ -45,5 +45,5 @@ workflows:
                 - staging
           label: version-<<pipeline.number>>
           requires:
-            - eb/setup
+            - build-pragaty-docker
 
