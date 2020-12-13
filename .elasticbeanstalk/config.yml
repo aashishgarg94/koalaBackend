@@ -1,12 +1,11 @@
 branch-defaults:
   staging:
-    environment: staging
-    group_suffix: null
+    environment: null
 global:
-  application_name: pragaty-prod
+  application_name: pragaty-backend
   branch: null
   default_ec2_keyname: administrator-key-pair
-  default_platform: Docker running on 64bit Amazon Linux 2
+  default_platform: Docker running on 64bit Amazon Linux
   default_region: ap-south-1
   include_git_submodules: true
   instance_profile: null

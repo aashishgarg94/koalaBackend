@@ -28,9 +28,9 @@ jobs:
       - run:
           name: Deploying docker image
           command: |
+            eb create $CIRCLE_BRANCH
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
-            eb use $CIRCLE_BRANCH
             eb deploy -l $CIRCLE_BUILD_NUM
 #  eb/deploy:
 #    docker:
