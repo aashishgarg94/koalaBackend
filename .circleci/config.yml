@@ -27,13 +27,13 @@ jobs:
           name: Printing some basic env variables to validate their pick-ups
           command: |
             echo $AWS_DEFAULT_REGION
-            echo pragaty-$CIRCLE_BRANCH
+            echo $CIRCLE_BRANCH
       - run:
           name: Deploying docker image
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
-#            eb use pragaty-$CIRCLE_BRANCH
+#            eb use $CIRCLE_BRANCH
 #            eb deploy -l $CIRCLE_BUILD_NUM
 workflows:
   version: 2
@@ -45,7 +45,7 @@ workflows:
 #              only: staging
       - eb/deploy:
           context: aws-creds
-          environment-name: pragaty-$CIRCLE_BRANCH
+          environment-name: pragaty-prod
           filters:
             branches:
               only:
