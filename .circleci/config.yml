@@ -15,6 +15,15 @@ jobs:
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM
+  eb-demo:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - run:
+          command: |
+            eb status
+          name: You may now use the EB CLI within this job
   eb/deploy:
     docker:
       - image: 'udayshankarsingh/koala-backend:born'
@@ -43,14 +52,15 @@ workflows:
 #          filters:
 #            branches:
 #              only: staging
-      - eb/deploy:
-          context: aws-creds
-          environment-name: $CIRCLE_BRANCH
-          filters:
-            branches:
-              only:
-                - staging
-          label: version-<<pipeline.number>>
+      - eb-demo
+#      - eb/deploy:
+#          context: aws-creds
+#          environment-name: $CIRCLE_BRANCH
+#          filters:
+#            branches:
+#              only:
+#                - staging
+#          label: version-<<pipeline.number>>
 #          requires:
 #            - build-pragaty-docker
 
