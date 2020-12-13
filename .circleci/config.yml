@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  aws-elastic-beanstalk: circleci/aws-elastic-beanstalk@1.0.0
+  eb: circleci/aws-elastic-beanstalk@1.0.0
 jobs:
   build-pragaty-docker:
     machine: true
