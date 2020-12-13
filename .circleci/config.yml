@@ -9,12 +9,12 @@ jobs:
       - run:
           name: Building Docker Image
           command: |
-            docker build -t udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM .
+            docker build -t udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM .
       - run:
           name: Pushing image to dockerhub
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            docker push udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM
+            docker push udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM
   eb-demo:
     docker:
       - image: 'cimg/base:stable'
@@ -26,12 +26,11 @@ jobs:
             eb use $CIRCLE_BRANCH
             eb status
           name: You may now use the EB CLI within this job
-#      - run:
-#          name: Deploying docker image
-#          command: |
-#            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-#            sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
-#            eb deploy -l $CIRCLE_BUILD_NUM
+      - run:
+          name: Deploying docker image
+          command: |
+            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+            eb deploy -l dn-$CIRCLE_BUILD_NUM
 #  eb/deploy:
 #    docker:
 #      - image: 'udayshankarsingh/koala-backend:born'
@@ -49,23 +48,23 @@ jobs:
 #          name: Deploying docker image
 #          command: |
 #            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-#            sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
+#            sed -i'' -e "s;%BUILD_NUM%;dn-$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
 #            eb use $CIRCLE_BRANCH
-#            eb deploy -l $CIRCLE_BUILD_NUM
+#            eb deploy -l dn-$CIRCLE_BUILD_NUM
 workflows:
   version: 2
   elastic-beanstalk-workflow:
     jobs:
-#      - build-pragaty-docker:
-#          filters:
-#            branches:
-#              only: staging
+      - build-pragaty-docker:
+          filters:
+            branches:
+              only: staging
       - eb-demo:
           filters:
             branches:
               only: staging
-#          requires:
-#            - build-pragaty-docker
+          requires:
+            - build-pragaty-docker
 #      - eb/deploy:
 #          context: aws-creds
 #          environment-name: $CIRCLE_BRANCH
