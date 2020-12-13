@@ -24,8 +24,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "echo environment variables from org-global context"
-          command: echo $MY_ENV_VAR
+          name: "echo environment variables from aws-creds context"
+          command: echo $AWS_DEFAULT_REGION
       - run:
           name: Deploying docker image
           command: |
