@@ -24,14 +24,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "echo environment variables from aws-credss context"
+          name: Printing some basic env variables to validate their pick-ups
           command: |
             echo $AWS_DEFAULT_REGION
             echo pragaty-$CIRCLE_BRANCH
       - run:
           name: Deploying docker image
+          environment-name: pragaty-$CIRCLE_BRANCH
           command: |
-            eb deploy pragaty-$CIRCLE_BRANCH
+            eb use pragaty-$CIRCLE_BRANCH
+            eb deploy
             eb status
 workflows:
   version: 2
@@ -43,7 +45,10 @@ workflows:
               only: staging
       - eb/deploy:
           context: aws-creds
-          label: version-<<pipeline.number>>
+          filters:
+            branches:
+              only:
+                - staging
           requires:
             - build-pragaty-docker
 
