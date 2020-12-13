@@ -23,7 +23,7 @@ jobs:
       - eb/setup
       - run:
           command: |
-            eb create $CIRCLE_BRANCH
+#            eb create $CIRCLE_BRANCH
             eb use $CIRCLE_BRANCH
             eb status
           name: You may now use the EB CLI within this job
