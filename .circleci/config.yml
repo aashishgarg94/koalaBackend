@@ -17,7 +17,10 @@ jobs:
             docker push udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM
   eb-demo:
     docker:
-      - image: 'cimg/base:stable'
+      - image: udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM
+          auth:
+            username: $DOCKERHUB_USERNAME
+            password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - eb/setup
