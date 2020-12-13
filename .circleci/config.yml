@@ -20,6 +20,7 @@ jobs:
       - image: 'cimg/base:stable'
     steps:
       - checkout
+      - eb/setup
       - run:
           command: |
             eb status
