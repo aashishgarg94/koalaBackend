@@ -14,11 +14,7 @@ jobs:
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:$CIRCLE_BUILD_NUM
   deploy:
-    docker:
-      - image: 'udayshankarsingh/koala-backend:born'
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+    machine: true
     steps:
       - checkout
       - run:
