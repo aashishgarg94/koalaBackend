@@ -25,6 +25,13 @@ jobs:
           command: |
             eb status
           name: You may now use the EB CLI within this job
+      - run:
+          name: Deploying docker image
+          command: |
+            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+            sed -i'' -e "s;%BUILD_NUM%;$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
+            eb use $CIRCLE_BRANCH
+      #            eb deploy -l $CIRCLE_BUILD_NUM
   eb/deploy:
     docker:
       - image: 'udayshankarsingh/koala-backend:born'
