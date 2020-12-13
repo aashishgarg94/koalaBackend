@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "echo environment variables from aws-creds context"
+          name: "echo environment variables from aws-credss context"
           command: |
             echo $AWS_DEFAULT_REGION
             echo pragaty-$CIRCLE_BRANCH
