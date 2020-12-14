@@ -15,7 +15,7 @@ from koala.models.jobs_models.user import (
     UserModel,
     UserOutModel,
     UserUpdateCls,
-    UserUpdateOutModel,
+    UserUpdateOutModel, BaseFullNameModel,
 )
 
 from ..social.users import SocialPostsCollection
@@ -188,7 +188,7 @@ class MongoDBUserDatabase:
                 custom_bio_dict = result.get("bio")
                 custom_bio_dict["_id"] = result.get("_id")
                 custom_bio_dict["profile_image"] = result.get("profile_image")
-                custom_bio_dict["name"] = result.get("full_name").get("first_name")
+                custom_bio_dict["name"] = result.get("full_name").get("first_name") if result.get("full_name") else None
                 custom_bio_dict["full_name"] = result.get("full_name")
                 custom_bio_dict["mobile_number"] = result.get("mobile_number")
                 custom_bio_dict["gender"] = result.get("gender")
@@ -300,9 +300,10 @@ class MongoDBUserDatabase:
         self, profile_details
     ) -> BaseIsUpdated:
         try:
+            user_full_name = BaseFullNameModel(first_name=profile_details.name, middle_name="", last_name="")
             updater = {
                 "$set": {
-                    "full_name.first_name": profile_details.name,
+                    "full_name": user_full_name.dict(),
                     "gender": profile_details.gender,
                     "current_city": profile_details.current_city,
                     "current_area": profile_details.current_area,
