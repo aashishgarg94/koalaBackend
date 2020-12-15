@@ -203,6 +203,16 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+
+            self.collection(SOCIAL_GROUPS)
+            for post in post_data:
+                group_name = await self.collection.find(
+                    finder={"_id": post.group_id},
+                    projection={'groupName': 1, "_id": 0},
+                    return_doc_id=False,
+                )
+                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
+
             return CreatePostModelOutList(post_list=post_data)
         except Exception as e:
             logging.error(f"Error: Get user post by user id {e}")
@@ -343,6 +353,16 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+
+            self.collection(SOCIAL_GROUPS)
+            for post in social_data:
+                group_name = await self.collection.find(
+                    finder={"_id": post.group_id},
+                    projection={'groupName': 1, "_id": 0},
+                    return_doc_id=False,
+                )
+                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
+
             return CreatePostModelOutList(post_list=social_data)
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
@@ -368,6 +388,16 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+
+            self.collection(SOCIAL_GROUPS)
+            for post in social_data:
+                group_name = await self.collection.find(
+                    finder={"_id": post.group_id},
+                    projection={'groupName': 1, "_id": 0},
+                    return_doc_id=False,
+                )
+                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
+
             # return CreatePostModelOutList(post_list=social_data)
             return social_data
         except Exception as e:
