@@ -137,11 +137,21 @@ class SocialPostsCollection:
         try:
             self.collection(SOCIAL_POSTS)
             post_id_obj = ObjectId(post_id)
-            return await self.collection.find_one(
+            data = await self.collection.find_one(
                 {"_id": post_id_obj},
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+
+            self.collection(SOCIAL_GROUPS)
+            group_name = await self.collection.find(
+                finder={"_id": data.group_id},
+                projection={'groupName': 1, "_id": 0},
+                return_doc_id=False,
+            )
+
+            data.group_name = group_name[0].get('groupName')
+            return data
         except Exception as e:
             logging.error(f"Error: Get user post by id {e}")
 
