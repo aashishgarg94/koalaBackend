@@ -119,6 +119,37 @@ class SocialPostsCollection:
             logging.error(f"Error: Job count {e}")
             raise e
 
+    async def get_group_name_for_post(self, data):
+        post_ids = []
+        for post in data:
+            if post.group_id is not None:
+                post_ids.append(post.group_id)
+            else:
+                continue
+
+        if len(post_ids) > 0:
+            self.collection(SOCIAL_GROUPS)
+
+            filter_condition = {"_id": {"$in": post_ids}}
+            group_names = await self.collection.find(
+                finder=filter_condition,
+                projection={'groupName': 1, "_id": 1},
+                return_doc_id=False,
+            )
+
+            group_names_obj = {}
+            for group_name in group_names:
+                group_names_obj[group_name.get('_id')] = group_name.get('groupName')
+
+            for post in data:
+                if post.group_id is not None:
+                    post.group_name = group_names_obj[post.group_id]
+                    post_ids.append(post.group_id)
+                else:
+                    continue
+            return data
+        return data
+
     async def get_user_all_posts(self, skip: int, limit: int) -> any:
         try:
             filter_condition = {"is_deleted": False}
@@ -130,16 +161,8 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
 
-            self.collection(SOCIAL_GROUPS)
-            for post in data:
-                group_name = await self.collection.find(
-                    finder={"_id": post.group_id},
-                    projection={'groupName': 1, "_id": 0},
-                    return_doc_id=False,
-                )
-                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
-
-            return data if data else None
+            post_data = await self.get_group_name_for_post(data)
+            return post_data if post_data else None
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
 
@@ -198,21 +221,13 @@ class SocialPostsCollection:
     async def get_user_post_by_user_id(self, user_id: str) -> CreatePostModelOutList:
         try:
             finder = {"owner.user_id": ObjectId(user_id)}
-            post_data = await self.collection.find(
+            data = await self.collection.find(
                 finder=finder,
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
 
-            self.collection(SOCIAL_GROUPS)
-            for post in post_data:
-                group_name = await self.collection.find(
-                    finder={"_id": post.group_id},
-                    projection={'groupName': 1, "_id": 0},
-                    return_doc_id=False,
-                )
-                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
-
+            post_data = await self.get_group_name_for_post(data)
             return CreatePostModelOutList(post_list=post_data)
         except Exception as e:
             logging.error(f"Error: Get user post by user id {e}")
@@ -346,7 +361,7 @@ class SocialPostsCollection:
                     "$query": {"is_deleted": False},
                     "$orderby": {"created_on": -1},
                 }
-            social_data = await self.collection.find(
+            data = await self.collection.find(
                 finder=finder,
                 skip=skip,
                 limit=limit,
@@ -354,16 +369,8 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
 
-            self.collection(SOCIAL_GROUPS)
-            for post in social_data:
-                group_name = await self.collection.find(
-                    finder={"_id": post.group_id},
-                    projection={'groupName': 1, "_id": 0},
-                    return_doc_id=False,
-                )
-                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
-
-            return CreatePostModelOutList(post_list=social_data)
+            post_data = await self.get_group_name_for_post(data)
+            return CreatePostModelOutList(post_list=post_data)
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
 
@@ -381,7 +388,7 @@ class SocialPostsCollection:
                     {"owner.user_id": {"$in": user_followed_list}},
                 ]
             }
-            social_data = await self.collection.find(
+            data = await self.collection.find(
                 finder=finder,
                 skip=skip,
                 limit=limit,
@@ -389,17 +396,8 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
 
-            self.collection(SOCIAL_GROUPS)
-            for post in social_data:
-                group_name = await self.collection.find(
-                    finder={"_id": post.group_id},
-                    projection={'groupName': 1, "_id": 0},
-                    return_doc_id=False,
-                )
-                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
-
-            # return CreatePostModelOutList(post_list=social_data)
-            return social_data
+            post_data = await self.get_group_name_for_post(data)
+            return CreatePostModelOutList(post_list=post_data)
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
 

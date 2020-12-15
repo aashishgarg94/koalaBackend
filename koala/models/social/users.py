@@ -83,7 +83,7 @@ class BaseFullDetailPostModel(BaseCreatePostModel):
     followers: Optional[FollowerModel]
     post_report: Optional[BasePostReportModel]
     post_image: Optional[str] = None
-    group_name: Optional[str] = None
+    group_name: Optional[str] = ''
 
 
 class CreatePostModelIn(BaseFullDetailPostModel):
