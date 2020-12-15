@@ -1,11 +1,12 @@
 branch-defaults:
   staging:
-    environment: null
+    environment: koala-staging
+    group_suffix: null
 global:
-  application_name: pragaty-backend
+  application_name: koala-backend
   branch: null
   default_ec2_keyname: administrator-key-pair
-  default_platform: Docker running on 64bit Amazon Linux
+  default_platform: Docker running on 64bit Amazon Linux 2
   default_region: ap-south-1
   include_git_submodules: true
   instance_profile: null
