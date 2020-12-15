@@ -129,6 +129,16 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+
+            self.collection(SOCIAL_GROUPS)
+            for post in data:
+                group_name = await self.collection.find(
+                    finder={"_id": post.group_id},
+                    projection={'groupName': 1, "_id": 0},
+                    return_doc_id=False,
+                )
+                post.group_name = group_name[0].get('groupName') if len(group_name) > 0 else ''
+
             return data if data else None
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
