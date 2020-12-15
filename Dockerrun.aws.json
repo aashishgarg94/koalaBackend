@@ -4,6 +4,10 @@
     "Name": "udayshankarsingh/koala-backend:%BUILD_NUM%",
     "Update": "true"
   },
+  "Authentication": {
+         "Bucket": "pragaty-docker",
+         "Key": "index.docker.io/dockercfg"
+    },
   "Ports": [
     {
       "ContainerPort": "80"
