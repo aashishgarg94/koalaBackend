@@ -1,16 +1,17 @@
 {
   "AWSEBDockerrunVersion": "1",
+  "Authentication": {
+    "Bucket": "pragaty-docker",
+    "Key": "dockercfg"
+  },
   "Image": {
-    "Name": "udayshankarsingh/koala-backend:%BUILD_NUM%",
+    "Name": "udayshankarsingh/koala-backend:born",
     "Update": "true"
   },
-  "Authentication": {
-         "Bucket": "pragaty-docker",
-         "Key": "index.docker.io/dockercfg"
-    },
   "Ports": [
     {
-      "ContainerPort": "80"
+      "ContainerPort": 80,
+      "HostPort": 443
     }
   ]
 }
