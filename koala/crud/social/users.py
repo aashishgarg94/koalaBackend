@@ -176,14 +176,15 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
 
-            self.collection(SOCIAL_GROUPS)
-            group_name = await self.collection.find(
-                finder={"_id": data.group_id},
-                projection={'groupName': 1, "_id": 0},
-                return_doc_id=False,
-            )
+            if data.group_id is not None:
+                self.collection(SOCIAL_GROUPS)
+                group_name = await self.collection.find(
+                    finder={"_id": data.group_id},
+                    projection={'groupName': 1, "_id": 0},
+                    return_doc_id=False,
+                )
 
-            data.group_name = group_name[0].get('groupName')
+                data.group_name = group_name[0].get('groupName')
             return data
         except Exception as e:
             logging.error(f"Error: Get user post by id {e}")
