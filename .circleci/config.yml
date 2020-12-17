@@ -9,7 +9,7 @@ jobs:
       - run:
           name: Building Docker Image
           command: |
-            docker build -t udayshankarsingh/koala-backend:pragaty-<<pipeline.number>> .
+            docker build -t udayshankarsingh/koala-backend:born .
       - run:
           name: Pushing image to dockerhub
           command: |
