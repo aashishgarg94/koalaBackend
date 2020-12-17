@@ -16,18 +16,19 @@ jobs:
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM
   eb-demo:
-    machine: true
+    docker:
+      - image: 'cimg/base:stable'
     steps:
       - eb/setup
       - run:
           command: |
-            eb use $CIRCLE_BRANCH
             eb status
           name: You may now use the EB CLI within this job
-      - run:
-          name: Deploying docker image
-          command: |
-            eb deploy
+#      - run:
+#          name: Deploying docker image
+#          command: |
+#            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
+#            eb deploy -l dn-$CIRCLE_BUILD_NUM
 #  eb/deploy:
 #    docker:
 #      - image: 'udayshankarsingh/koala-backend:born'
