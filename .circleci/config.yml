@@ -39,7 +39,9 @@ workflows:
       - build-docker:
           filters:
             branches:
-              only: staging
+              only:
+              - master
+              - staging
       - hold:
           type: approval
           requires:
