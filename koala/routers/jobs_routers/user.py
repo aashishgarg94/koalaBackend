@@ -88,6 +88,25 @@ async def disable_user_me(
         raise e
 
 
+@router.get(
+    "/user/disable",
+    response_model=BaseIsDisabled,
+    dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
+)
+async def disable_user_me(
+        user_id: str,
+        current_user: UserModel = Security(
+            get_current_active_user,
+            scopes=["applicant:write"],
+            )
+):
+    try:
+        return True
+    except Exception as e:
+        logging.error(f"Error while processing this request {e}")
+        raise e
+
+
 # Get user bio
 @router.get(
     "/user/bio",

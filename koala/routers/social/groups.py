@@ -203,3 +203,35 @@ async def groups_by_user_id(
         return BaseGroupMemberCountListModel(user_groups=[])
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/group_users",
+    response_model=None,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def group_users(
+    user_id: str = None,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_groups_collection = SocialGroupsCollection()
+        return True
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/group_delete_user_by_id",
+    response_model=None,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def group_delete_user_by_id(
+    user_id: str = None,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_groups_collection = SocialGroupsCollection()
+        return True
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
