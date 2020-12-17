@@ -462,3 +462,19 @@ async def get_user_followed(posts_tags: PostByTagInModel, page_no: Optional[int]
     except Exception as e:
         logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/delete_post_by_post_id",
+    response_model=BaseIsUpdated,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def delete_post_by_post_id(
+    post_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        return True
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
