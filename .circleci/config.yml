@@ -2,20 +2,20 @@ version: 2.1
 orbs:
   eb: circleci/aws-elastic-beanstalk@1.0.0
 jobs:
-  build-pragaty-docker:
+  build-docker:
     machine: true
     steps:
       - checkout
       - run:
           name: Building Docker Image
           command: |
-            docker build -t udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM .
+            docker build -t udayshankarsingh/koala-backend:dn-<<pipeline.number>> .
       - run:
           name: Pushing image to dockerhub
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            docker push udayshankarsingh/koala-backend:dn-$CIRCLE_BUILD_NUM
-  eb-demo:
+            docker push udayshankarsingh/koala-backend:dn-<<pipeline.number>>
+  eb-deploy:
     docker:
       - image: 'cimg/base:stable'
     steps:
@@ -30,6 +30,8 @@ jobs:
           name: Deploying docker image
           command: |
             echo "This is pipeline ID - "<<pipeline.number>>
+            sed -i'' -e "s;%BUILD_NUM%;<<pipeline.number>>;g" ./.deploy/Dockerrun.aws.json
+            eb deploy
 #  eb/deploy:
 #    docker:
 #      - image: 'udayshankarsingh/koala-backend:born'
@@ -47,23 +49,23 @@ jobs:
 #          name: Deploying docker image
 #          command: |
 #            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-#            sed -i'' -e "s;%BUILD_NUM%;dn-$CIRCLE_BUILD_NUM;g" Dockerrun.aws.json
+#            sed -i'' -e "s;%BUILD_NUM%;dn-<<pipeline.number>>;g" Dockerrun.aws.json
 #            eb use $CIRCLE_BRANCH
-#            eb deploy -l dn-$CIRCLE_BUILD_NUM
+#            eb deploy -l dn-<<pipeline.number>>
 workflows:
   version: 2
   elastic-beanstalk-workflow:
     jobs:
-#      - build-pragaty-docker:
-#          filters:
-#            branches:
-#              only: staging
-      - eb-demo:
+      - build-docker:
           filters:
             branches:
               only: staging
-#          requires:
-#            - build-pragaty-docker
+      - eb-deploy:
+          filters:
+            branches:
+              only: staging
+          requires:
+            - build-pragaty-docker
 #      - eb/deploy:
 #          context: aws-creds
 #          environment-name: $CIRCLE_BRANCH
