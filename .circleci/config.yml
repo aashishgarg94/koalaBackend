@@ -32,26 +32,6 @@ jobs:
             echo "This is pipeline ID - "<<pipeline.number>>
             sed -i'' -e "s;%BUILD_NUM%;<<pipeline.number>>;g" Dockerrun.aws.json
             eb deploy -l pragaty-<<pipeline.number>>
-#  eb/deploy:
-#    docker:
-#      - image: 'udayshankarsingh/koala-backend:born'
-#        auth:
-#          username: $DOCKERHUB_USERNAME
-#          password: $DOCKERHUB_PASSWORD
-#    steps:
-#      - checkout
-#      - run:
-#          name: Printing some basic env variables to validate their pick-ups
-#          command: |
-#            echo $AWS_DEFAULT_REGION
-#            echo $CIRCLE_BRANCH
-#      - run:
-#          name: Deploying docker image
-#          command: |
-#            docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-#            sed -i'' -e "s;%BUILD_NUM%;pragaty-<<pipeline.number>>;g" Dockerrun.aws.json
-#            eb use $CIRCLE_BRANCH
-#            eb deploy -l pragaty-<<pipeline.number>>
 workflows:
   version: 2
   elastic-beanstalk-workflow:
@@ -60,20 +40,10 @@ workflows:
           filters:
             branches:
               only: staging
-      - eb-deploy:
-          filters:
-            branches:
-              only: staging
+      - hold:
+          type: approval
           requires:
             - build-docker
-#      - eb/deploy:
-#          context: aws-creds
-#          environment-name: $CIRCLE_BRANCH
-#          filters:
-#            branches:
-#              only:
-#                - staging
-#          label: version-<<pipeline.number>>
-#          requires:
-#            - build-pragaty-docker
-
+      - eb-deploy:
+          requires:
+            - hold
