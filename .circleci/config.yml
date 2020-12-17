@@ -23,7 +23,7 @@ jobs:
       - eb/setup
       - run:
           command: |
-            eb use $CIRCLE_BRANCH
+            eb use koala-$CIRCLE_BRANCH
             eb status
           name: You may now use the EB CLI within this job
 #      - run:
