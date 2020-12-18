@@ -206,18 +206,23 @@ async def groups_by_user_id(
 
 
 @router.post(
-    "/group_users_by_group_id",
+    "/disable_group_by_group_id",
     response_model=BaseIsDisabled,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
-async def group_users(
+async def disable_group_by_group_id(
     group_id: str = None,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         social_groups_collection = SocialGroupsCollection()
-        response = await social_groups_collection.disable_group_by_group_id(group_id=group_id)
-        return response
+        disabled_group = await social_groups_collection.disable_group_by_group_id(group_id=group_id)
+
+        social_posts_collection = SocialPostsCollection()
+        result = await social_posts_collection.disable_multiple_post_by_post_ids(
+            post_ids=disabled_group.get('posts').get('post_list')
+        )
+        return result
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 

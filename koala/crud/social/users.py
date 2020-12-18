@@ -79,8 +79,6 @@ class SocialPostsCollection:
                     "$push": {
                         "posts.posts_list": {
                             "$each": [insert_id],
-                            "$sort": {"applied_on": -1},
-                            "$slice": EMBEDDED_COLLECTION_LIMIT,
                         }
                     },
                 }
@@ -597,6 +595,22 @@ class SocialPostsCollection:
             updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
             result = await self.collection.find_one_and_modify(
                 find,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=BaseIsDisabled,
+            )
+            data = result if result else None
+            return data
+        except Exception as e:
+            logging.error(f"Error: While deleting post {e}")
+            raise e
+
+    async def disable_multiple_post_by_post_ids(self, post_ids: list) -> BaseIsDisabled:
+        try:
+            filter_condition = {"_id": {"$in": post_ids}}
+            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find=filter_condition,
                 update=updater,
                 return_doc_id=True,
                 extended_class_model=BaseIsDisabled,

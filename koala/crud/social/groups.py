@@ -235,15 +235,14 @@ class SocialGroupsCollection:
         except Exception as e:
             logging.error(f"Error: Get group count by user_id {e}")
 
-    async def disable_group_by_group_id(self, group_id: str) -> BaseIsDisabled:
+    async def disable_group_by_group_id(self, group_id: str) -> any:
         try:
             find = {"_id": ObjectId(group_id)}
             updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
             result = await self.collection.find_one_and_modify(
                 find,
                 update=updater,
-                return_doc_id=True,
-                extended_class_model=BaseIsDisabled,
+                return_doc_id=False
             )
             data = result if result else None
             return data
