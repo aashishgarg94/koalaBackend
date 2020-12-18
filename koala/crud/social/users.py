@@ -397,8 +397,7 @@ class SocialPostsCollection:
                 extended_class_model=CreatePostModelOut,
             )
 
-            post_data = await self.get_group_name_for_post(data)
-            return CreatePostModelOutList(post_list=post_data)
+            return await self.get_group_name_for_post(data)
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
 
