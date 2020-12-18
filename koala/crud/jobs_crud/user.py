@@ -154,6 +154,21 @@ class MongoDBUserDatabase:
         except Exception as e:
             raise e
 
+    async def disable_user_by_id(self, user_id: str) -> BaseIsDisabled:
+        try:
+            find = {"_id": ObjectId(user_id)}
+            updater = {"$set": {"is_disabled": True, "disabled_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=BaseIsDisabled,
+            )
+            data = result if result else None
+            return data
+        except Exception as e:
+            raise e
+
     async def user_bio_update(
         self, bio_updates: BioUpdateInModel, current_user: UserModel
     ) -> BioUpdateOutModel:
