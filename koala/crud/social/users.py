@@ -6,7 +6,7 @@ from fastapi import File, HTTPException, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
@@ -221,7 +221,7 @@ class SocialPostsCollection:
 
     async def get_user_post_by_user_id(self, user_id: str) -> CreatePostModelOutList:
         try:
-            finder = {"owner.user_id": ObjectId(user_id)}
+            finder = {"owner.user_id": ObjectId(user_id), "is_deleted": False}
             data = await self.collection.find(
                 finder=finder,
                 return_doc_id=True,
@@ -384,6 +384,7 @@ class SocialPostsCollection:
     ) -> CreatePostModelOutList:
         try:
             finder = {
+                "is_deleted": False,
                 "$or": [
                     {"group_id": {"$in": groups_followed_list}},
                     {"owner.user_id": {"$in": user_followed_list}},
@@ -573,7 +574,7 @@ class SocialPostsCollection:
         try:
             self.collection(SOCIAL_POSTS)
 
-            finder = {"tags": {"$in": tags}}
+            finder = {"tags": {"$in": tags}, "is_deleted": False}
             tags_post_list = await self.collection.find(
                 finder=finder,
                 skip=skip,
@@ -589,3 +590,20 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(e)
             logging.error(f"Error: Get user followed {e}")
+
+    async def disable_post_by_post_id(self, post_id: str) -> BaseIsDisabled:
+        try:
+            find = {"_id": ObjectId(post_id)}
+            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=BaseIsDisabled,
+            )
+            data = result if result else None
+            return data
+        except Exception as e:
+            logging.error(f"Error: While deleting post {e}")
+            raise e
+

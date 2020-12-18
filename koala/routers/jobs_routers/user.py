@@ -89,11 +89,11 @@ async def disable_user_me(
 
 
 @router.get(
-    "/user/disable_by_id",
+    "/user/disable_user_by_id",
     response_model=BaseIsDisabled,
     dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
 )
-async def user_disable_by_id(
+async def disable_user_by_id(
         user_id: str,
         current_user: UserModel = Security(
             get_current_active_user,
