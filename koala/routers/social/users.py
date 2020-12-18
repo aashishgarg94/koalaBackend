@@ -8,7 +8,7 @@ from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.master import BaseIsUpdated
+from koala.models.jobs_models.master import BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
@@ -465,16 +465,19 @@ async def get_user_followed(posts_tags: PostByTagInModel, page_no: Optional[int]
 
 
 @router.post(
-    "/delete_post_by_post_id",
-    response_model=BaseIsUpdated,
+    "/disable_post_by_post_id",
+    response_model=BaseIsDisabled,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
-async def delete_post_by_post_id(
+async def disable_post_by_post_id(
     post_id: str,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         social_posts_collection = SocialPostsCollection()
-        return True
+        result = await social_posts_collection.disable_post_by_post_id(
+            post_id=post_id
+        )
+        return result
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
