@@ -493,6 +493,7 @@ class SocialPostsCollection:
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
+                "is_disabled": False,
                 "bio.current_company": current_company,
                 "_id": {"$nin": [ObjectId(user_id)]},
             }
@@ -532,6 +533,7 @@ class SocialPostsCollection:
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
+                "is_disabled": False,
                 "_id": {"$nin": current_followed_users},
             }
 
