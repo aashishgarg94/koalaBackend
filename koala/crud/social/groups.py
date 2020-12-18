@@ -7,7 +7,7 @@ from fastapi import File, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
@@ -234,3 +234,18 @@ class SocialGroupsCollection:
             return BaseGroupMemberCountListModel(user_groups=user_group_data)
         except Exception as e:
             logging.error(f"Error: Get group count by user_id {e}")
+
+    async def disable_group_by_group_id(self, group_id: str) -> BaseIsDisabled:
+        try:
+            find = {"_id": ObjectId(group_id)}
+            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=BaseIsDisabled,
+            )
+            data = result if result else None
+            return data
+        except Exception as e:
+            raise e

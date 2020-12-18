@@ -8,7 +8,7 @@ from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.groups import SocialGroupsCollection
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
@@ -206,17 +206,18 @@ async def groups_by_user_id(
 
 
 @router.post(
-    "/group_users",
-    response_model=None,
+    "/group_users_by_group_id",
+    response_model=BaseIsDisabled,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
 async def group_users(
-    user_id: str = None,
+    group_id: str = None,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         social_groups_collection = SocialGroupsCollection()
-        return True
+        response = await social_groups_collection.disable_group_by_group_id(group_id=group_id)
+        return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
@@ -224,7 +225,7 @@ async def group_users(
 @router.post(
     "/group_delete_user_by_id",
     response_model=None,
-    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def group_delete_user_by_id(
     user_id: str = None,
