@@ -638,10 +638,9 @@ class SocialPostsCollection:
                 find,
                 update=updater,
                 return_doc_id=True,
-                extended_class_model=BaseIsDisabled,
+                extended_class_model=CreatePostModelIn,
             )
-            data = result if result else None
-            return data
+            return BaseIsDisabled(id=ObjectId(post_id), is_disabled=result.is_deleted)
         except Exception as e:
             logging.error(f"Error: While deleting post {e}")
             raise e
