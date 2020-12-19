@@ -220,7 +220,7 @@ async def disable_group_by_group_id(
 
         social_posts_collection = SocialPostsCollection()
         result = await social_posts_collection.disable_multiple_post_by_post_ids(
-            post_ids=disabled_group.get('posts').get('post_list')
+            group_id=group_id, post_ids=disabled_group.get('posts').get('posts_list')
         )
         return result
     except Exception:
