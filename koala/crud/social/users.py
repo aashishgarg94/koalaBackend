@@ -645,18 +645,20 @@ class SocialPostsCollection:
             logging.error(f"Error: While deleting post {e}")
             raise e
 
-    async def disable_multiple_post_by_post_ids(self, post_ids: list) -> BaseIsDisabled:
+    async def disable_multiple_post_by_post_ids(self, group_id: str, post_ids: list) -> BaseIsDisabled:
         try:
-            filter_condition = {"_id": {"$in": post_ids}}
-            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
-            result = await self.collection.find_one_and_modify(
-                find=filter_condition,
-                update=updater,
-                return_doc_id=True,
-                extended_class_model=BaseIsDisabled,
-            )
-            data = result if result else None
-            return data
+            if len(post_ids) > 0:
+                filter_condition = {"_id": {"$in": post_ids}}
+                updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+                result = await self.collection.modify_many(
+                    find=filter_condition,
+                    update=updater,
+                )
+                if len(post_ids) == result.modified_count:
+                    return BaseIsDisabled(id=ObjectId(group_id), is_disabled=True)
+                return BaseIsDisabled(id=ObjectId(group_id), is_disabled=False)
+
+            return BaseIsDisabled(id=ObjectId(group_id), is_disabled=True)
         except Exception as e:
             logging.error(f"Error: While deleting post {e}")
             raise e
