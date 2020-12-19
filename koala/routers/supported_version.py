@@ -7,7 +7,4 @@ router = APIRouter()
     "/supported_version",
 )
 async def generate_otp():
-    try:
-        return True;
-    except Exception:
-        raise HTTPException(status_code=500, detail="Can't pull supported versions")
+    return ['1.0.0', '1.2.0']
