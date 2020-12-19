@@ -125,15 +125,21 @@ class SocialPostsCollection:
                 if post_image_upload_result.get("is_post_image_upload") is True:
                     s3_post_url = post_image_upload_result.get("post_image_url")
 
+            post_updates = {}
+            if title is not None:
+                post_updates['title'] = title.strip()
+            if description is not None:
+                post_updates['description'] = description.strip()
+            if content is not None:
+                post_updates['content'] = content.strip()
+            if len(tags) > 0:
+                post_updates['tags'] = tags
+            if s3_post_url:
+                post_updates['post_image'] = s3_post_url.strip()
+
             finder = {"_id": ObjectId(post_id)}
             updater = {
-                "$set": {
-                    "title": title,
-                    "description": description,
-                    "content": content,
-                    "tags": tags,
-                    "post_image": s3_post_url,
-                }
+                "$set": post_updates
             }
             result = await self.collection.find_one_and_modify(
                 find=finder,
