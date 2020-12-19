@@ -248,3 +248,21 @@ class SocialGroupsCollection:
             return data
         except Exception as e:
             raise e
+
+    async def get_group_users_details(self, group_id: str) -> any:
+        try:
+            finder = {"_id": ObjectId(group_id)}
+            data = await self.collection.find(
+                finder=finder,
+                projection={"followers": 1, "_id": 0},
+                return_doc_id=False,
+            )
+
+            group_users = []
+            if len(data[0].get('followers').get('followers_list')) > 0:
+                for user in data[0].get('followers').get('followers_list'):
+                    group_users.append({'name': user.get('name').get('first_name')})
+
+            return group_users
+        except Exception as e:
+            raise e

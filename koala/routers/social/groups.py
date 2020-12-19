@@ -211,7 +211,7 @@ async def groups_by_user_id(
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
 async def disable_group_by_group_id(
-    group_id: str = None,
+    group_id: str,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
@@ -228,16 +228,17 @@ async def disable_group_by_group_id(
 
 
 @router.post(
-    "/group_delete_user_by_id",
+    "/group_users",
     response_model=None,
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def group_delete_user_by_id(
-    user_id: str = None,
+    group_id: str,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
         social_groups_collection = SocialGroupsCollection()
-        return True
+        response = await social_groups_collection.get_group_users_details(group_id=group_id)
+        return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
