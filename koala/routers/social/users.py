@@ -122,6 +122,36 @@ async def create_post(
 
 
 @router.post(
+    "/update_post",
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def update_post(
+    post_id: Optional[str] = None,
+    file: UploadFile = File(None),
+    title: str = Form(None),
+    description: str = Form(None),
+    content: str = Form(None),
+    tags: list = Form(None),
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+
+        response = await social_posts_collection.update_post(
+            post_id=post_id,
+            file=file,
+            title=title,
+            description=description,
+            content=content,
+            tags=tags,
+        )
+        return response
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
     "/all_posts",
     response_model=CreatePostModelPaginationModel,
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
