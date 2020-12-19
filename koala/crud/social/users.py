@@ -108,6 +108,47 @@ class SocialPostsCollection:
             logging.error(f"Error: Create social users error {e}")
             raise HTTPException(status_code=500, detail="Something went wrong")
 
+    async def update_post(
+            self,
+            post_id: str,
+            title: str,
+            description: str,
+            content: str,
+            tags: list,
+            file: UploadFile = File(...),
+    ) -> any:
+        try:
+            s3_post_url = ""
+            # Upload image to get S3 url
+            if file is not None:
+                post_image_upload_result = await upload_social_post_image(file=file)
+                if post_image_upload_result.get("is_post_image_upload") is True:
+                    s3_post_url = post_image_upload_result.get("post_image_url")
+
+            finder = {"_id": ObjectId(post_id)}
+            updater = {
+                "$set": {
+                    "title": title,
+                    "description": description,
+                    "content": content,
+                    "tags": tags,
+                    "post_image": s3_post_url,
+                }
+            }
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+                insert_if_not_found=False,
+                return_updated_document=True,
+            )
+
+            return result
+        except Exception as e:
+            logging.error(f"Error: Update social users error {e}")
+            raise HTTPException(status_code=500, detail="Something went wrong")
+
     async def get_count(self) -> int:
         try:
             filter_condition = {"is_deleted": False}
