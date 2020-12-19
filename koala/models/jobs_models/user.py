@@ -91,6 +91,7 @@ class UserInModel(UserModel):
     is_disabled: Optional[bool] = False
     is_updated: Optional[bool] = False
     is_deleted: Optional[bool] = False
+    is_super_user: Optional[bool] = False
     groups_followed: Optional[List[OID]] = []
     users_followed: Optional[List[OID]] = []  # Users followed by this user
     users_following: Optional[FollowerModel]  # Users following this user

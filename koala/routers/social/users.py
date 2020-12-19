@@ -8,7 +8,7 @@ from koala.authentication.authentication_user import get_current_active_user
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.master import BaseIsUpdated
+from koala.models.jobs_models.master import BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
@@ -116,6 +116,36 @@ async def create_post(
             post_report=post_report,
             file=file,
         )
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/update_post",
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def update_post(
+    post_id: Optional[str] = None,
+    file: UploadFile = File(None),
+    title: str = Form(None),
+    description: str = Form(None),
+    content: str = Form(None),
+    tags: list = Form(None),
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+
+        response = await social_posts_collection.update_post(
+            post_id=post_id,
+            file=file,
+            title=title,
+            description=description,
+            content=content,
+            tags=tags,
+        )
+        return response
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
@@ -461,4 +491,23 @@ async def get_user_followed(posts_tags: PostByTagInModel, page_no: Optional[int]
         )
     except Exception as e:
         logging.info(e)
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/disable_post_by_post_id",
+    response_model=BaseIsDisabled,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def disable_post_by_post_id(
+    post_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_posts_collection = SocialPostsCollection()
+        result = await social_posts_collection.disable_post_by_post_id(
+            post_id=post_id
+        )
+        return result
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

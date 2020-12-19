@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from koala.authentication import authentication_company, authentication_user
 from koala.authentication.jwt_handler import Token, create_access_token
 from koala.constants import ACCESS_TOKEN_EXPIRE_MINUTES
+from koala.crud.jobs_crud.constants import USER_ALREADY_EXISTS
 
 router = APIRouter()
 
@@ -14,6 +15,14 @@ router = APIRouter()
 async def login_user(credentials: OAuth2PasswordRequestForm = Depends()):
     try:
         user, scopes = await authentication_user.authenticate(credentials)
+
+        if user.is_disabled is True:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=USER_ALREADY_EXISTS,
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

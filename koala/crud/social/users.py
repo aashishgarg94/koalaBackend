@@ -6,7 +6,7 @@ from fastapi import File, HTTPException, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.models.social.users import (
@@ -79,8 +79,6 @@ class SocialPostsCollection:
                     "$push": {
                         "posts.posts_list": {
                             "$each": [insert_id],
-                            "$sort": {"applied_on": -1},
-                            "$slice": EMBEDDED_COLLECTION_LIMIT,
                         }
                     },
                 }
@@ -108,6 +106,53 @@ class SocialPostsCollection:
             )
         except Exception as e:
             logging.error(f"Error: Create social users error {e}")
+            raise HTTPException(status_code=500, detail="Something went wrong")
+
+    async def update_post(
+            self,
+            post_id: str,
+            title: str,
+            description: str,
+            content: str,
+            tags: list,
+            file: UploadFile = File(...),
+    ) -> any:
+        try:
+            s3_post_url = ""
+            # Upload image to get S3 url
+            if file is not None:
+                post_image_upload_result = await upload_social_post_image(file=file)
+                if post_image_upload_result.get("is_post_image_upload") is True:
+                    s3_post_url = post_image_upload_result.get("post_image_url")
+
+            post_updates = {}
+            if title is not None:
+                post_updates['title'] = title.strip()
+            if description is not None:
+                post_updates['description'] = description.strip()
+            if content is not None:
+                post_updates['content'] = content.strip()
+            if len(tags) > 0:
+                post_updates['tags'] = tags
+            if s3_post_url:
+                post_updates['post_image'] = s3_post_url.strip()
+
+            finder = {"_id": ObjectId(post_id)}
+            updater = {
+                "$set": post_updates
+            }
+            result = await self.collection.find_one_and_modify(
+                find=finder,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+                insert_if_not_found=False,
+                return_updated_document=True,
+            )
+
+            return result
+        except Exception as e:
+            logging.error(f"Error: Update social users error {e}")
             raise HTTPException(status_code=500, detail="Something went wrong")
 
     async def get_count(self) -> int:
@@ -221,7 +266,7 @@ class SocialPostsCollection:
 
     async def get_user_post_by_user_id(self, user_id: str) -> CreatePostModelOutList:
         try:
-            finder = {"owner.user_id": ObjectId(user_id)}
+            finder = {"owner.user_id": ObjectId(user_id), "is_deleted": False}
             data = await self.collection.find(
                 finder=finder,
                 return_doc_id=True,
@@ -384,6 +429,7 @@ class SocialPostsCollection:
     ) -> CreatePostModelOutList:
         try:
             finder = {
+                "is_deleted": False,
                 "$or": [
                     {"group_id": {"$in": groups_followed_list}},
                     {"owner.user_id": {"$in": user_followed_list}},
@@ -493,6 +539,7 @@ class SocialPostsCollection:
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
+                "is_disabled": False,
                 "bio.current_company": current_company,
                 "_id": {"$nin": [ObjectId(user_id)]},
             }
@@ -532,6 +579,7 @@ class SocialPostsCollection:
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
+                "is_disabled": False,
                 "_id": {"$nin": current_followed_users},
             }
 
@@ -571,7 +619,7 @@ class SocialPostsCollection:
         try:
             self.collection(SOCIAL_POSTS)
 
-            finder = {"tags": {"$in": tags}}
+            finder = {"tags": {"$in": tags}, "is_deleted": False}
             tags_post_list = await self.collection.find(
                 finder=finder,
                 skip=skip,
@@ -587,3 +635,37 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(e)
             logging.error(f"Error: Get user followed {e}")
+
+    async def disable_post_by_post_id(self, post_id: str) -> BaseIsDisabled:
+        try:
+            find = {"_id": ObjectId(post_id)}
+            updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+            result = await self.collection.find_one_and_modify(
+                find,
+                update=updater,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelIn,
+            )
+            return BaseIsDisabled(id=ObjectId(post_id), is_disabled=result.is_deleted)
+        except Exception as e:
+            logging.error(f"Error: While deleting post {e}")
+            raise e
+
+    async def disable_multiple_post_by_post_ids(self, group_id: str, post_ids: list) -> BaseIsDisabled:
+        try:
+            if len(post_ids) > 0:
+                filter_condition = {"_id": {"$in": post_ids}}
+                updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
+                result = await self.collection.modify_many(
+                    find=filter_condition,
+                    update=updater,
+                )
+                if len(post_ids) == result.modified_count:
+                    return BaseIsDisabled(id=ObjectId(group_id), is_disabled=True)
+                return BaseIsDisabled(id=ObjectId(group_id), is_disabled=False)
+
+            return BaseIsDisabled(id=ObjectId(group_id), is_disabled=True)
+        except Exception as e:
+            logging.error(f"Error: While deleting post {e}")
+            raise e
+
