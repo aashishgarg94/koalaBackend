@@ -100,6 +100,7 @@ class SocialGroupsCollection:
                 projection={
                     "_id": 1,
                     "groupName": 1,
+                    "group_image": 1,
                     "groupDescription": 1,
                     "owner": 1,
                     "followers": 1,
