@@ -1,6 +1,6 @@
 branch-defaults:
   staging:
-    environment: null
+    environment: staging
 global:
   application_name: koala-backend
   branch: null
