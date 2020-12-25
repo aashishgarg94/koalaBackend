@@ -4,9 +4,9 @@ branch-defaults:
 global:
   application_name: koala-backend
   branch: null
-  default_ec2_keyname: koala-backend
+  default_ec2_keyname: administrator-key-pair
   default_platform: Docker running on 64bit Amazon Linux 2
-  default_region: us-west-2
+  default_region: ap-south-1
   include_git_submodules: true
   instance_profile: null
   platform_name: null
