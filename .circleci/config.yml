@@ -16,10 +16,8 @@ jobs:
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:pragaty-<<pipeline.number>>
   eb-deploy:
-    docker:
-      - image: 'cimg/base:stable'
+    machine: true
     steps:
-      - checkout
       - eb/setup
       - run:
           command: |
