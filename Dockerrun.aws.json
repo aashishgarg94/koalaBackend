@@ -5,7 +5,7 @@
     "Key": "dockercfg"
   },
   "Image": {
-    "Name": "udayshankarsingh/koala-backend:pragaty-%BUILD_NUM%",
+    "Name": "udayshankarsingh/koala-backend:born",
     "Update": "true"
   },
   "Ports": [
