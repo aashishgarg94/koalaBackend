@@ -16,6 +16,7 @@ jobs:
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
             docker push udayshankarsingh/koala-backend:born
   eb-deploy:
+    docker:
       - image: 'cimg/base:stable'
     steps:
       - checkout
@@ -30,7 +31,7 @@ jobs:
           command: |
             echo "This is pipeline ID - "<<pipeline.number>>
             sed -i'' -e "s;%BUILD_NUM%;<<pipeline.number>>;g" Dockerrun.aws.json
-            eb deploy -l pragaty-<<pipeline.number>>
+            eb deploy -l born
 workflows:
   version: 2
   elastic-beanstalk-workflow:
