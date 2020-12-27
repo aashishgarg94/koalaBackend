@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 class BaseSocialGroup(MongoModel):
     groupName: str
     groupDescription: str
+    group_image: Optional[str] = None
 
 
 class BaseSocialPostModel(BaseModel):
@@ -17,7 +18,6 @@ class BaseSocialPostModel(BaseModel):
 
 
 class SocialGroupCreateIn(BaseSocialGroup):
-    group_image: Optional[str] = None
     owner: Optional[BasePostOwnerModel]
     posts: Optional[BaseSocialPostModel]
     followers: Optional[FollowerModel]

@@ -31,11 +31,9 @@ def return_id_transformation(extended_class_model, result):
             for document in result:
                 data = extended_class_model.from_mongo(data=document)
                 data_list.append(data)
-            logging.info(f"Transformation successfully completed ;)")
             return data_list
         else:
             data = extended_class_model.from_mongo(data=result) if result else None
-            logging.info(f"Transformation successfully completed ;)")
             return data
     except Exception as e:
         raise e
@@ -55,13 +53,8 @@ class MongoBase:
                 status_code=500,
                 detail=f"Mongo base: Not callable. DB collection is not passed.",
             )
-
-        logging.info(
-            f"Yay... Collection name OK :). Trying to connect to collection..."
-        )
         try:
             self.collection = get_collection(self.collection_name)
-            logging.info(f"Connected to collection. Will try to perform operations now")
         except Exception as e:
             raise e
 
@@ -87,12 +80,8 @@ class MongoBase:
             self.pre_flight_check(return_doc_id, extended_class_model)
         except Exception as e:
             raise e
-        logging.info(f"Pre flight operations looks good ;)")
         try:
             result = await self.collection.insert_one(document)
-            logging.info(
-                f"Mongo base: Item Created. Checking if transformation required..."
-            )
             return result.inserted_id
         except Exception as e:
             logging.error(
@@ -107,12 +96,8 @@ class MongoBase:
             self.pre_flight_check(return_doc_id, extended_class_model)
         except Exception as e:
             raise e
-        logging.info(f"Pre flight operations looks good ;)")
         try:
             result = await self.collection.find_one(finder)
-            logging.info(
-                f"Mongo base: Item fetched. Checking if transformation required..."
-            )
             if return_doc_id:
                 transformed_result = return_id_transformation(
                     extended_class_model=extended_class_model, result=result
@@ -139,7 +124,6 @@ class MongoBase:
             self.pre_flight_check(return_doc_id, extended_class_model)
         except Exception as e:
             raise e
-        logging.info(f"Pre flight operations looks good ;)")
         try:
             result = await self.collection.find_one_and_update(
                 find,
@@ -149,9 +133,6 @@ class MongoBase:
                 else ReturnDocument.BEFORE,
                 upsert=insert_if_not_found,
                 array_filters=array_filters,
-            )
-            logging.info(
-                f"Mongo base: Item updated. Checking if transformation required..."
             )
             if return_doc_id:
                 transformed_result = return_id_transformation(
@@ -183,15 +164,11 @@ class MongoBase:
                 )
         except Exception as e:
             raise e
-        logging.info(f"Pre flight operations looks good ;)")
         try:
             result = (
                 self.collection.find(filter=finder, projection=projection)
                 .skip(skip)
                 .limit(limit)
-            )
-            logging.info(
-                f"Mongo base: Item fetched. Checking if transformation required..."
             )
             result_list = []
             if only_list_without_id:
@@ -217,7 +194,6 @@ class MongoBase:
         filter_condition: dict,
     ):
         try:
-            logging.info(f"Mongo base: Fetching count...")
             return await self.collection.count_documents(filter=filter_condition)
         except Exception as e:
             logging.error(
@@ -243,4 +219,21 @@ class MongoBase:
             return result_aggregate_count
         except Exception as e:
             logging.error(f"Mongo base: Error while aggregating. Error {e}")
+            raise e
+
+    async def modify_many(
+        self,
+        find: dict,
+        update: dict,
+    ):
+        try:
+            result = await self.collection.update_many(
+                find,
+                update
+            )
+            return result
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while updating one in collection. Error: {e}"
+            )
             raise e

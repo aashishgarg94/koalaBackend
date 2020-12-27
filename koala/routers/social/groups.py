@@ -8,7 +8,7 @@ from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.groups import SocialGroupsCollection
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
@@ -201,5 +201,44 @@ async def groups_by_user_id(
             )
 
         return BaseGroupMemberCountListModel(user_groups=[])
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/disable_group_by_group_id",
+    response_model=BaseIsDisabled,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def disable_group_by_group_id(
+    group_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_groups_collection = SocialGroupsCollection()
+        disabled_group = await social_groups_collection.disable_group_by_group_id(group_id=group_id)
+
+        social_posts_collection = SocialPostsCollection()
+        result = await social_posts_collection.disable_multiple_post_by_post_ids(
+            group_id=group_id, post_ids=disabled_group.get('posts').get('posts_list')
+        )
+        return result
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/group_users",
+    response_model=None,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def group_delete_user_by_id(
+    group_id: str,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        social_groups_collection = SocialGroupsCollection()
+        response = await social_groups_collection.get_group_users_details(group_id=group_id)
+        return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

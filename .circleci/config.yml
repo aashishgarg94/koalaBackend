@@ -9,12 +9,12 @@ jobs:
       - run:
           name: Building Docker Image
           command: |
-            docker build -t udayshankarsingh/koala-backend:born .
+            docker build -t udayshankarsingh/koala-backend:pragaty-<<pipeline.number>> .
       - run:
           name: Pushing image to dockerhub
           command: |
             docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASSWORD
-            docker push udayshankarsingh/koala-backend:born
+            docker push udayshankarsingh/koala-backend:pragaty-<<pipeline.number>>
   eb-deploy:
     docker:
       - image: 'cimg/base:stable'
@@ -23,7 +23,7 @@ jobs:
       - eb/setup
       - run:
           command: |
-            eb use koala-$CIRCLE_BRANCH
+            eb use $CIRCLE_BRANCH
             eb status
           name: You may now use the EB CLI within this job
       - run:
