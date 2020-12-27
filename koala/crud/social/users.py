@@ -429,11 +429,14 @@ class SocialPostsCollection:
     ) -> CreatePostModelOutList:
         try:
             finder = {
-                "is_deleted": False,
-                "$or": [
-                    {"group_id": {"$in": groups_followed_list}},
-                    {"owner.user_id": {"$in": user_followed_list}},
-                ]
+                "$query": {
+                    "is_deleted": False,
+                    "$or": [
+                        {"group_id": {"$in": groups_followed_list}},
+                        {"owner.user_id": {"$in": user_followed_list}},
+                    ]
+                },
+                "$orderby": {"created_on": -1},
             }
             data = await self.collection.find(
                 finder=finder,
