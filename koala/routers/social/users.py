@@ -1,6 +1,7 @@
 import logging
 import math
 from typing import Optional
+import random
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
 from fastapi.params import File
@@ -173,6 +174,9 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
 
             if page_no == math.ceil(post_count / REQUEST_LIMIT):
                 more_pages = False
+
+            # TODO: Shuffling is temp, once the planned db changes done, must remove this
+            random.shuffle(post_list)
 
         return CreatePostModelPaginationModel(
             more_pages=more_pages, post_list=post_list
