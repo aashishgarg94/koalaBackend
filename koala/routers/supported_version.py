@@ -11,5 +11,7 @@ router = APIRouter()
 async def supported_version(app_version: str, build_version: str):
     logging.info(app_version)
     logging.info(build_version)
-    data = ['1.0.0', '1.2.0']
-    return False
+    allowed_version = ['1.1.4']
+    if app_version in allowed_version:
+        return False
+    return True
