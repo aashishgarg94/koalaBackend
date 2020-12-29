@@ -17,6 +17,7 @@ motor = "*"
 boto3 = "*"
 requests = "*"
 email-validator = "*"
+telesign = "*"
 
 [requires]
 python_version = "3.8"
