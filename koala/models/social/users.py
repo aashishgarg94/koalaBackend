@@ -145,7 +145,7 @@ class PostUserBioModel(BaseModel):
 class BasePostMemberModel(MongoModel):
     id: OID = Field()
     profile_image: Optional[str] = None
-    full_name: BaseFullNameModel
+    full_name: Optional[BaseFullNameModel] = None
     users_following: Optional[FollowerModel]
     bio: Optional[PostUserBioModel] = None
 
@@ -153,7 +153,7 @@ class BasePostMemberModel(MongoModel):
 class BasePostMemberCountModel(BaseModel):
     id: OID = Field()
     profile_image: Optional[str] = None
-    full_name: BaseFullNameModel
+    full_name: Optional[BaseFullNameModel] = None
     total_followers: int
     current_company: Optional[str] = None
 
