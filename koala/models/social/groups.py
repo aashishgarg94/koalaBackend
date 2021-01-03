@@ -60,12 +60,14 @@ class UsersFollowed(MongoModel):
 class BaseGroupMemberModel(MongoModel):
     id: OID = Field()
     groupName: str
+    group_image: Optional[str] = None
     followers: Optional[FollowerModel]
 
 
 class BaseGroupMemberCountModel(BaseModel):
     id: OID = Field()
     group_name: str
+    group_image: Optional[str] = None
     total_followers: int
 
 

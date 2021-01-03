@@ -217,7 +217,7 @@ class SocialGroupsCollection:
 
             user_group_list = await self.collection.find(
                 finder=filter_condition,
-                projection={"groupName": 1, "followers": 1},
+                projection={"groupName": 1, "followers": 1, "group_image": 1},
                 return_doc_id=True,
                 extended_class_model=BaseGroupMemberModel,
             )
@@ -228,6 +228,7 @@ class SocialGroupsCollection:
                         BaseGroupMemberCountModel(
                             id=group.id,
                             group_name=group.groupName,
+                            group_image=group.group_image,
                             total_followers=group.followers.total_followers,
                         )
                     )
