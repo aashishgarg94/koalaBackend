@@ -1,6 +1,6 @@
 branch-defaults:
   staging:
-    environment: staging
+    environment: null
     group_suffix: null
 global:
   application_name: pragaty-prod
