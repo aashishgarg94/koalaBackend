@@ -69,8 +69,9 @@ async def t_generate_otp(mobile_number: str, is_resend: bool):
 
 
 @router.get("/verify_otp")
-async def t_verify_otp(mobile_number: str, verify_otp: int):
+async def t_verify_otp(mobile_number: str, otp: int):
     try:
+        verify_otp = otp
         phone_number = f"{COUNTRY_CODE}{mobile_number}"
 
         otp = OTP()
@@ -87,9 +88,9 @@ async def t_verify_otp(mobile_number: str, verify_otp: int):
         elif verify_otp == data.get("generated_otp") and is_token_valid:
             # No assignment on below query as it's just updating the db, will push it to kafka later
             await otp.update_by_phone_number(phone_number=phone_number)
-            return {"status_code": 200, "data": {"otp_verified": True}}
+            return {"status_code": 200, "type": "success", "data": {"otp_verified": True}}
         else:
-            return {"status_code": 500, "error": {"msg": "OTP verification failed"}}
+            return {"status_code": 500, "type": "failure", "error": {"msg": "OTP verification failed"}}
 
     except Exception:
         raise HTTPException(status_code=500, detail="Not able to generate OTP")
