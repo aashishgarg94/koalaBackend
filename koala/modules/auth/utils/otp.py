@@ -38,14 +38,12 @@ async def telesign_send_otp(phone_number: str, verify_code: int) -> any:
 
 async def msg91_resend_otp(phone_number: str, verify_code: int) -> any:
     try:
-        url = f"{MSG91_URL}?authkey={MSG91_AUTHKEY}&template_id={MSG91_TEMPLATE_ID}&mobile=+91{phone_number}&otp={verify_code}"
+        url = f"{MSG91_URL}?authkey={MSG91_AUTHKEY}&template_id={MSG91_TEMPLATE_ID}&mobile={phone_number}&otp={verify_code}"
 
         payload = {}
         headers = {"content-type": "application/json"}
 
-        response = requests.request("GET", url, headers=headers, data=payload)
-        return json.loads(response.text)
-
+        return requests.request("GET", url, headers=headers, data=payload)
     except Exception as e:
         logging.error(f"Error: while re-sending OTP {e}")
         raise e
