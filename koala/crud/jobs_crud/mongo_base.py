@@ -152,6 +152,7 @@ class MongoBase:
         projection: dict = None,
         return_doc_id=False,
         extended_class_model=None,
+        sort: list = None,
         skip: int = REQUEST_SKIP_DEFAULT,
         limit: int = REQUEST_LIMIT,
         only_list_without_id: bool = False,
@@ -165,11 +166,19 @@ class MongoBase:
         except Exception as e:
             raise e
         try:
-            result = (
-                self.collection.find(filter=finder, projection=projection)
-                .skip(skip)
-                .limit(limit)
-            )
+            if sort:
+                result = (
+                    self.collection.find(filter=finder, projection=projection)
+                    .sort(sort)
+                    .skip(skip)
+                    .limit(limit)
+                )
+            else:
+                result = (
+                    self.collection.find(filter=finder, projection=projection)
+                        .skip(skip)
+                        .limit(limit)
+                )
             result_list = []
             if only_list_without_id:
                 for document in await result.to_list(length=limit):
