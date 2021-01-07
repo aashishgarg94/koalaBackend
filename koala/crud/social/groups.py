@@ -7,7 +7,7 @@ from fastapi import File, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled
+from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import (
     BaseGroupMemberCountListModel,
@@ -242,9 +242,7 @@ class SocialGroupsCollection:
             find = {"_id": ObjectId(group_id)}
             updater = {"$set": {"is_deleted": True, "deleted_on": datetime.now()}}
             result = await self.collection.find_one_and_modify(
-                find,
-                update=updater,
-                return_doc_id=False
+                find, update=updater, return_doc_id=False
             )
             data = result if result else None
             return data
@@ -261,9 +259,9 @@ class SocialGroupsCollection:
             )
 
             group_users = []
-            if len(data[0].get('followers').get('followers_list')) > 0:
-                for user in data[0].get('followers').get('followers_list'):
-                    group_users.append({'name': user.get('name').get('first_name')})
+            if len(data[0].get("followers").get("followers_list")) > 0:
+                for user in data[0].get("followers").get("followers_list"):
+                    group_users.append({"name": user.get("name").get("first_name")})
 
             return group_users
         except Exception as e:

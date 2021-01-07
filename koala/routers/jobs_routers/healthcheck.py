@@ -1,8 +1,5 @@
-import logging
-
-from fastapi import APIRouter, HTTPException
-from koala.crud.jobs_crud.company import CompanyCollection
-from pydantic import EmailStr, BaseModel
+from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -14,7 +11,5 @@ class BaseHealthCheck(BaseModel):
 
 @router.get("/healthcheck")
 def healthcheck():
-    msg = (
-        "I am good"
-    )
+    msg = "I am good"
     return BaseHealthCheck(message=msg, status=200)

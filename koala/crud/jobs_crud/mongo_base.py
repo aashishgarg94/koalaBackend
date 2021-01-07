@@ -215,7 +215,7 @@ class MongoBase:
             result = self.collection.aggregate(condition)
             result_aggregate_count = 0
             for document in await result.to_list(length=100):
-                result_aggregate_count = document.get('aggregate_sum')
+                result_aggregate_count = document.get("aggregate_sum")
             return result_aggregate_count
         except Exception as e:
             logging.error(f"Mongo base: Error while aggregating. Error {e}")
@@ -227,10 +227,7 @@ class MongoBase:
         update: dict,
     ):
         try:
-            result = await self.collection.update_many(
-                find,
-                update
-            )
+            result = await self.collection.update_many(find, update)
             return result
         except Exception as e:
             logging.error(

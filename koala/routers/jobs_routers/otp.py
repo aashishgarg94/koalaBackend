@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from koala.crud.jobs_crud.master import MasterCollections
 from telesign.messaging import MessagingClient
 from telesign.util import random_with_n_digits
-import sys
 
 router = APIRouter()
 
@@ -35,7 +34,7 @@ async def t_generate_otp(mobile_number: str):
         customer_id = "799079BA-116B-45E8-811B-79F68268D064"
         api_key = "rEyKCONdyxeGcGbU6pEUFMyD8vf98Js6s1UgJCz87ThwoEx7mP9LTcD6vNVcF7eb+Ac0xQtIGPdbo8bVwEvkjQ=="
 
-        country_code = '91'
+        country_code = "91"
         phone_number = country_code + mobile_number
         verify_code = random_with_n_digits(4)
 

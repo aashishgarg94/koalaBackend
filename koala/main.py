@@ -3,7 +3,9 @@ import logging
 import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 # from starlette.middleware.cors import CORSMiddleware
+from koala.modules.auth import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.routers.jobs_routers import (
@@ -14,7 +16,6 @@ from koala.routers.jobs_routers import (
     job_user,
     jobs,
     master,
-    otp,
     register,
     user,
     website,
@@ -110,6 +111,7 @@ app.include_router(
     otp.router,
     tags=["OTP APIs"],
 )
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
