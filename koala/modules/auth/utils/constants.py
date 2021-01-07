@@ -6,8 +6,8 @@ MSG91_URL = "https://api.msg91.com/api/v5/otp"
 MSG91_AUTHKEY = "346625Ax7oGJre0NBr5fa798e1P1"
 MSG91_TEMPLATE_ID = "5fa91058dcd361333a02e410"
 
-COUNTRY_CODE = "91"
-OTP_MESSAGE = "Your code is {}"
+COUNTRY_CODE = "+91"
+OTP_MESSAGE = "{} is your OTP for Pragaty"
 OTP_DIGIT = 4
 
 OTP_VALIDITY = 10

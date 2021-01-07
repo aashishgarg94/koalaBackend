@@ -25,7 +25,7 @@ async def send_otp(phone_number: str, verify_code: int):
         response = await telesign_send_otp(
             phone_number=phone_number, verify_code=verify_code
         )
-        if response.get("status_code") == 200:
+        if response.status_code == 200:
             return {"status_code": 200, "type": "success", "data": {"otp_sent": True}}
 
     except Exception:
@@ -39,7 +39,7 @@ async def resend_otp(phone_number: str, verify_code: int):
         response = await msg91_resend_otp(
             phone_number=phone_number, verify_code=verify_code
         )
-        if response.get("type") == "success":
+        if response.status_code == 200:
             return {"status_code": 200, "type": "success", "data": {"otp_sent": True}}
 
     except Exception:
