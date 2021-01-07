@@ -35,14 +35,14 @@ class SocialPostsCollection:
         self.collection(SOCIAL_POSTS)
 
     async def create_post(
-            self,
-            post_details: CreatePostModelIn,
-            is_group_post: bool,
-            group_id: str,
-            shares: BaseShare,
-            likes: BaseLikeModel,
-            post_report: BasePostReportModel,
-            file: UploadFile = File(...),
+        self,
+        post_details: CreatePostModelIn,
+        is_group_post: bool,
+        group_id: str,
+        shares: BaseShare,
+        likes: BaseLikeModel,
+        post_report: BasePostReportModel,
+        file: UploadFile = File(...),
     ) -> any:
         try:
             s3_post_url = ""
@@ -109,13 +109,13 @@ class SocialPostsCollection:
             raise HTTPException(status_code=500, detail="Something went wrong")
 
     async def update_post(
-            self,
-            post_id: str,
-            title: str,
-            description: str,
-            content: str,
-            tags: list,
-            file: UploadFile = File(...),
+        self,
+        post_id: str,
+        title: str,
+        description: str,
+        content: str,
+        tags: list,
+        file: UploadFile = File(...),
     ) -> any:
         try:
             s3_post_url = ""
@@ -127,20 +127,18 @@ class SocialPostsCollection:
 
             post_updates = {}
             if title is not None:
-                post_updates['title'] = title.strip()
+                post_updates["title"] = title.strip()
             if description is not None:
-                post_updates['description'] = description.strip()
+                post_updates["description"] = description.strip()
             if content is not None:
-                post_updates['content'] = content.strip()
+                post_updates["content"] = content.strip()
             if len(tags) > 0:
-                post_updates['tags'] = tags
+                post_updates["tags"] = tags
             if s3_post_url:
-                post_updates['post_image'] = s3_post_url.strip()
+                post_updates["post_image"] = s3_post_url.strip()
 
             finder = {"_id": ObjectId(post_id)}
-            updater = {
-                "$set": post_updates
-            }
+            updater = {"$set": post_updates}
             result = await self.collection.find_one_and_modify(
                 find=finder,
                 update=updater,
@@ -178,13 +176,13 @@ class SocialPostsCollection:
             filter_condition = {"_id": {"$in": post_ids}}
             group_names = await self.collection.find(
                 finder=filter_condition,
-                projection={'groupName': 1, "_id": 1},
+                projection={"groupName": 1, "_id": 1},
                 return_doc_id=False,
             )
 
             group_names_obj = {}
             for group_name in group_names:
-                group_names_obj[group_name.get('_id')] = group_name.get('groupName')
+                group_names_obj[group_name.get("_id")] = group_name.get("groupName")
 
             for post in data:
                 if post.group_id is not None:
@@ -225,11 +223,11 @@ class SocialPostsCollection:
                 self.collection(SOCIAL_GROUPS)
                 group_name = await self.collection.find(
                     finder={"_id": data.group_id},
-                    projection={'groupName': 1, "_id": 0},
+                    projection={"groupName": 1, "_id": 0},
                     return_doc_id=False,
                 )
 
-                data.group_name = group_name[0].get('groupName')
+                data.group_name = group_name[0].get("groupName")
             return data
         except Exception as e:
             logging.error(f"Error: Get user post by id {e}")
@@ -257,7 +255,12 @@ class SocialPostsCollection:
             self.collection(SOCIAL_POSTS)
             aggregate_condition = [
                 {"$match": {"owner.user_id": ObjectId(user_id)}},
-                {"$group": {"_id": ObjectId(user_id), "aggregate_sum": {"$sum": "$like.total_likes"}}}
+                {
+                    "$group": {
+                        "_id": ObjectId(user_id),
+                        "aggregate_sum": {"$sum": "$like.total_likes"},
+                    }
+                },
             ]
 
             return await self.collection.aggregate_get_count(aggregate_condition)
@@ -294,7 +297,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user followed groups {e}")
 
     async def make_user_follow_user(
-            self, user_id: str, user_map=BaseFollowerModel
+        self, user_id: str, user_map=BaseFollowerModel
     ) -> BaseIsFollowed:
         try:
             # Updating User collection for user followers
@@ -352,7 +355,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Make user follow {e}")
 
     async def get_user_followed(
-            self, user_id: ObjectId, skip: int, limit: int
+        self, user_id: ObjectId, skip: int, limit: int
     ) -> UsersFollowed:
         try:
             self.collection(USERS)
@@ -394,7 +397,7 @@ class SocialPostsCollection:
             raise e
 
     async def get_group_posts(
-            self, skip: int, limit: int, group_id: str = None
+        self, skip: int, limit: int, group_id: str = None
     ) -> CreatePostModelOutList:
         try:
             if group_id:
@@ -421,11 +424,11 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user feed {e}")
 
     async def get_user_feed_by_groups_and_users_following(
-            self,
-            skip: int,
-            limit: int,
-            groups_followed_list: list,
-            user_followed_list: list,
+        self,
+        skip: int,
+        limit: int,
+        groups_followed_list: list,
+        user_followed_list: list,
     ) -> CreatePostModelOutList:
         try:
             finder = {
@@ -434,7 +437,7 @@ class SocialPostsCollection:
                     "$or": [
                         {"group_id": {"$in": groups_followed_list}},
                         {"owner.user_id": {"$in": user_followed_list}},
-                    ]
+                    ],
                 },
                 "$orderby": {"created_on": -1},
             }
@@ -451,13 +454,13 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user feed {e}")
 
     async def post_action(
-            self,
-            post_id: str,
-            user_id: str,
-            comments: BaseCommentsModel = None,
-            like: int = None,
-            share: str = None,
-            report_post: bool = False,
+        self,
+        post_id: str,
+        user_id: str,
+        comments: BaseCommentsModel = None,
+        like: int = None,
+        share: str = None,
+        report_post: bool = False,
     ) -> any:
         try:
             finder = {"_id": ObjectId(post_id)}
@@ -522,8 +525,8 @@ class SocialPostsCollection:
             logging.error(f"Error: Get user followed {e}")
 
     async def post_likes_count_by_user_id(
-            self,
-            user_id: str,
+        self,
+        user_id: str,
     ) -> int:
         try:
             filter_condition = {"like.liked_by": {"$all": [ObjectId(user_id)]}}
@@ -538,7 +541,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get like count by user_id {e}")
 
     async def get_users_in_same_company(
-            self, current_company: str, user_id: str
+        self, current_company: str, user_id: str
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
@@ -578,7 +581,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get group count by user_id {e}")
 
     async def get_users_to_follow(
-            self, current_followed_users: list
+        self, current_followed_users: list
     ) -> BasePostMemberCountListModel:
         try:
             filter_condition = {
@@ -617,7 +620,7 @@ class SocialPostsCollection:
             logging.error(f"Error: Get group count by user_id {e}")
 
     async def get_posts_by_tags(
-            self, tags: list, skip: int, limit: int
+        self, tags: list, skip: int, limit: int
     ) -> CreatePostModelOutList:
         try:
             self.collection(SOCIAL_POSTS)
@@ -654,7 +657,9 @@ class SocialPostsCollection:
             logging.error(f"Error: While deleting post {e}")
             raise e
 
-    async def disable_multiple_post_by_post_ids(self, group_id: str, post_ids: list) -> BaseIsDisabled:
+    async def disable_multiple_post_by_post_ids(
+        self, group_id: str, post_ids: list
+    ) -> BaseIsDisabled:
         try:
             if len(post_ids) > 0:
                 filter_condition = {"_id": {"$in": post_ids}}
@@ -671,4 +676,3 @@ class SocialPostsCollection:
         except Exception as e:
             logging.error(f"Error: While deleting post {e}")
             raise e
-

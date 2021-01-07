@@ -94,11 +94,11 @@ async def disable_user_me(
     dependencies=[Security(get_current_active_user, scopes=["applicant:write"])],
 )
 async def disable_user_by_id(
-        user_id: str,
-        current_user: UserModel = Security(
-            get_current_active_user,
-            scopes=["applicant:write"],
-            )
+    user_id: str,
+    current_user: UserModel = Security(
+        get_current_active_user,
+        scopes=["applicant:write"],
+    ),
 ):
     try:
         user_db = MongoDBUserDatabase(UserInModel)
