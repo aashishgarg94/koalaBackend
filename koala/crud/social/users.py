@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from math import ceil
 
 from bson import ObjectId
 from fastapi import File, HTTPException, UploadFile
@@ -196,15 +197,29 @@ class SocialPostsCollection:
     async def get_user_all_posts(self, skip: int, limit: int) -> any:
         try:
             filter_condition = {"is_deleted": False}
-            data = await self.collection.find(
+            desc_sort = [("like.total_likes", -1)]
+            desc_data = await self.collection.find(
                 finder=filter_condition,
+                sort=desc_sort,
                 skip=skip,
-                limit=limit,
+                limit=ceil(limit/2),
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
 
+            asc_sort = [("like.total_likes", 1)]
+            asc_data = await self.collection.find(
+                finder=filter_condition,
+                sort=asc_sort,
+                skip=skip,
+                limit=ceil(limit/2),
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+
+            data = desc_data + asc_data
             post_data = await self.get_group_name_for_post(data)
+
             return post_data if post_data else None
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
