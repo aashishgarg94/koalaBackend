@@ -1,10 +1,9 @@
-import logging
 from datetime import datetime
 from typing import Optional, Type
 
 from bson import ObjectId
 from fastapi import HTTPException
-from koala.config.collections import SOCIAL_POSTS, USERS
+from koala.config.collections import USERS
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsDisabled, BaseIsUpdated
 from koala.models.jobs_models.user import (
     UD,
@@ -15,7 +14,8 @@ from koala.models.jobs_models.user import (
     UserModel,
     UserOutModel,
     UserUpdateCls,
-    UserUpdateOutModel, BaseFullNameModel,
+    UserUpdateOutModel,
+    BaseFullNameModel,
 )
 
 from ..social.users import SocialPostsCollection
@@ -203,7 +203,11 @@ class MongoDBUserDatabase:
                 custom_bio_dict = result.get("bio")
                 custom_bio_dict["_id"] = result.get("_id")
                 custom_bio_dict["profile_image"] = result.get("profile_image")
-                custom_bio_dict["name"] = result.get("full_name").get("first_name") if result.get("full_name") else None
+                custom_bio_dict["name"] = (
+                    result.get("full_name").get("first_name")
+                    if result.get("full_name")
+                    else None
+                )
                 custom_bio_dict["full_name"] = result.get("full_name")
                 custom_bio_dict["mobile_number"] = result.get("mobile_number")
                 custom_bio_dict["gender"] = result.get("gender")
@@ -229,9 +233,17 @@ class MongoDBUserDatabase:
             result = await self.collection.find_one({"_id": ObjectId(user_id)})
 
             social_posts_collection = SocialPostsCollection()
-            post_results_count = await social_posts_collection.get_user_post_count_by_user_id(user_id=user_id)
+            post_results_count = (
+                await social_posts_collection.get_user_post_count_by_user_id(
+                    user_id=user_id
+                )
+            )
 
-            post_results_like_count = await social_posts_collection.get_user_post_like_count_by_user_id(user_id=user_id)
+            post_results_like_count = (
+                await social_posts_collection.get_user_post_like_count_by_user_id(
+                    user_id=user_id
+                )
+            )
 
             if result:
                 bio_dict = result.get("bio")
@@ -273,7 +285,7 @@ class MongoDBUserDatabase:
                     "following": users_followed_count,
                     "followers": users_following_count,
                     "likes": post_results_like_count,
-                    "posts": post_results_count
+                    "posts": post_results_count,
                 }
 
                 return social_profile_data
@@ -315,7 +327,9 @@ class MongoDBUserDatabase:
         self, profile_details
     ) -> BaseIsUpdated:
         try:
-            user_full_name = BaseFullNameModel(first_name=profile_details.name, middle_name="", last_name="")
+            user_full_name = BaseFullNameModel(
+                first_name=profile_details.name, middle_name="", last_name=""
+            )
             updater = {
                 "$set": {
                     "full_name": user_full_name.dict(),

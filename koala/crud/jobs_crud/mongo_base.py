@@ -152,6 +152,7 @@ class MongoBase:
         projection: dict = None,
         return_doc_id=False,
         extended_class_model=None,
+        sort: list = None,
         skip: int = REQUEST_SKIP_DEFAULT,
         limit: int = REQUEST_LIMIT,
         only_list_without_id: bool = False,
@@ -165,11 +166,19 @@ class MongoBase:
         except Exception as e:
             raise e
         try:
-            result = (
-                self.collection.find(filter=finder, projection=projection)
-                .skip(skip)
-                .limit(limit)
-            )
+            if sort:
+                result = (
+                    self.collection.find(filter=finder, projection=projection)
+                    .sort(sort)
+                    .skip(skip)
+                    .limit(limit)
+                )
+            else:
+                result = (
+                    self.collection.find(filter=finder, projection=projection)
+                        .skip(skip)
+                        .limit(limit)
+                )
             result_list = []
             if only_list_without_id:
                 for document in await result.to_list(length=limit):
@@ -215,7 +224,7 @@ class MongoBase:
             result = self.collection.aggregate(condition)
             result_aggregate_count = 0
             for document in await result.to_list(length=100):
-                result_aggregate_count = document.get('aggregate_sum')
+                result_aggregate_count = document.get("aggregate_sum")
             return result_aggregate_count
         except Exception as e:
             logging.error(f"Mongo base: Error while aggregating. Error {e}")
@@ -227,10 +236,7 @@ class MongoBase:
         update: dict,
     ):
         try:
-            result = await self.collection.update_many(
-                find,
-                update
-            )
+            result = await self.collection.update_many(find, update)
             return result
         except Exception as e:
             logging.error(

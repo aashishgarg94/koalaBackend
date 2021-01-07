@@ -30,3 +30,7 @@ WEBSITE_PROVIDER = "website_provider"
 # GROUPS
 SOCIAL_GROUPS = "social_groups"
 SOCIAL_POSTS = "social_posts"
+
+
+# OTP
+OTP_GENERATION = "otp_generation"

@@ -333,9 +333,7 @@ async def user_feed_by_groups_and_users_following(
             if page_no == math.ceil(post_count / REQUEST_LIMIT):
                 more_pages = False
 
-        return CreatePostModelOutList(
-            more_pages=more_pages, post_list=post_list
-        )
+        return CreatePostModelOutList(more_pages=more_pages, post_list=post_list)
     except Exception as e:
         logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
@@ -509,9 +507,7 @@ async def disable_post_by_post_id(
 ):
     try:
         social_posts_collection = SocialPostsCollection()
-        result = await social_posts_collection.disable_post_by_post_id(
-            post_id=post_id
-        )
+        result = await social_posts_collection.disable_post_by_post_id(post_id=post_id)
         return result
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

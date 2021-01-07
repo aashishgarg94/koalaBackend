@@ -216,11 +216,13 @@ async def disable_group_by_group_id(
 ):
     try:
         social_groups_collection = SocialGroupsCollection()
-        disabled_group = await social_groups_collection.disable_group_by_group_id(group_id=group_id)
+        disabled_group = await social_groups_collection.disable_group_by_group_id(
+            group_id=group_id
+        )
 
         social_posts_collection = SocialPostsCollection()
         result = await social_posts_collection.disable_multiple_post_by_post_ids(
-            group_id=group_id, post_ids=disabled_group.get('posts').get('posts_list')
+            group_id=group_id, post_ids=disabled_group.get("posts").get("posts_list")
         )
         return result
     except Exception:
@@ -238,7 +240,9 @@ async def group_delete_user_by_id(
 ):
     try:
         social_groups_collection = SocialGroupsCollection()
-        response = await social_groups_collection.get_group_users_details(group_id=group_id)
+        response = await social_groups_collection.get_group_users_details(
+            group_id=group_id
+        )
         return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
