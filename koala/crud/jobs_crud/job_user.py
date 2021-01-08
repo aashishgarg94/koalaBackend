@@ -512,7 +512,6 @@ class JobUser:
             # else:
             filter_condition = {}
             if(city or job_type or salary_start_range or salary_end_range or area or company_name):
-                logging.info("checks")
                 filter_condition = {
                     "$or": [
                         {"city": city},
