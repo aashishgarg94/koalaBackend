@@ -453,6 +453,7 @@ class JobUser:
         try:
             self.collection(JOBS)
             filter_condition = {}
+
             jobs_data = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,
@@ -509,21 +510,29 @@ class JobUser:
             #         ]
             #     }
             # else:
-            filter_condition = {
-                "$or": [
-                    {"city": city},
-                    {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
-                    {"area": area},
-                    {"title": title},
-                    {"job_info.company_details.company_name": company_name},
-                ],
-                "experience.start_range": {
-                    "$gte": salary_start_range if salary_start_range else 0
-                },
-                "experience.end_range": {
-                    "$lte": salary_end_range if salary_end_range else 50
-                },
-            }
+            filter_condition = {}
+            if(city or job_type or salary_start_range or salary_end_range or area or company_name):
+                logging.info("checks")
+                filter_condition = {
+                    "$or": [
+                        {"city": city},
+                        {"job_info.job_types": {"$elemMatch": {"name": job_type}}},
+                        {"area": area},
+                        {"title": title},
+                        {"job_info.company_details.company_name": company_name},
+                        {   "$and": [                    
+                                {   "salary.start_range": {
+                                        "$gte": salary_start_range if salary_start_range else 0
+                                    }
+                                },
+                                {   "salary.end_range": {
+                                        "$lte": salary_end_range if salary_end_range else 10000000
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             jobs_data = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,

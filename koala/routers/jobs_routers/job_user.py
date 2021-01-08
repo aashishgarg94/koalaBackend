@@ -216,20 +216,6 @@ async def job_all_matched():
 
 
 @router.post(
-    "/jobs/all_matched",
-    dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
-)
-async def job_all_matched():
-    try:
-        job_user = JobUser()
-        result = await job_user.get_all_matched_jobs()
-        return result
-    except Exception as e:
-        logging.error(f"Error while applying action: ERROR: {e}")
-        raise e
-
-
-@router.post(
     "/jobs/freshers_jobs",
     dependencies=[Security(get_current_active_user, scopes=["applicant:read"])],
 )
