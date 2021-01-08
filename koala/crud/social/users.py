@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from math import ceil
+import random
 
 from bson import ObjectId
 from fastapi import File, HTTPException, UploadFile
@@ -216,13 +217,33 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
-
-            data = desc_data + asc_data
+            
+            raw_data = desc_data + asc_data
+            random.shuffle(raw_data)
+            
+            pinned_data = await self.get_user_all_posts_master_pinned()
+            data = pinned_data + raw_data
+            
             post_data = await self.get_group_name_for_post(data)
 
             return post_data if post_data else None
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
+            
+    async def get_user_all_posts_master_pinned(self) -> any:
+        try:
+            filter_condition = {"is_master_pinned": True}
+            data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+
+            post_data = await self.get_group_name_for_post(data)
+
+            return post_data if post_data else None
+        except Exception as e:
+            logging.error(f"Error: Get user all posts master pinned {e}")
 
     async def get_user_post_by_post_id(self, post_id: str) -> any:
         try:
