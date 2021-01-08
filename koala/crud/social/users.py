@@ -233,13 +233,11 @@ class SocialPostsCollection:
     async def get_user_all_posts_master_pinned(self) -> any:
         try:
             filter_condition = {"is_master_pinned": True}
-            data = await self.collection.find(
+            post_data = await self.collection.find(
                 finder=filter_condition,
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
-
-            post_data = await self.get_group_name_for_post(data)
 
             return post_data if post_data else None
         except Exception as e:
