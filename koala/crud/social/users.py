@@ -444,18 +444,43 @@ class SocialPostsCollection:
                     "$query": {"is_deleted": False},
                     "$orderby": {"created_on": -1},
                 }
-            data = await self.collection.find(
+            raw_data = await self.collection.find(
                 finder=finder,
                 skip=skip,
                 limit=limit,
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
+            
+            pinned_data = await self.get_group_posts_pinned(group_id)
+            data = pinned_data + raw_data
 
             post_data = await self.get_group_name_for_post(data)
             return CreatePostModelOutList(post_list=post_data)
         except Exception as e:
             logging.error(f"Error: Get user feed {e}")
+
+    async def get_group_posts_pinned(
+        self, group_id: str = None
+    ) -> CreatePostModelOutList:
+        try:
+            if group_id:
+                finder = {
+                    "$query": {"group_id": ObjectId(group_id), "is_deleted": False, "is_group_pinned": True},
+                }
+            else:
+                finder = {
+                    "$query": {"is_deleted": False, "is_group_pinned": True},
+                }
+            post_data = await self.collection.find(
+                finder=finder,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+
+            return post_data if post_data else None
+        except Exception as e:
+            logging.error(f"Error: Get user feed pinned {e}")
 
     async def get_user_feed_by_groups_and_users_following(
         self,
