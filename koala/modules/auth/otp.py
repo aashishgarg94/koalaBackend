@@ -15,13 +15,11 @@ router = APIRouter()
 
 def handle_admin_accounts(phone_number: str):
     if phone_number in admin_accounts:
-        return {"type": "success", "reason": "user already exists"}
+        return True
 
 
 async def send_otp(phone_number: str, verify_code: int):
     try:
-        handle_admin_accounts(phone_number)
-
         response = await telesign_send_otp(
             phone_number=phone_number, verify_code=verify_code
         )
@@ -34,8 +32,6 @@ async def send_otp(phone_number: str, verify_code: int):
 
 async def resend_otp(phone_number: str, verify_code: int):
     try:
-        handle_admin_accounts(phone_number)
-
         response = await msg91_resend_otp(
             phone_number=phone_number, verify_code=verify_code
         )
@@ -57,10 +53,14 @@ async def t_generate_otp(mobile_number: str, is_resend: bool):
             phone_number=phone_number, verify_code=verify_code
         )
 
-        if is_resend is False:
+        is_admin_account = handle_admin_accounts(phone_number)
+        if is_admin_account:
+            return {"status_code": 200, "type": "failure", "reason": "user already exists"}
+
+        if not is_resend:
             return await send_otp(phone_number=phone_number, verify_code=verify_code)
 
-        if is_resend is True:
+        if is_resend:
             return await resend_otp(phone_number=phone_number, verify_code=verify_code)
 
         return {"status_code": 500, "error": {"msg": "Error while sending OTP"}}

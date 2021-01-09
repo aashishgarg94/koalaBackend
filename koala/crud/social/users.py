@@ -165,6 +165,9 @@ class SocialPostsCollection:
 
     async def get_group_name_for_post(self, data):
         post_ids = []
+        if not data:
+            return None
+
         for post in data:
             if post.group_id is not None:
                 post_ids.append(post.group_id)
