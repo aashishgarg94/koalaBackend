@@ -176,7 +176,7 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
                 more_pages = False
 
             # TODO: Shuffling is temp, once the planned db changes done, must remove this
-            random.shuffle(post_list)
+            # random.shuffle(post_list)
 
         return CreatePostModelPaginationModel(
             more_pages=more_pages, post_list=post_list
