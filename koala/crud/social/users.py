@@ -225,8 +225,11 @@ class SocialPostsCollection:
             random.shuffle(raw_data)
             
             pinned_data = await self.get_user_all_posts_master_pinned()
-            data = pinned_data + raw_data
-            
+
+            data = raw_data
+            if pinned_data is not None:
+                data = pinned_data + data
+
             post_data = await self.get_group_name_for_post(data)
 
             return post_data if post_data else None
@@ -456,7 +459,10 @@ class SocialPostsCollection:
             )
             
             pinned_data = await self.get_group_posts_pinned(group_id)
-            data = pinned_data + raw_data
+
+            data = raw_data
+            if pinned_data is not None:
+                data = pinned_data + data
 
             post_data = await self.get_group_name_for_post(data)
             return CreatePostModelOutList(post_list=post_data)
