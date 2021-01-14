@@ -6,7 +6,7 @@ import random
 from bson import ObjectId
 from fastapi import File, HTTPException, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
-from koala.constants import EMBEDDED_COLLECTION_LIMIT
+from koala.constants import EMBEDDED_COLLECTION_LIMIT_FOLLOWERS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserUpdateOutModel
@@ -351,7 +351,7 @@ class SocialPostsCollection:
                     "users_following.followers_list": {
                         "$each": [user_map.dict()],
                         "$sort": {"applied_on": -1},
-                        "$slice": EMBEDDED_COLLECTION_LIMIT,
+                        "$slice": EMBEDDED_COLLECTION_LIMIT_FOLLOWERS,
                     }
                 },
             }
