@@ -254,7 +254,7 @@ class SocialPostsCollection:
                 finder=filter_condition,
                 sort=desc_sort,
                 skip=skip,
-                limit=ceil(limit/2),
+                limit=ceil(limit / 2),
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
@@ -264,14 +264,14 @@ class SocialPostsCollection:
                 finder=filter_condition,
                 sort=asc_sort,
                 skip=skip,
-                limit=ceil(limit/2),
+                limit=ceil(limit / 2),
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
-            
+
             raw_data = desc_data + asc_data
             random.shuffle(raw_data)
-            
+
             pinned_data = await self.get_user_all_posts_master_pinned()
 
             data = raw_data
@@ -283,7 +283,7 @@ class SocialPostsCollection:
             return post_data if post_data else None
         except Exception as e:
             logging.error(f"Error: Get user all posts {e}")
-            
+
     async def get_user_all_posts_master_pinned(self) -> any:
         try:
             filter_condition = {"is_master_pinned": True}
@@ -505,7 +505,7 @@ class SocialPostsCollection:
                 return_doc_id=True,
                 extended_class_model=CreatePostModelOut,
             )
-            
+
             pinned_data = await self.get_group_posts_pinned(group_id)
 
             data = raw_data
@@ -523,7 +523,11 @@ class SocialPostsCollection:
         try:
             if group_id:
                 finder = {
-                    "$query": {"group_id": ObjectId(group_id), "is_deleted": False, "is_group_pinned": True},
+                    "$query": {
+                        "group_id": ObjectId(group_id),
+                        "is_deleted": False,
+                        "is_group_pinned": True,
+                    },
                 }
             else:
                 finder = {

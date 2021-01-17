@@ -1,4 +1,4 @@
-DB_NAME = "koala-production"
+DB_NAME = "Production"
 USERS = "users"
 GIG_TYPE = "gig-types"
 OP_CITIES = "op-cities"
@@ -40,3 +40,5 @@ LEARNING_CATEGORIES = "learning_categories"
 LEARNING_VIDEOS = "learning_videos"
 VIDEOS_WATCHED = "videos_watched"
 
+# OTP
+DEVICES = "devices"

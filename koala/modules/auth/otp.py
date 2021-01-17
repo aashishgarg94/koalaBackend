@@ -55,7 +55,11 @@ async def t_generate_otp(mobile_number: str, is_resend: bool):
 
         is_admin_account = handle_admin_accounts(phone_number)
         if is_admin_account:
-            return {"status_code": 200, "type": "failure", "reason": "user already exists"}
+            return {
+                "status_code": 200,
+                "type": "failure",
+                "reason": "user already exists",
+            }
 
         if not is_resend:
             return await send_otp(phone_number=phone_number, verify_code=verify_code)
@@ -88,9 +92,17 @@ async def t_verify_otp(mobile_number: str, otp: int):
         elif verify_otp == data.get("generated_otp") and is_token_valid:
             # No assignment on below query as it's just updating the db, will push it to kafka later
             await otp.update_by_phone_number(phone_number=phone_number)
-            return {"status_code": 200, "type": "success", "data": {"otp_verified": True}}
+            return {
+                "status_code": 200,
+                "type": "success",
+                "data": {"otp_verified": True},
+            }
         else:
-            return {"status_code": 500, "type": "failure", "error": {"msg": "OTP verification failed"}}
+            return {
+                "status_code": 500,
+                "type": "failure",
+                "error": {"msg": "OTP verification failed"},
+            }
 
     except Exception:
         raise HTTPException(status_code=500, detail="Not able to generate OTP")

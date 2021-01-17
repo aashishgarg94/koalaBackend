@@ -176,8 +176,8 @@ class MongoBase:
             else:
                 result = (
                     self.collection.find(filter=finder, projection=projection)
-                        .skip(skip)
-                        .limit(limit)
+                    .skip(skip)
+                    .limit(limit)
                 )
             result_list = []
             if only_list_without_id:

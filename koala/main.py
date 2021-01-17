@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from koala.modules.auth import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
+from koala.modules.notifications import notification
 from koala.routers.jobs_routers import (
     healthcheck,
     auth,
@@ -114,6 +115,13 @@ app.include_router(
 app.include_router(
     otp.router,
     tags=["OTP APIs"],
+)
+
+# Notifications
+app.include_router(
+    notification.router,
+    prefix="/notification",
+    tags=["Notifications APIs"],
 )
 
 
