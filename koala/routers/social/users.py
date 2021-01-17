@@ -3,6 +3,7 @@ import math
 from typing import Optional
 import random
 
+from bson import ObjectId
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
 from fastapi.params import File
 from koala.authentication.authentication_user import get_current_active_user
@@ -394,11 +395,12 @@ async def user_action_comment(
             username=current_user.username,
             comments=comments,
             profile_image=current_user.profile_image,
+            user_id=ObjectId(current_user.id)
         )
         return await social_posts_collection.post_action(
             post_id=post_id, comments=comments, user_id=current_user.id
         )
-    except Exception:
+    except Exception as e:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 

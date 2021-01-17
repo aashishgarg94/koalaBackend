@@ -22,6 +22,7 @@ class BaseCommentsModel(BaseModel):
     username: str
     comments: Optional[CommentInModel]
     profile_image: Optional[str]
+    user_id: Optional[OID]
 
 
 class BasePostOwnerModel(BaseModel):

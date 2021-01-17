@@ -6,7 +6,7 @@ import random
 from bson import ObjectId
 from fastapi import File, HTTPException, UploadFile
 from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
-from koala.constants import EMBEDDED_COLLECTION_LIMIT
+from koala.constants import EMBEDDED_COLLECTION_LIMIT_FOLLOWERS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserUpdateOutModel
@@ -225,8 +225,11 @@ class SocialPostsCollection:
             random.shuffle(raw_data)
             
             pinned_data = await self.get_user_all_posts_master_pinned()
-            data = pinned_data + raw_data
-            
+
+            data = raw_data
+            if pinned_data is not None:
+                data = pinned_data + data
+
             post_data = await self.get_group_name_for_post(data)
 
             return post_data if post_data else None
@@ -348,7 +351,7 @@ class SocialPostsCollection:
                     "users_following.followers_list": {
                         "$each": [user_map.dict()],
                         "$sort": {"applied_on": -1},
-                        "$slice": EMBEDDED_COLLECTION_LIMIT,
+                        "$slice": EMBEDDED_COLLECTION_LIMIT_FOLLOWERS,
                     }
                 },
             }
@@ -456,7 +459,10 @@ class SocialPostsCollection:
             )
             
             pinned_data = await self.get_group_posts_pinned(group_id)
-            data = pinned_data + raw_data
+
+            data = raw_data
+            if pinned_data is not None:
+                data = pinned_data + data
 
             post_data = await self.get_group_name_for_post(data)
             return CreatePostModelOutList(post_list=post_data)
