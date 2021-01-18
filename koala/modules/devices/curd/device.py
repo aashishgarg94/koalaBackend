@@ -2,7 +2,7 @@ import logging
 
 from koala.dao.mongo_base import MongoBase
 from koala.config.collections import DEVICES
-from koala.modules.notifications.models.device import DeviceInModel, DeviceIdOutModel
+from koala.modules.devices.models.device import DeviceInModel, DeviceIdOutModel
 
 
 class UserDevices:

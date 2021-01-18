@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from koala.modules.notifications.models.device import BaseDeviceModel, DeviceInModel
+from koala.modules.devices.models.device import BaseDeviceModel, DeviceInModel
 
 
 def mapper_register_device(device_data: BaseDeviceModel):

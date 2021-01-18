@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from koala.modules.notifications.curd.device import UserDevices
-from koala.modules.notifications.mapper.device import mapper_register_device
-from koala.modules.notifications.models.device import BaseDeviceModel
+from koala.modules.devices.curd.device import UserDevices
+from koala.modules.devices.mapper.device import mapper_register_device
+from koala.modules.devices.models.device import BaseDeviceModel
 
 router = APIRouter()
 
