@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from koala.modules.auth import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
-from koala.modules.notifications import device
+from koala.modules.devices import device
 from koala.routers.jobs_routers import (
     healthcheck,
     auth,
