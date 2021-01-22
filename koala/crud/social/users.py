@@ -198,6 +198,29 @@ class SocialPostsCollection:
             return data
         return data
 
+    async def get_user_job_news(self, skip: int, limit: int) -> any:
+        try:
+            finder = {
+                "$query": {
+                    "is_deleted": False,
+                    "is_job_news": True
+                },
+                "$orderby": {"created_on": -1},
+            }
+            data = await self.collection.find(
+                finder=finder,
+                skip=skip,
+                limit=limit,
+                return_doc_id=True,
+                extended_class_model=CreatePostModelOut,
+            )
+
+            post_data = await self.get_group_name_for_post(data)
+
+            return post_data if post_data else None
+        except Exception as e:
+            logging.error(f"Error: Get user job news {e}")
+
     async def get_user_all_posts(self, skip: int, limit: int) -> any:
         try:
             filter_condition = {"is_deleted": False}

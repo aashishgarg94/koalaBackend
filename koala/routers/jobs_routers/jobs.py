@@ -7,7 +7,7 @@ from koala.authentication.authentication_company import (
     get_current_user_company,
 )
 from koala.authentication.authentication_user import get_current_active_user
-from koala.constants import REQUEST_LIMIT
+from koala.constants import REQUEST_LIMIT_JOBS
 from koala.crud.jobs_crud.company import CompanyCollection
 from koala.crud.jobs_crud.jobs import JobCollection
 from koala.models.jobs_models.jobs import (
@@ -84,9 +84,9 @@ async def job_get_all(page_no: Optional[int] = 1):
         job_list = []
         if jobs_count > 0:
             adjusted_page_number = page_no - 1
-            skip = adjusted_page_number * REQUEST_LIMIT
+            skip = adjusted_page_number * REQUEST_LIMIT_JOBS
             job_list = await job_collection.get_all_with_full_details(
-                skip, REQUEST_LIMIT
+                skip, REQUEST_LIMIT_JOBS
             )
 
         return JobOutWithPagination(
@@ -115,8 +115,8 @@ async def job_get_all(page_no: Optional[int] = 1):
         job_list = []
         if jobs_count > 0:
             adjusted_page_number = page_no - 1
-            skip = adjusted_page_number * REQUEST_LIMIT
-            job_list = await job_collection.get_all(skip, REQUEST_LIMIT)
+            skip = adjusted_page_number * REQUEST_LIMIT_JOBS
+            job_list = await job_collection.get_all(skip, REQUEST_LIMIT_JOBS)
 
         return JobListOutWithPaginationModel(
             total_jobs=jobs_count, current_page=page_no, jobs=job_list

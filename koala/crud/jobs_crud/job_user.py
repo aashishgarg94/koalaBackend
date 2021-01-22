@@ -452,7 +452,13 @@ class JobUser:
     async def get_all_matched_jobs(self) -> any:
         try:
             self.collection(JOBS)
-            filter_condition = {}
+            filter_condition = {
+                "$query": {
+                    "is_deleted": False,
+                    "is_closed": False
+                },
+                "$orderby": {"created_on": -1}
+            }
 
             jobs_data = await self.collection.find(
                 finder=filter_condition,
