@@ -21,6 +21,7 @@ from koala.routers.jobs_routers import (
     website,
 )
 from koala.routers.social import groups, users
+from koala.routers.learning import learning
 from koala.routers import supported_version
 
 app = FastAPI()
@@ -99,6 +100,9 @@ app.include_router(users.router, prefix="/user", tags=["Social Users"])
 app.include_router(image_uploads.router, prefix="/upload", tags=["Image Upload"])
 
 app.include_router(supported_version.router, tags=["App Version Check"])
+
+#LEARNING ROUTERS
+app.include_router(learning.router, prefix="/learning", tags=["Learning"])
 
 # Website API's
 app.include_router(
