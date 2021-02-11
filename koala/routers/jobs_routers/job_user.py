@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_company import get_current_active_user_company
 from koala.authentication.authentication_user import get_current_active_user
-from koala.constants import REQUEST_LIMIT
+from koala.constants import REQUEST_LIMIT_JOBS
 from koala.crud.jobs_crud.job_user import JobUser
 from koala.models.jobs_models.job_user import (
     AllowedActionModel,
@@ -88,10 +88,10 @@ async def get_user_all_jobs(
         job_list = []
         if jobs_count > 0:
             adjusted_page_number = page_no - 1
-            skip = adjusted_page_number * REQUEST_LIMIT
+            skip = adjusted_page_number * REQUEST_LIMIT_JOBS
 
             job_list = await job_user.user_get_all_jobs(
-                skip, REQUEST_LIMIT, current_user
+                skip, REQUEST_LIMIT_JOBS, current_user
             )
 
         return UserJobsOutWithPagination(
@@ -147,9 +147,9 @@ async def get_job_all_applicants(job_info: BaseJobApplicant):
         # applicant_list = []
         # if applicant_count > 0:
         adjusted_page_number = job_info.page_no - 1
-        skip = adjusted_page_number * REQUEST_LIMIT
+        skip = adjusted_page_number * REQUEST_LIMIT_JOBS
         applicants_map = await job_user.job_get_all_applicants(
-            skip=skip, limit=REQUEST_LIMIT, job_id=job_info.job_id
+            skip=skip, limit=REQUEST_LIMIT_JOBS, job_id=job_info.job_id
         )
 
         applicants_map["current_page"] = job_info.page_no

@@ -119,7 +119,6 @@ async def create_post(
             file=file,
         )
     except Exception as e:
-        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -185,6 +184,38 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
+
+@router.post(
+    "/job_news",
+    response_model=CreatePostModelPaginationModel,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_user_job_news(page_no: Optional[int] = 1):
+    try:
+        social_posts_collection = SocialPostsCollection()
+
+        post_count = await social_posts_collection.get_count()
+
+        more_pages = True
+        post_list = []
+        if post_count > 0:
+            adjusted_page_number = page_no - 1
+            skip = adjusted_page_number * REQUEST_LIMIT
+            post_list = await social_posts_collection.get_user_job_news(
+                skip=skip, limit=REQUEST_LIMIT
+            )
+
+            if page_no == math.ceil(post_count / REQUEST_LIMIT):
+                more_pages = False
+
+            # TODO: Shuffling is temp, once the planned db changes done, must remove this
+            # random.shuffle(post_list)
+
+        return CreatePostModelPaginationModel(
+            more_pages=more_pages, post_list=post_list
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Something went wrong")
 
 @router.post(
     "/post_by_post_id",
@@ -280,7 +311,6 @@ async def get_user_followed(
         else:
             return UsersFollowed(post_list=[])
     except Exception as e:
-        logging.info(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -336,7 +366,6 @@ async def user_feed_by_groups_and_users_following(
 
         return CreatePostModelOutList(more_pages=more_pages, post_list=post_list)
     except Exception as e:
-        logging.error(e)
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
