@@ -87,3 +87,10 @@ class MongoBase:
                 f"Mongo base: Error while inserting/updating in collection. Error: {e}"
             )
             raise e
+
+    async def insert_many(self, document_list: list):
+        try:
+            result = await self.collection.insert_many(document_list, ordered=True)
+            return result
+        except Exception as e:
+            raise e

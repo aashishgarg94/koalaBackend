@@ -1,0 +1,41 @@
+SNS_TOPIC_ARN = "arn:aws:sns:ap-south-1:247564879499:Pragaty.fifo"
+
+# POST QUEUE
+POST_OP_QUEUE = "https://sqs.ap-south-1.amazonaws.com/247564879499/PostOpQueue.fifo"
+
+# LIKE QUEUE
+POST_LIKE_QUEUE = "https://sqs.ap-south-1.amazonaws.com/247564879499/PostOpQueue.fifo"
+
+# COMMENT QUEUE
+COMMENT_QUEUE = (
+    "https://sqs.ap-south-1.amazonaws.com/247564879499/PostCommentQueue.fifo"
+)
+
+# NOTIFICATION QUEUE
+NOTIFICATION_QUEUE = (
+    "https://sqs.ap-south-1.amazonaws.com/247564879499/NotificationQueue.fifo"
+)
+
+# TEST QUEUE
+POST_TEST_QUEUE = "https://sqs.ap-south-1.amazonaws.com/247564879499/TestQueue.fifo"
+
+# POST EVENTS
+POST_CREATE = "POST_CREATE"
+POST_UPDATE = "POST_UPDATE"
+POST_DELETE = "POST_DELETE"
+
+# LIKE EVENTS
+POST_LIKE = "POST_LIKE"
+
+# COMMENT EVENTS
+POST_COMMENT = "POST_COMMENT"
+
+# NOTIFICATION EVENTS
+NOTIFICATION_LIKE = "NOTIFICATION_LIKE"
+NOTIFICATION_COMMENT = "NOTIFICATION_COMMENT"
+NOTIFICATION_SHARE = "NOTIFICATION_SHARE"
+
+# QUEUE SETTINGS
+MAX_NUMBER = 5
+WAIT_TIME = 5
+VISIBILITY_TIMEOUT = 60

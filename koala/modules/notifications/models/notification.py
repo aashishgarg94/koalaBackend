@@ -16,6 +16,7 @@ class BaseNotificationModel(BaseModel):
 class NotificationInModel(BaseNotificationModel):
     read_at: Optional[datetime]
     sent_at: Optional[datetime]
+    created_at: Optional[datetime]
 
 
 class NotificationOutModel(NotificationInModel):

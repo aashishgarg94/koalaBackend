@@ -31,3 +31,6 @@ S3_IMAGE_BUCKET_PROFILE = "koala-profile-images"
 S3_IMAGE_BUCKET_POSTS = "koala-posts-images"
 S3_IMAGE_BUCKET_COMPANY_BANNER = "koala-company-banners"
 S3_IMAGE_BUCKET_GROUPS = "koala-groups-images"
+
+# SCHEMA VERSION
+SCHEMA_VERSION = 1

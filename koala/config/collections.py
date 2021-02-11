@@ -26,8 +26,10 @@ WEBSITE_APPLICANT = "website_applicant"
 WEBSITE_PROVIDER = "website_provider"
 
 # GROUPS
-SOCIAL_GROUPS = "social_groups"
-SOCIAL_POSTS = "social_posts"
+SOCIAL_GROUPS = "groups"
+SOCIAL_POSTS = "posts"
+SOCIAL_COMMENTS = "comments"
+USER_SOCIAL = "user_social"
 ADDITIONAL_FEED = "additional_feed"
 STREAKS = "streaks"
 COINS = "coins"
@@ -42,3 +44,16 @@ VIDEOS_WATCHED = "videos_watched"
 
 # OTP
 DEVICES = "devices"
+
+
+# MASTER COLLECTIONS - NEW
+POST_LIKES = "post_likes"
+POST_COMMENTS = "post_comments"
+
+# Cache collection
+CACHE_FEED_POSTS = "cache_feed_posts"
+CACHE_USER_POSTS = "cache_user_posts"
+CACHE_USER_FOLLOWERS = "cache_user_followers"
+CACHE_USER_FOLLOWINGS = "cache_user_following"
+CACHE_TRENDING_POSTS = "cache_trending_posts"
+CACHE_POSTS = "cache_posts"
