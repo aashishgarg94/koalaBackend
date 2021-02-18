@@ -35,4 +35,5 @@ OTP_GENERATION = "otp_generation"
 # LEARNING
 LEARNING_CATEGORIES = "learning_categories"
 LEARNING_VIDEOS = "learning_videos"
+VIDEOS_WATCHED = "videos_watched"
 

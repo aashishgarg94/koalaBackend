@@ -5,11 +5,14 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Security
 from koala.authentication.authentication_user import get_current_active_user
 from koala.crud.learning.learning_categories import LearningCategoriesCollection
 from koala.crud.learning.learning_videos import LearningVideosCollection
+from koala.crud.learning.videos_watched import VideosWatchedCollection
+from koala.models.jobs_models.user import UserModel
 from koala.models.learning.learning import (
     BaseLearningCategoriesModel,
     BaseLearningVideosModel,
     CreateLearningCategoriesModelIn,
     CreateLearningVideosModelIn,
+    CreateVideoWatchedModelIn,
     CreateLearningCategoriesModelOut,
     CreateLearningCategoriesModelOutList,
     CreateLearningVideosModelOut,
@@ -196,4 +199,65 @@ async def get_all_learning_videos(
 
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
+@router.post(
+    "/video_started",
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def video_started(
+    video_id: str,
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    try:
+        learning_videos_collection = LearningVideosCollection()
+
+        await learning_videos_collection.video_watched_action(
+            video_id=video_id, started=True, user_id=current_user.id
+        )
+
+        videos_watched_collection = VideosWatchedCollection()
+
+        video_watched_details = CreateVideoWatchedModelIn(
+            video_id=video_id,
+            user_id=ObjectId(current_user.id),
+            is_started_log=True,
+            is_finished_log=False
+        )
+
+        return await videos_watched_collection.video_watched_action(
+            video_watched_details=video_watched_details
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+@router.post(
+    "/video_finished",
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def video_finished(
+    video_id: str,
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    try:
+        learning_videos_collection = LearningVideosCollection()
+
+        await learning_videos_collection.video_watched_action(
+            video_id=video_id, finished=True, user_id=current_user.id
+        )
+
+        videos_watched_collection = VideosWatchedCollection()
+
+        video_watched_details = CreateVideoWatchedModelIn(
+            video_id=video_id,
+            user_id=ObjectId(current_user.id),
+            is_started_log=False,
+            is_finished_log=True
+        )
+
+        return await videos_watched_collection.video_watched_action(
+            video_watched_details=video_watched_details
+        )
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
 
