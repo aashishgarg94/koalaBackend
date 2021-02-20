@@ -1,4 +1,5 @@
 import logging
+import random
 from bson import ObjectId
 from fastapi import HTTPException
 from koala.config.collections import LEARNING_VIDEOS
@@ -75,6 +76,19 @@ class LearningVideosCollection:
             return result
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
+    
+    async def get_views_number_for_videos(self, data):
+        video_ids = []
+        if not data:
+            return None
+
+        for video in data:
+            if video.views_started is not None:
+                video.views = video.views_started + 200
+            else:
+                video.views = random.randint(200, 250)
+
+        return data
 
     async def get_all_learning_videos(
         self,
@@ -88,7 +102,9 @@ class LearningVideosCollection:
                 extended_class_model=CreateLearningVideosModelOut,
             )
 
-            return data if data else None
+            video_data = await self.get_views_number_for_videos(data)
+
+            return video_data if video_data else None
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
 

@@ -17,6 +17,7 @@ class BaseLearningVideosModel(MongoModel):
     image: Optional[str] = None
     views_started: Optional[int] = None
     views_finished: Optional[int] = None
+    views: Optional[str] = None
 
 class BaseVideoWatchedModel(MongoModel):
     video_id: str = ""
