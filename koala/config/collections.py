@@ -28,6 +28,7 @@ WEBSITE_PROVIDER = "website_provider"
 # GROUPS
 SOCIAL_GROUPS = "social_groups"
 SOCIAL_POSTS = "social_posts"
+ADDITIONAL_FEED = "additional_feed"
 
 # OTP
 OTP_GENERATION = "otp_generation"

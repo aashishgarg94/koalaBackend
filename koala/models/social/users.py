@@ -53,6 +53,17 @@ class BaseCreatePostModel(MongoModel):
     content: Optional[str] = None
     tags: Optional[List[str]] = None
 
+class BaseCreateAdditionalFeedModel(MongoModel):
+    position: int =  0
+    element_type: str = ""
+    banner1url: Optional[str] = None
+    banner1name: Optional[str] = None
+    banner1categoryid: Optional[str] = None
+    banner1categorytitle: Optional[str] = None
+    banner2url: Optional[str] = None
+    banner2name: Optional[str] = None
+    banner2categoryid: Optional[str] = None
+    banner2categorytitle: Optional[str] = None
 
 class BaseShareModel(MongoModel):
     total_share: int = 0
@@ -98,6 +109,8 @@ class CreatePostModelIn(BaseFullDetailPostModel):
 class CreatePostModelOut(BaseFullDetailPostModel):
     id: OID = Field()
 
+class CreateAdditionalFeedModelOut(BaseCreateAdditionalFeedModel):
+    id: OID = Field()
 
 class CreatePostModelOutList(MongoModel):
     # current_page: int
@@ -114,6 +127,7 @@ class CreatePostModelPaginationModel(MongoModel):
     # request_limit: int
     more_pages: bool
     post_list: List[CreatePostModelOut]
+    additional_feed: Optional[List[CreateAdditionalFeedModelOut]]
 
 
 class BaseFollowedIdRef(BaseModel):
