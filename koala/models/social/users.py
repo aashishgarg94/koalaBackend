@@ -64,6 +64,10 @@ class BaseCreateAdditionalFeedModel(MongoModel):
     banner2name: Optional[str] = None
     banner2categoryid: Optional[str] = None
     banner2categorytitle: Optional[str] = None
+    videoTitle: Optional[str] = None
+    videocategoryid: Optional[str] = None
+    videocategorytitle: Optional[str] = None
+    videoid: Optional[str] = None
 
 class BaseShareModel(MongoModel):
     total_share: int = 0
