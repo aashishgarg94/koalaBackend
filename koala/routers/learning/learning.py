@@ -6,6 +6,7 @@ from koala.authentication.authentication_user import get_current_active_user
 from koala.crud.learning.learning_categories import LearningCategoriesCollection
 from koala.crud.learning.learning_videos import LearningVideosCollection
 from koala.crud.learning.videos_watched import VideosWatchedCollection
+from koala.crud.social.streaks import StreaksCollection
 from koala.models.jobs_models.user import UserModel
 from koala.models.learning.learning import (
     BaseLearningCategoriesModel,
@@ -212,6 +213,12 @@ async def video_started(
         learning_videos_collection = LearningVideosCollection()
 
         await learning_videos_collection.video_watched_action(
+            video_id=video_id, started=True, user_id=current_user.id
+        )
+
+        streaks_collection = StreaksCollection()
+
+        await streaks_collection.video_streak(
             video_id=video_id, started=True, user_id=current_user.id
         )
 

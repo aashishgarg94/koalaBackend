@@ -69,6 +69,17 @@ class BaseCreateAdditionalFeedModel(MongoModel):
     videocategorytitle: Optional[str] = None
     videoid: Optional[str] = None
 
+class BaseStreakElementModel(BaseModel):
+    streak_length: int
+    streak_end: datetime
+
+class BaseCreateStreakModel(MongoModel):
+    streak_type: str
+    user_id: OID
+    current_streak: int
+    last_update: datetime
+    prev_streaks: Optional[List[BaseStreakElementModel]] = None
+
 class BaseShareModel(MongoModel):
     total_share: int = 0
     shared_by: Optional[List[OID]] = []
@@ -114,6 +125,9 @@ class CreatePostModelOut(BaseFullDetailPostModel):
     id: OID = Field()
 
 class CreateAdditionalFeedModelOut(BaseCreateAdditionalFeedModel):
+    id: OID = Field()
+
+class CreateStreakModelOut(BaseCreateStreakModel):
     id: OID = Field()
 
 class CreatePostModelOutList(MongoModel):
