@@ -449,7 +449,7 @@ class JobUser:
             logging.error(f"Error while applying job action. ERROR: {e}")
             raise e
 
-    async def get_all_matched_jobs(self) -> any:
+    async def get_all_matched_jobs(self, limit: int) -> any:
         try:
             self.collection(JOBS)
             filter_condition = {
@@ -462,6 +462,7 @@ class JobUser:
 
             jobs_data = await self.collection.find(
                 finder=filter_condition,
+                limit=limit,
                 return_doc_id=True,
                 extended_class_model=JobOutModel,
             )

@@ -28,6 +28,8 @@ WEBSITE_PROVIDER = "website_provider"
 # GROUPS
 SOCIAL_GROUPS = "social_groups"
 SOCIAL_POSTS = "social_posts"
+ADDITIONAL_FEED = "additional_feed"
+STREAKS = "streaks"
 
 # OTP
 OTP_GENERATION = "otp_generation"
@@ -35,4 +37,5 @@ OTP_GENERATION = "otp_generation"
 # LEARNING
 LEARNING_CATEGORIES = "learning_categories"
 LEARNING_VIDEOS = "learning_videos"
+VIDEOS_WATCHED = "videos_watched"
 
