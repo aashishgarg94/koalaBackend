@@ -11,6 +11,7 @@ from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
 from koala.crud.social.additional_feed import AdditionalFeedCollection
+from koala.crud.social.streaks import StreaksCollection
 from koala.models.jobs_models.master import BaseIsUpdated, BaseIsDisabled
 from koala.models.jobs_models.user import UserInModel, UserModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
@@ -548,4 +549,21 @@ async def disable_post_by_post_id(
         result = await social_posts_collection.disable_post_by_post_id(post_id=post_id)
         return result
     except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.post(
+    "/get_streak_count",
+    response_model=int,
+    dependencies=[Security(get_current_active_user, scopes=["social:write"])],
+)
+async def get_streak_count(
+    streak_type: str,
+    current_user: UserModel = Depends(get_current_active_user),
+):
+    try:
+        streaks_collection = StreaksCollection()
+        result = await streaks_collection.get_current_streak(streak_type=streak_type, user_id=current_user.id)
+        return result
+    except Exception as e:
         raise HTTPException(status_code=500, detail="Something went wrong")

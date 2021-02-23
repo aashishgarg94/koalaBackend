@@ -22,8 +22,16 @@ class StreaksCollection:
         finished: int = None
     ) -> any:
         try:
+            streak_type = "Video Started"
+            if started is not None and started == True:
+                streak_type = "Video Started"
+            elif finished is not None and finished == True:
+                streak_type = "Video Finished"
+            else:
+                return
+
             data = await self.collection.find_one(
-                finder={"streak_type": "Video Started", "user_id": user_id},
+                finder={"streak_type": streak_type, "user_id": user_id},
                 return_doc_id=True,
                 extended_class_model=CreateStreakModelOut,
             )
@@ -75,7 +83,7 @@ class StreaksCollection:
 
             else:
                 video_streak_create = {
-                    "streak_type": "Video Started",
+                    "streak_type": streak_type,
                     "user_id": user_id,
                     "current_streak": 1,
                     "last_update": datetime.datetime.now(),
@@ -89,5 +97,27 @@ class StreaksCollection:
 
                 return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
 
+        except Exception:
+            raise HTTPException(status_code=500, detail="Something went wrong")
+
+    async def get_current_streak(self, streak_type: str, user_id: str) -> any:
+        try:
+
+            data = await self.collection.find_one(
+                finder={"streak_type": streak_type, "user_id": user_id},
+                return_doc_id=True,
+                extended_class_model=CreateStreakModelOut,
+            )
+
+            if data is not None:
+                date_limit = data.last_update + datetime.timedelta(days=1)
+                valid_streak = datetime.datetime.now().date() <= date_limit.date()
+
+                if valid_streak:
+                    return data.current_streak
+                else:
+                    return 0
+
+            return None
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
