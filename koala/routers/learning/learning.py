@@ -267,4 +267,23 @@ async def video_finished(
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
+@router.post(
+    "/recommended_learning_videos",
+    response_model=CreateLearningVideosModelOutList,
+    dependencies=[Security(get_current_active_user, scopes=["social:read"])],
+)
+async def get_recommended_learning_videos():
+    try:
+        learning_videos_collection = LearningVideosCollection()
+
+        videos_list = []
+        videos_list = await learning_videos_collection.get_recommended_learning_videos()
+
+        return CreateLearningVideosModelOutList(
+            videos_list=videos_list
+        )
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
 
