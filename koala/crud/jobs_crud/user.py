@@ -189,6 +189,43 @@ class MongoDBUserDatabase:
             return result_transformation if result else None
         except Exception as e:
             raise e
+            
+    async def user_increment_coins(
+        self, user_id: str = None, coins: int = 0
+    ) -> any:
+        try:
+            finder={"_id": ObjectId(user_id)}
+
+            data = await self.collection.find_one(
+                finder=finder,
+                return_doc_id=True,
+                extended_class_model=BioUpdateWithUserDetailOutModel
+            )
+
+            if data is not None:
+                if data.coins is not None:
+                    updater = {
+                        "$inc": {"coins": coins}
+                    }
+                else:
+                    updater = {
+                        "$set": {"coins": coins}
+                    }
+
+                result = await self.collection.find_one_and_modify(
+                    find=finder,
+                    update=updater,
+                    return_doc_id=True,
+                    return_updated_document=True,
+                    extended_class_model=BioUpdateWithUserDetailOutModel
+                )
+
+                return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+
+            raise HTTPException(status_code=200, detail="Bio not available")
+        except Exception:
+            raise HTTPException(status_code=500, detail="Something went wrong")
+
 
     async def user_bio_fetch(
         self, username: str, user_id: str = None
@@ -213,6 +250,7 @@ class MongoDBUserDatabase:
                 custom_bio_dict["gender"] = result.get("gender")
                 custom_bio_dict["current_city"] = result.get("current_city")
                 custom_bio_dict["current_area"] = result.get("current_area")
+                custom_bio_dict["coins"] = result.get("coins")
                 # custom_bio_dict["is_fresher"] = result.get("is_fresher")
                 # custom_bio_dict["education"] = result.get("education")
                 # custom_bio_dict["job_type"] = result.get("job_type")

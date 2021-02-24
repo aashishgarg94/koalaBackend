@@ -152,3 +152,17 @@ class LearningVideosCollection:
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
 
+    async def get_recommended_learning_videos(
+        self,
+    ) -> any:
+        try:
+            filter_condition = {"is_deleted": False, "is_recommended": True}
+            data = await self.collection.find(
+                finder=filter_condition,
+                return_doc_id=True,
+                extended_class_model=CreateLearningVideosModelOut,
+            )
+
+            return data if data else None
+        except Exception:
+            raise HTTPException(status_code=500, detail="Something went wrong")

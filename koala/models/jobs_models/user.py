@@ -154,6 +154,7 @@ class BioUpdateWithUserDetailOutModel(BioUpdateInModel, MongoModel):
     job_type: Optional[str] = None
     current_company: Optional[str] = None
     last_institute_name: Optional[str] = None
+    coins: Optional[int] = None
 
 
 class UserCreateBioModel(BaseModel):
