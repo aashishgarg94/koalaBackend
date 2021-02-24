@@ -4,9 +4,13 @@ from bson import ObjectId
 from fastapi import HTTPException
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.crud.jobs_crud.mongo_base import MongoBase
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.config.collections import STREAKS
 from koala.models.social.users import (
     CreateStreakModelOut
+)
+from koala.models.jobs_models.user import (
+    UserInModel
 )
 
 class StreaksCollection:
@@ -43,8 +47,21 @@ class StreaksCollection:
                 finder = {"_id": ObjectId(data.id)}
                 
                 if valid_streak:
+
                     streak_increased = data.last_update.date() < datetime.datetime.now().date()
+
                     if streak_increased:
+
+                        if data.current_streak == 6:
+
+                            users_collection = MongoDBUserDatabase(UserInModel)
+                            await users_collection.user_increment_coins(user_id=user_id, coins=30)
+
+                        elif data.current_streak == 20:
+
+                            users_collection = MongoDBUserDatabase(UserInModel)
+                            await users_collection.user_increment_coins(user_id=user_id, coins=80)
+
                         updater = {
                             "$inc": {"current_streak": 1},
                             "$set": {"last_update": datetime.datetime.now()}
