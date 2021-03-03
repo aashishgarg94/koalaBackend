@@ -30,6 +30,7 @@ SOCIAL_GROUPS = "social_groups"
 SOCIAL_POSTS = "social_posts"
 ADDITIONAL_FEED = "additional_feed"
 STREAKS = "streaks"
+COINS = "coins"
 
 # OTP
 OTP_GENERATION = "otp_generation"

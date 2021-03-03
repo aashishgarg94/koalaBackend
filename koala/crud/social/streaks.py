@@ -3,11 +3,13 @@ import datetime
 from bson import ObjectId
 from fastapi import HTTPException
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
+from koala.crud.social.coins import CoinsCollection
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.config.collections import STREAKS
 from koala.models.social.users import (
-    CreateStreakModelOut
+    CreateStreakModelOut,
+    CreateCoinsModelIn
 )
 from koala.models.jobs_models.user import (
     UserInModel
@@ -54,13 +56,35 @@ class StreaksCollection:
 
                         if data.current_streak == 6:
 
-                            users_collection = MongoDBUserDatabase(UserInModel)
-                            await users_collection.user_increment_coins(user_id=user_id, coins=30)
+                            coins_collection = CoinsCollection()
+                            coins_details = CreateCoinsModelIn(
+                                user_id=ObjectId(user_id),
+                                coins_reason="Learning Streak 7",
+                                coins=30,
+                                time_added=datetime.datetime.now()
+                            )
+
+                            await coins_collection.coins_added(
+                                coins_details=coins_details,
+                                user_id=user_id,
+                                coins=30
+                            )
 
                         elif data.current_streak == 20:
 
-                            users_collection = MongoDBUserDatabase(UserInModel)
-                            await users_collection.user_increment_coins(user_id=user_id, coins=80)
+                            coins_collection = CoinsCollection()
+                            coins_details = CreateCoinsModelIn(
+                                user_id=ObjectId(user_id),
+                                coins_reason="Learning Streak 21",
+                                coins=80,
+                                time_added=datetime.datetime.now()
+                            )
+
+                            await coins_collection.coins_added(
+                                coins_details=coins_details,
+                                user_id=user_id,
+                                coins=80
+                            )
 
                         updater = {
                             "$inc": {"current_streak": 1},

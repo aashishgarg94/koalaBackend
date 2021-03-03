@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Optional, Type
 
@@ -18,7 +19,6 @@ from koala.models.jobs_models.user import (
     BaseFullNameModel,
 )
 
-from ..social.users import SocialPostsCollection
 from .mongo_base import MongoBase, return_id_transformation
 
 
@@ -261,72 +261,6 @@ class MongoDBUserDatabase:
                     result=custom_bio_dict,
                 )
                 return result_transformation
-
-            raise HTTPException(status_code=200, detail="Bio not available")
-        except Exception as e:
-            raise e
-
-    async def user_social_bio_fetch(self, user_id: str = None) -> any:
-        try:
-            result = await self.collection.find_one({"_id": ObjectId(user_id)})
-
-            social_posts_collection = SocialPostsCollection()
-            post_results_count = (
-                await social_posts_collection.get_user_post_count_by_user_id(
-                    user_id=user_id
-                )
-            )
-
-            post_results_like_count = (
-                await social_posts_collection.get_user_post_like_count_by_user_id(
-                    user_id=user_id
-                )
-            )
-
-            if result:
-                bio_dict = result.get("bio")
-                users_followed_count = (
-                    len(result.get("users_followed"))
-                    if result.get("users_followed") is not None
-                    else 0
-                )
-                users_following_count = (
-                    result.get("users_following").get("total_followers")
-                    if result.get("users_following")
-                    else 0
-                )
-
-                # self.collection(SOCIAL_POSTS)
-                # social_post_collection = SocialPostsCollection()
-                # like_count = await social_post_collection.post_likes_count_by_user_id(
-                #     user_id=user_id
-                # )
-
-                social_profile_data = {
-                    "id": str(result.get("_id")),
-                    "name": result.get("full_name"),
-                    "profile_image": result.get("profile_image")
-                    if result.get("profile_image")
-                    else None,
-                    "current_city": result.get("current_city")
-                    if result.get("current_city")
-                    else None,
-                    "about_me": bio_dict.get("about_me") if bio_dict else None,
-                    "qualifications": bio_dict.get("qualifications")
-                    if bio_dict
-                    else None,
-                    "experience": bio_dict.get("experience") if bio_dict else None,
-                    "work_history": bio_dict.get("work_history") if bio_dict else None,
-                    "current_company": bio_dict.get("current_company")
-                    if bio_dict
-                    else None,
-                    "following": users_followed_count,
-                    "followers": users_following_count,
-                    "likes": post_results_like_count,
-                    "posts": post_results_count,
-                }
-
-                return social_profile_data
 
             raise HTTPException(status_code=200, detail="Bio not available")
         except Exception as e:

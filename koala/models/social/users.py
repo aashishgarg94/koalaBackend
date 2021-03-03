@@ -120,6 +120,14 @@ class CreatePostModelIn(BaseFullDetailPostModel):
     updated_on: Optional[datetime]
     deleted_on: Optional[datetime]
 
+class BaseCoinsModel(MongoModel):
+    user_id: OID = Field()
+    coins_reason: str
+    coins: int
+    time_added: datetime
+
+class CreateCoinsModelIn(BaseCoinsModel):
+    is_deleted: Optional[bool] = False
 
 class CreatePostModelOut(BaseFullDetailPostModel):
     id: OID = Field()
