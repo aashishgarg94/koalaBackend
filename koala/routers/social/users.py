@@ -115,6 +115,7 @@ async def create_post(
             post_details=post_details,
             is_group_post=is_group_post,
             group_id=group_id,
+            user_id=current_user.id,
             shares=shares,
             likes=likes,
             post_report=post_report,
@@ -467,8 +468,8 @@ async def user_action_report(
 )
 async def user_social_bio_fetch(user_id: str = None):
     try:
-        user_db = MongoDBUserDatabase(UserInModel)
-        return await user_db.user_social_bio_fetch(user_id=user_id)
+        social_posts_collection = SocialPostsCollection()
+        return await social_posts_collection.user_social_bio_fetch(user_id=user_id)
     except Exception as e:
         logging.error(f"Error while processing this request {e}")
         raise e
