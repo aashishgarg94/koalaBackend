@@ -18,6 +18,7 @@ boto3 = "*"
 requests = "*"
 email-validator = "*"
 telesign = "*"
+pyfcm = "*"
 
 [requires]
 python_version = "3.8"
