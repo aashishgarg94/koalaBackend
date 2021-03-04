@@ -208,7 +208,7 @@ async def user_action_jobs(
 async def job_all_matched():
     try:
         job_user = JobUser()
-        result = await job_user.get_all_matched_jobs()
+        result = await job_user.get_all_matched_jobs(limit=REQUEST_LIMIT_JOBS)
         return result
     except Exception as e:
         logging.error(f"Error while applying action: ERROR: {e}")

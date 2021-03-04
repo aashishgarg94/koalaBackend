@@ -9,8 +9,13 @@ from koala.config.collections import SOCIAL_GROUPS, SOCIAL_POSTS, USERS
 from koala.constants import EMBEDDED_COLLECTION_LIMIT_FOLLOWERS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated, BaseIsDisabled
+from koala.crud.social.coins import CoinsCollection
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
+from koala.models.jobs_models.user import (
+    UserInModel
+)
 from koala.models.social.users import (
     BaseCommentIsUpdated,
     BaseCommentsModel,
@@ -28,6 +33,12 @@ from koala.models.social.users import (
     FollowerModel,
     ShareModel,
 )
+from koala.models.social.users import (
+    CreateCoinsModelIn
+)
+from koala.models.jobs_models.user import (
+    UserInModel
+)
 from koala.utils.utils import upload_social_post_image
 
 
@@ -41,6 +52,7 @@ class SocialPostsCollection:
         post_details: CreatePostModelIn,
         is_group_post: bool,
         group_id: str,
+        user_id: str,
         shares: BaseShare,
         likes: BaseLikeModel,
         post_report: BasePostReportModel,
@@ -71,6 +83,20 @@ class SocialPostsCollection:
                 post_details.dict(),
                 return_doc_id=True,
                 extended_class_model=BaseIsCreated,
+            )
+
+            coins_collection = CoinsCollection()
+            coins_details = CreateCoinsModelIn(
+                user_id=ObjectId(user_id),
+                coins_reason="Post",
+                coins=5,
+                time_added=datetime.now()
+            )
+
+            await coins_collection.coins_added(
+                coins_details=coins_details,
+                user_id=user_id,
+                coins=5
             )
 
             # Update group post list with post is group post
@@ -161,7 +187,6 @@ class SocialPostsCollection:
             count = await self.collection.count(filter_condition)
             return count if count else 0
         except Exception as e:
-            logging.error(f"Error: Job count {e}")
             raise e
 
     async def get_group_name_for_post(self, data):
@@ -561,6 +586,30 @@ class SocialPostsCollection:
                     "$inc": {"like.total_likes": 1},
                     "$push": {"like.liked_by": {"$each": [ObjectId(user_id)]}},
                 }
+
+                data = await self.collection.find_one(
+                    finder=finder,
+                    return_doc_id=True,
+                    extended_class_model=CreatePostModelOut,
+                )
+
+                if data is not None:
+                    post_owner_id = data.owner.user_id
+
+                    coins_collection = CoinsCollection()
+                    coins_details = CreateCoinsModelIn(
+                        user_id=ObjectId(post_owner_id),
+                        coins_reason="Like",
+                        coins=1,
+                        time_added=datetime.now()
+                    )
+
+                    await coins_collection.coins_added(
+                        coins_details=coins_details,
+                        user_id=post_owner_id,
+                        coins=1
+                    )
+
             if like is False:
                 updater = {
                     "$inc": {"like.total_likes": -1},
@@ -592,6 +641,21 @@ class SocialPostsCollection:
                     insert_if_not_found=True,
                     return_updated_document=True,
                 )
+
+                coins_collection = CoinsCollection()
+                coins_details = CreateCoinsModelIn(
+                    user_id=ObjectId(user_id),
+                    coins_reason="Comment",
+                    coins=1,
+                    time_added=datetime.now()
+                )
+
+                await coins_collection.coins_added(
+                    coins_details=coins_details,
+                    user_id=user_id,
+                    coins=1
+                )
+
                 return BaseCommentIsUpdated(
                     id=result.id, is_updated=True, comment=comments
                 )
@@ -766,4 +830,64 @@ class SocialPostsCollection:
             return BaseIsDisabled(id=ObjectId(group_id), is_disabled=True)
         except Exception as e:
             logging.error(f"Error: While deleting post {e}")
+            raise e
+
+    async def user_social_bio_fetch(self, user_id: str = None) -> any:
+        try:
+            users_collection = MongoDBUserDatabase(UserInModel)
+            result = await users_collection.find_by_object_id(user_id=ObjectId(user_id))
+
+            post_results_count = (
+                await self.get_user_post_count_by_user_id(
+                    user_id=user_id
+                )
+            )
+
+            post_results_like_count = (
+                await self.get_user_post_like_count_by_user_id(
+                    user_id=user_id
+                )
+            )
+
+            if result:
+                bio_dict = result.bio
+                users_followed_count = (
+                    len(result.users_followed)
+                    if result.users_followed is not None
+                    else 0
+                )
+                users_following_count = (
+                    result.users_following.total_followers
+                    if result.users_following
+                    else 0
+                )
+
+                social_profile_data = {
+                    "id": str(result.id),
+                    "name": result.full_name,
+                    "profile_image": result.profile_image
+                    if result.profile_image
+                    else None,
+                    "current_city": result.current_city
+                    if result.current_city
+                    else None,
+                    "about_me": bio_dict.about_me if bio_dict else None,
+                    "qualifications": bio_dict.qualifications
+                    if bio_dict
+                    else None,
+                    "experience": bio_dict.experience if bio_dict else None,
+                    "work_history": bio_dict.work_history if bio_dict else None,
+                    "current_company": bio_dict.current_company
+                    if bio_dict
+                    else None,
+                    "following": users_followed_count,
+                    "followers": users_following_count,
+                    "likes": post_results_like_count,
+                    "posts": post_results_count,
+                }
+
+                return social_profile_data
+
+            raise HTTPException(status_code=200, detail="Bio not available")
+        except Exception as e:
             raise e
