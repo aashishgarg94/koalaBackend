@@ -14,13 +14,10 @@ class CacheFeedPosts:
             self.collection(USERS)
             find = {"_id": ObjectId(user_id)}
             projection = {"users_following": 1, "_id": 0}
-            data = await self.collection.find_one(
-                finder=find,
-                projection=projection
-            )
+            data = await self.collection.find_one(finder=find, projection=projection)
             followers_list = []
-            for data in data.get('users_following').get('followers_list'):
-                followers_list.append(data.get('user_id'))
+            for data in data.get("users_following").get("followers_list"):
+                followers_list.append(data.get("user_id"))
             return followers_list
         except Exception as e:
             raise e
@@ -48,7 +45,6 @@ class CacheFeedPosts:
                 )
 
             return True
-
 
             # Not needed here as it's create post
             # # 1. Check if post is liked by user
@@ -84,7 +80,6 @@ class CacheFeedPosts:
             #     upsert=True,
             # )
             # logging.info(insert_resp)
-            pass
         except Exception as e:
             logging.error(f"Error: While creating user feed posts")
             raise e

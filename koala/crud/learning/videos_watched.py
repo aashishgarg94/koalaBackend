@@ -1,12 +1,9 @@
-import logging
-from bson import ObjectId
 from fastapi import HTTPException
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.config.collections import VIDEOS_WATCHED
-from koala.models.learning.learning import (
-    CreateVideoWatchedModelIn
-)
+from koala.models.learning.learning import CreateVideoWatchedModelIn
+
 
 class VideosWatchedCollection:
     def __init__(self):
@@ -14,8 +11,7 @@ class VideosWatchedCollection:
         self.collection(VIDEOS_WATCHED)
 
     async def video_watched_action(
-        self,
-        video_watched_details: CreateVideoWatchedModelIn
+        self, video_watched_details: CreateVideoWatchedModelIn
     ) -> any:
         try:
             insert_id = await self.collection.insert_one(
@@ -23,7 +19,7 @@ class VideosWatchedCollection:
                 return_doc_id=True,
                 extended_class_model=BaseIsCreated,
             )
-        
+
             return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
 
         except Exception:

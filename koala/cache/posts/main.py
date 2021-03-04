@@ -44,10 +44,6 @@ async def cache_create_post(message: dict):
 
         # 3.2. Send Notifications
 
-
-
-
-
         # # 3. Cache Trending Posts
         # # 2.3. Update Trending feed based on this post weightage(Currently just dumping it in the treding feed)
         # await cache_feed_posts.upsert_cache_trending_posts(

@@ -1,4 +1,3 @@
-import logging
 import random
 from bson import ObjectId
 from fastapi import HTTPException
@@ -6,12 +5,11 @@ from koala.config.collections import LEARNING_VIDEOS
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.learning.learning import (
-    BaseLearningVideosModel,
     CreateLearningVideosModelIn,
     CreateLearningVideosModelOut,
-    CreateLearningVideosModelOutList,
-    CreateVideoWatchedModelOut
+    CreateVideoWatchedModelOut,
 )
+
 
 class LearningVideosCollection:
     def __init__(self):
@@ -19,8 +17,7 @@ class LearningVideosCollection:
         self.collection(LEARNING_VIDEOS)
 
     async def create_learning_video(
-        self,
-        video_details: CreateLearningVideosModelIn
+        self, video_details: CreateLearningVideosModelIn
     ) -> any:
         try:
             insert_id = await self.collection.insert_one(
@@ -43,7 +40,7 @@ class LearningVideosCollection:
         category_id: str,
         lesson_number: int,
         description: str,
-        image: str
+        image: str,
     ) -> any:
         try:
             video_updates = {}
@@ -76,9 +73,8 @@ class LearningVideosCollection:
             return result
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
-    
+
     async def get_views_number_for_videos(self, data):
-        video_ids = []
         if not data:
             return None
 
@@ -90,10 +86,7 @@ class LearningVideosCollection:
 
         return data
 
-    async def get_all_learning_videos(
-        self,
-        category_id: str
-    ) -> any:
+    async def get_all_learning_videos(self, category_id: str) -> any:
         try:
             filter_condition = {"is_deleted": False, "category_id": category_id}
             data = await self.collection.find(
@@ -109,11 +102,7 @@ class LearningVideosCollection:
             raise HTTPException(status_code=500, detail="Something went wrong")
 
     async def video_watched_action(
-        self,
-        video_id: str,
-        user_id: str,
-        started: int = None,
-        finished: int = None
+        self, video_id: str, user_id: str, started: int = None, finished: int = None
     ) -> any:
         try:
             finder = {"video_id": video_id}

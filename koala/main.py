@@ -23,7 +23,7 @@ from koala.routers.jobs_routers import (
     user,
     website,
 )
-from koala.routers.social import groups, users
+from koala.routers.social import users
 from koala.routers.learning import learning
 from koala.routers.social import users
 from koala.routers import supported_version
@@ -105,7 +105,7 @@ app.include_router(image_uploads.router, prefix="/upload", tags=["Image Upload"]
 
 app.include_router(supported_version.router, tags=["App Version Check"])
 
-#LEARNING ROUTERS
+# LEARNING ROUTERS
 app.include_router(learning.router, prefix="/learning", tags=["Learning"])
 
 # Website API's

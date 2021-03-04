@@ -53,8 +53,9 @@ class BaseCreatePostModel(MongoModel):
     content: Optional[str] = None
     tags: Optional[List[str]] = None
 
+
 class BaseCreateAdditionalFeedModel(MongoModel):
-    position: int =  0
+    position: int = 0
     element_type: str = ""
     banner1url: Optional[str] = None
     banner1name: Optional[str] = None
@@ -69,9 +70,11 @@ class BaseCreateAdditionalFeedModel(MongoModel):
     videocategorytitle: Optional[str] = None
     videoid: Optional[str] = None
 
+
 class BaseStreakElementModel(BaseModel):
     streak_length: int
     streak_end: datetime
+
 
 class BaseCreateStreakModel(MongoModel):
     streak_type: str
@@ -79,6 +82,7 @@ class BaseCreateStreakModel(MongoModel):
     current_streak: int
     last_update: datetime
     prev_streaks: Optional[List[BaseStreakElementModel]] = None
+
 
 class BaseShareModel(MongoModel):
     total_share: int = 0
@@ -120,23 +124,29 @@ class CreatePostModelIn(BaseFullDetailPostModel):
     updated_on: Optional[datetime]
     deleted_on: Optional[datetime]
 
+
 class BaseCoinsModel(MongoModel):
     user_id: OID = Field()
     coins_reason: str
     coins: int
     time_added: datetime
 
+
 class CreateCoinsModelIn(BaseCoinsModel):
     is_deleted: Optional[bool] = False
+
 
 class CreatePostModelOut(BaseFullDetailPostModel):
     id: OID = Field()
 
+
 class CreateAdditionalFeedModelOut(BaseCreateAdditionalFeedModel):
     id: OID = Field()
 
+
 class CreateStreakModelOut(BaseCreateStreakModel):
     id: OID = Field()
+
 
 class CreatePostModelOutList(MongoModel):
     # current_page: int

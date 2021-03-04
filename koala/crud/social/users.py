@@ -13,9 +13,7 @@ from koala.crud.social.coins import CoinsCollection
 from koala.models.jobs_models.user import UserUpdateOutModel
 from koala.models.social.groups import GroupsFollowed, UsersFollowed
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
-from koala.models.jobs_models.user import (
-    UserInModel
-)
+from koala.models.jobs_models.user import UserInModel
 from koala.models.social.users import (
     BaseCommentIsUpdated,
     BaseCommentsModel,
@@ -33,12 +31,8 @@ from koala.models.social.users import (
     FollowerModel,
     ShareModel,
 )
-from koala.models.social.users import (
-    CreateCoinsModelIn
-)
-from koala.models.jobs_models.user import (
-    UserInModel
-)
+from koala.models.social.users import CreateCoinsModelIn
+from koala.models.jobs_models.user import UserInModel
 from koala.utils.utils import upload_social_post_image
 
 
@@ -90,13 +84,11 @@ class SocialPostsCollection:
                 user_id=ObjectId(user_id),
                 coins_reason="Post",
                 coins=5,
-                time_added=datetime.now()
+                time_added=datetime.now(),
             )
 
             await coins_collection.coins_added(
-                coins_details=coins_details,
-                user_id=user_id,
-                coins=5
+                coins_details=coins_details, user_id=user_id, coins=5
             )
 
             # Update group post list with post is group post
@@ -226,10 +218,7 @@ class SocialPostsCollection:
     async def get_user_job_news(self, skip: int, limit: int) -> any:
         try:
             finder = {
-                "$query": {
-                    "is_deleted": False,
-                    "is_job_news": True
-                },
+                "$query": {"is_deleted": False, "is_job_news": True},
                 "$orderby": {"created_on": -1},
             }
             data = await self.collection.find(
@@ -605,13 +594,11 @@ class SocialPostsCollection:
                         user_id=ObjectId(post_owner_id),
                         coins_reason="Like",
                         coins=1,
-                        time_added=datetime.now()
+                        time_added=datetime.now(),
                     )
 
                     await coins_collection.coins_added(
-                        coins_details=coins_details,
-                        user_id=post_owner_id,
-                        coins=1
+                        coins_details=coins_details, user_id=post_owner_id, coins=1
                     )
 
             if like is False:
@@ -651,13 +638,11 @@ class SocialPostsCollection:
                     user_id=ObjectId(user_id),
                     coins_reason="Comment",
                     coins=1,
-                    time_added=datetime.now()
+                    time_added=datetime.now(),
                 )
 
                 await coins_collection.coins_added(
-                    coins_details=coins_details,
-                    user_id=user_id,
-                    coins=1
+                    coins_details=coins_details, user_id=user_id, coins=1
                 )
 
                 return BaseCommentIsUpdated(
@@ -841,16 +826,12 @@ class SocialPostsCollection:
             users_collection = MongoDBUserDatabase(UserInModel)
             result = await users_collection.find_by_object_id(user_id=ObjectId(user_id))
 
-            post_results_count = (
-                await self.get_user_post_count_by_user_id(
-                    user_id=user_id
-                )
+            post_results_count = await self.get_user_post_count_by_user_id(
+                user_id=user_id
             )
 
-            post_results_like_count = (
-                await self.get_user_post_like_count_by_user_id(
-                    user_id=user_id
-                )
+            post_results_like_count = await self.get_user_post_like_count_by_user_id(
+                user_id=user_id
             )
 
             if result:
@@ -876,14 +857,10 @@ class SocialPostsCollection:
                     if result.current_city
                     else None,
                     "about_me": bio_dict.about_me if bio_dict else None,
-                    "qualifications": bio_dict.qualifications
-                    if bio_dict
-                    else None,
+                    "qualifications": bio_dict.qualifications if bio_dict else None,
                     "experience": bio_dict.experience if bio_dict else None,
                     "work_history": bio_dict.work_history if bio_dict else None,
-                    "current_company": bio_dict.current_company
-                    if bio_dict
-                    else None,
+                    "current_company": bio_dict.current_company if bio_dict else None,
                     "following": users_followed_count,
                     "followers": users_following_count,
                     "likes": post_results_like_count,

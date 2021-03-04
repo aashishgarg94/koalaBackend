@@ -1,19 +1,12 @@
-import logging
 import datetime
 from bson import ObjectId
 from fastapi import HTTPException
 from koala.models.jobs_models.master import BaseIsCreated, BaseIsUpdated
 from koala.crud.social.coins import CoinsCollection
 from koala.crud.jobs_crud.mongo_base import MongoBase
-from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.config.collections import STREAKS
-from koala.models.social.users import (
-    CreateStreakModelOut,
-    CreateCoinsModelIn
-)
-from koala.models.jobs_models.user import (
-    UserInModel
-)
+from koala.models.social.users import CreateStreakModelOut, CreateCoinsModelIn
+
 
 class StreaksCollection:
     def __init__(self):
@@ -21,11 +14,7 @@ class StreaksCollection:
         self.collection(STREAKS)
 
     async def video_streak(
-        self,
-        video_id: str,
-        user_id: str,
-        started: int = None,
-        finished: int = None
+        self, video_id: str, user_id: str, started: int = None, finished: int = None
     ) -> any:
         try:
             streak_type = "Video Started"
@@ -43,14 +32,16 @@ class StreaksCollection:
             )
 
             if data is not None:
-                
+
                 date_limit = data.last_update + datetime.timedelta(days=1)
                 valid_streak = datetime.datetime.now().date() <= date_limit.date()
                 finder = {"_id": ObjectId(data.id)}
-                
+
                 if valid_streak:
 
-                    streak_increased = data.last_update.date() < datetime.datetime.now().date()
+                    streak_increased = (
+                        data.last_update.date() < datetime.datetime.now().date()
+                    )
 
                     if streak_increased:
 
@@ -61,13 +52,11 @@ class StreaksCollection:
                                 user_id=ObjectId(user_id),
                                 coins_reason="Learning Streak 7",
                                 coins=30,
-                                time_added=datetime.datetime.now()
+                                time_added=datetime.datetime.now(),
                             )
 
                             await coins_collection.coins_added(
-                                coins_details=coins_details,
-                                user_id=user_id,
-                                coins=30
+                                coins_details=coins_details, user_id=user_id, coins=30
                             )
 
                         elif data.current_streak == 20:
@@ -77,18 +66,16 @@ class StreaksCollection:
                                 user_id=ObjectId(user_id),
                                 coins_reason="Learning Streak 21",
                                 coins=80,
-                                time_added=datetime.datetime.now()
+                                time_added=datetime.datetime.now(),
                             )
 
                             await coins_collection.coins_added(
-                                coins_details=coins_details,
-                                user_id=user_id,
-                                coins=80
+                                coins_details=coins_details, user_id=user_id, coins=80
                             )
 
                         updater = {
                             "$inc": {"current_streak": 1},
-                            "$set": {"last_update": datetime.datetime.now()}
+                            "$set": {"last_update": datetime.datetime.now()},
                         }
 
                         result = await self.collection.find_one_and_modify(
@@ -99,17 +86,24 @@ class StreaksCollection:
                             extended_class_model=CreateStreakModelOut,
                         )
 
-                        return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+                        return (
+                            BaseIsUpdated(id=result.id, is_updated=True)
+                            if result
+                            else None
+                        )
 
                 else:
                     updater = {
-                        "$set": {"current_streak": 1, "last_update": datetime.datetime.now()},
+                        "$set": {
+                            "current_streak": 1,
+                            "last_update": datetime.datetime.now(),
+                        },
                         "$push": {
                             "prev_streaks": {
                                 "streak_length": data.current_streak,
-                                "streak_end": datetime.datetime.now()
+                                "streak_end": datetime.datetime.now(),
                             }
-                        }
+                        },
                     }
 
                     result = await self.collection.find_one_and_modify(
@@ -120,7 +114,9 @@ class StreaksCollection:
                         extended_class_model=CreateStreakModelOut,
                     )
 
-                    return BaseIsUpdated(id=result.id, is_updated=True) if result else None
+                    return (
+                        BaseIsUpdated(id=result.id, is_updated=True) if result else None
+                    )
 
             else:
                 video_streak_create = {
@@ -128,7 +124,7 @@ class StreaksCollection:
                     "user_id": user_id,
                     "current_streak": 1,
                     "last_update": datetime.datetime.now(),
-                    "prev_streaks": []
+                    "prev_streaks": [],
                 }
                 insert_id = await self.collection.insert_one(
                     video_streak_create,
@@ -136,7 +132,9 @@ class StreaksCollection:
                     extended_class_model=BaseIsCreated,
                 )
 
-                return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
+                return (
+                    BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
+                )
 
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
