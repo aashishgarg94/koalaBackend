@@ -3,6 +3,7 @@ import logging
 
 from koala.cache.feed.curd.feed import CacheFeedPosts
 from koala.cache.posts.curd.posts import CacheUserPosts
+from koala.modules.devices.curd.device import UserDevices
 
 
 async def cache_create_post(message: dict):
@@ -33,6 +34,19 @@ async def cache_create_post(message: dict):
         await cache_feed_posts.upsert_cache_feed_posts(
             user_id=owner_id, post_id=post_id, followers_list=followers_list
         )
+
+        # 3. Send Notification
+        # 3.1. Get Device IDs for all followers
+        user_devices = UserDevices()
+        fcm_tokens = await user_devices.get_fcm_tokens(user_ids=followers_list)
+
+        logging.info(fcm_tokens)
+
+        # 3.2. Send Notifications
+
+
+
+
 
         # # 3. Cache Trending Posts
         # # 2.3. Update Trending feed based on this post weightage(Currently just dumping it in the treding feed)

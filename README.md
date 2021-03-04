@@ -27,5 +27,19 @@ https://stackoverflow.com/questions/25611167/do-i-need-oauth2-for-my-web-apps-ap
 uvicorn koala.main:app --reload
 ```
 
+### New Flow
+1. Production - SNS -> SQS -> HTTP Server(EB) -> all background work will happen here
+2. Development - SNS -> SQS = Implemented (Periodic pull can be done)(Postman can be use for pull and verifying data)
+
+###
+- koala
+|--modules
+  |--app_module
+
+
+### Logic for data in, processing and out
+1. Pydantic(fastapi)
+
+
 ### Important Links
  - 
