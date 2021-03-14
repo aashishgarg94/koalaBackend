@@ -4,6 +4,7 @@ import logging
 from koala.cache.feed.curd.feed import CacheFeedPosts
 from koala.cache.posts.curd.posts import CacheUserPosts
 from koala.modules.devices.curd.device import UserDevices
+from koala.modules.notifications.curd.notification import Notifications
 
 
 async def cache_create_post(message: dict):
@@ -43,6 +44,11 @@ async def cache_create_post(message: dict):
         logging.info(fcm_tokens)
 
         # 3.2. Send Notifications
+
+        notification = Notifications()
+        await notification.send_notifications(fcm_tokens=fcm_tokens)
+
+
 
         # # 3. Cache Trending Posts
         # # 2.3. Update Trending feed based on this post weightage(Currently just dumping it in the treding feed)

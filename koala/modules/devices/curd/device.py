@@ -1,5 +1,6 @@
 import logging
 
+from koala.constants import REQUEST_SKIP_DEFAULT, REQUEST_LIMIT
 from koala.dao.mongo_base import MongoBase
 from koala.config.collections import DEVICES
 from koala.modules.devices.models.device import DeviceInModel, DeviceIdOutModel
@@ -35,13 +36,20 @@ class UserDevices:
 
     async def get_fcm_tokens(self, user_ids: list) -> any:
         try:
-            finder = {"_id": {"$in": user_ids}}
-            projection = {"fcm_token": 1}
+            finder = {"user_id": {"$in": user_ids}}
+            projection = {"fcm_token": 1, "_id": 0}
 
-            result = await self.collection.find_one(
+            result = await self.collection.find(
                 finder=finder,
                 projection=projection,
+                skip=REQUEST_SKIP_DEFAULT,
+                limit=REQUEST_LIMIT,
             )
-            return result
+
+            fcm_list = []
+            for fcm in await result.to_list(length=REQUEST_LIMIT):
+                fcm_list.append(fcm.get("fcm_token"))
+
+            return fcm_list
         except Exception as e:
             logging.error(f"Error: while saving device details - {e}")
