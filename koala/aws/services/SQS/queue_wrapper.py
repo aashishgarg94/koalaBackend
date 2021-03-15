@@ -39,7 +39,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
-sqs = boto3.resource("sqs")
+sqs = boto3.resource("sqs", region_name="ap-south-1")
 
 
 def create_queue(name, attributes=None):

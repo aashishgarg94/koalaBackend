@@ -44,7 +44,7 @@ from botocore.exceptions import ClientError
 import queue_wrapper
 
 logger = logging.getLogger(__name__)
-sqs = boto3.resource("sqs")
+sqs = boto3.resource("sqs", region_name="ap-south-1")
 
 
 def send_message(queue, message_body, message_attributes=None):

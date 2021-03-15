@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 
 from koala.aws.constants import MAX_NUMBER, WAIT_TIME, VISIBILITY_TIMEOUT
 
-sqs = boto3.resource("sqs")
+sqs = boto3.resource("sqs", region_name="ap-south-1")
 
 
 class SqsWrapper:
