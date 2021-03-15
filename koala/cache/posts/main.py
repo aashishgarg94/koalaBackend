@@ -41,14 +41,16 @@ async def cache_create_post(message: dict):
         user_devices = UserDevices()
         fcm_tokens = await user_devices.get_fcm_tokens(user_ids=followers_list)
 
-        logging.info(fcm_tokens)
-
         # 3.2. Send Notifications
 
+        message_title = "Pragaty"
+        message_body = "New post added"
         notification = Notifications()
-        await notification.send_notifications(fcm_tokens=fcm_tokens)
-
-
+        await notification.send_notifications(
+            fcm_tokens=fcm_tokens,
+            notification_title=message_title,
+            notification_body=message_body,
+        )
 
         # # 3. Cache Trending Posts
         # # 2.3. Update Trending feed based on this post weightage(Currently just dumping it in the treding feed)

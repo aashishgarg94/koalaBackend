@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from koala.modules.common import Common
@@ -23,5 +25,6 @@ async def register_device(device_data: BaseUserDeviceModel):
         )
         return result
 
-    except Exception:
+    except Exception as e:
+        logging.info(e)
         raise HTTPException(status_code=500, detail="Not able to register device")

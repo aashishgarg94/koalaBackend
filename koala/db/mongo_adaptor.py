@@ -14,7 +14,7 @@ async def connect_to_mongo():
         str(
             "mongodb+srv://udayshankarsingh:koala1mongo@koala.3blhy.mongodb.net/Production?retryWrites=true&w=majority"
         ),
-        maxPoolSize=10,
+        maxPoolSize=500,
         minPoolSize=10,
     )
     logging.info("KOALA shouts: Successfully connected :)")

@@ -18,8 +18,8 @@ class BaseUserDeviceModel(BaseDeviceModel):
 class DeviceInModel(BaseDeviceModel):
     user_id: OID = Field()
     is_active: Optional[bool] = True
-    created_at: Optional[datetime]
-    disabled_at: Optional[datetime]
+    created_at: datetime
+    disabled_at: Optional[datetime] = None
 
 
 class DeviceIdOutModel(MongoModel):

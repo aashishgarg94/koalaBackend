@@ -4,7 +4,6 @@ from koala.constants import REQUEST_SKIP_DEFAULT, REQUEST_LIMIT
 from koala.dao.mongo_base import MongoBase
 from koala.config.collections import DEVICES
 from koala.modules.devices.models.device import DeviceInModel, DeviceIdOutModel
-from bson import ObjectId
 
 
 class UserDevices:
@@ -15,11 +14,16 @@ class UserDevices:
     async def insert_user_device(self, user_device_data: DeviceInModel) -> any:
         try:
             # TODO: Also need to push user_id
-            finder = {"device_id": user_device_data.device_id}
-            user_device_data_dict = user_device_data.dict()
-            user_device_data_dict["user_id"] = ObjectId(
-                user_device_data_dict.get("user_id")
-            )
+            finder = {
+                "user_id": user_device_data.user_id,
+                "device_id": user_device_data.device_id,
+                "fcm_token": user_device_data.fcm_token,
+            }
+
+            user_device_data.dict()
+            # user_device_data_dict["user_id"] = ObjectId(
+            #     user_device_data_dict.get("user_id")
+            # )
             updater = {"$set": user_device_data.dict()}
             projection = {"_id": 1}
 
