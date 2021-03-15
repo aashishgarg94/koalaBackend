@@ -61,6 +61,36 @@ class MongoBase:
             logging.error(f"Mongo base: Error while looking for a document. Error: {e}")
             raise e
 
+    async def find(
+        self,
+        finder: dict,
+        limit: int,
+        sort: list = None,
+        projection: [dict] = None,
+        skip: int = None,
+    ):
+        try:
+            result = self.collection.find(
+                filter=finder,
+                projection=projection,
+                sort=sort,
+                skip=skip,
+                limit=limit,
+            )
+            return result
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while fetching all matching documents using find. Error: {e}"
+            )
+            raise e
+
+    async def insert_many(self, document_list: list):
+        try:
+            result = await self.collection.insert_many(document_list, ordered=True)
+            return result
+        except Exception as e:
+            raise e
+
     async def find_one_and_modify(
         self,
         finder: dict,

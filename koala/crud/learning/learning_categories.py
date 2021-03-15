@@ -1,15 +1,13 @@
-import logging
 from bson import ObjectId
 from fastapi import HTTPException
 from koala.config.collections import LEARNING_CATEGORIES
 from koala.crud.jobs_crud.mongo_base import MongoBase
 from koala.models.jobs_models.master import BaseIsCreated
 from koala.models.learning.learning import (
-    BaseLearningCategoriesModel,
     CreateLearningCategoriesModelIn,
     CreateLearningCategoriesModelOut,
-    CreateLearningCategoriesModelOutList,
 )
+
 
 class LearningCategoriesCollection:
     def __init__(self):
@@ -17,8 +15,7 @@ class LearningCategoriesCollection:
         self.collection(LEARNING_CATEGORIES)
 
     async def create_learning_category(
-        self,
-        category_details: CreateLearningCategoriesModelIn
+        self, category_details: CreateLearningCategoriesModelIn
     ) -> any:
         try:
             insert_id = await self.collection.insert_one(
@@ -29,14 +26,11 @@ class LearningCategoriesCollection:
 
             return BaseIsCreated(id=insert_id, is_created=True) if insert_id else None
 
-        except Exception as e:
+        except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
 
     async def update_learning_category(
-        self,
-        category_id: str,
-        title: str,
-        image: str
+        self, category_id: str, title: str, image: str
     ) -> any:
         try:
             category_updates = {}

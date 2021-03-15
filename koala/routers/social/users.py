@@ -1,7 +1,6 @@
 import logging
 import math
 from typing import Optional
-import random
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
@@ -121,7 +120,7 @@ async def create_post(
             post_report=post_report,
             file=file,
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -182,7 +181,7 @@ async def get_user_all_posts(page_no: Optional[int] = 1):
             # random.shuffle(post_list)
 
         additional_feed = []
-        if( page_no == 1):
+        if page_no == 1:
             additional_feed_collection = AdditionalFeedCollection()
 
             additional_feed = await additional_feed_collection.get_all_feed()
@@ -223,8 +222,9 @@ async def get_user_job_news(page_no: Optional[int] = 1):
         return CreatePostModelPaginationModel(
             more_pages=more_pages, post_list=post_list
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/post_by_post_id",
@@ -319,7 +319,7 @@ async def get_user_followed(
             )
         else:
             return UsersFollowed(post_list=[])
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -374,7 +374,7 @@ async def user_feed_by_groups_and_users_following(
                 more_pages = False
 
         return CreatePostModelOutList(more_pages=more_pages, post_list=post_list)
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -433,12 +433,12 @@ async def user_action_comment(
             username=current_user.username,
             comments=comments,
             profile_image=current_user.profile_image,
-            user_id=ObjectId(current_user.id)
+            user_id=ObjectId(current_user.id),
         )
         return await social_posts_collection.post_action(
             post_id=post_id, comments=comments, user_id=current_user.id
         )
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
 
@@ -564,7 +564,9 @@ async def get_streak_count(
 ):
     try:
         streaks_collection = StreaksCollection()
-        result = await streaks_collection.get_current_streak(streak_type=streak_type, user_id=current_user.id)
+        result = await streaks_collection.get_current_streak(
+            streak_type=streak_type, user_id=current_user.id
+        )
         return result
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")

@@ -7,13 +7,14 @@ from .mongodb import db
 
 # mongodb+srv://uday:koala1mongo@cluster0.ca4yg.mongodb.net/koala-production?retryWrites=true&w=majority - prod
 # mongodb+srv://uday:koala1mongo@cluster0.tbo7y.mongodb.net/koala-backend?retryWrites=true&w=majority - dev
+# mongodb+srv://udayshankarsingh:koala1mongo@koala.3blhy.mongodb.net/Production?retryWrites=true&w=majority
 async def connect_to_mongo():
     logging.info("Connecting to mongo...")
     db.client = AsyncIOMotorClient(
         str(
-            "mongodb+srv://uday:koala1mongo@cluster0.ca4yg.mongodb.net/koala-production?retryWrites=true&w=majority"
+            "mongodb+srv://udayshankarsingh:koala1mongo@koala.3blhy.mongodb.net/Production?retryWrites=true&w=majority"
         ),
-        maxPoolSize=10,
+        maxPoolSize=500,
         minPoolSize=10,
     )
     logging.info("KOALA shouts: Successfully connected :)")

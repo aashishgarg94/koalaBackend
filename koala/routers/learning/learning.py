@@ -1,4 +1,3 @@
-import logging
 from typing import Optional, List
 from bson import ObjectId
 from fastapi import APIRouter, Depends, Form, HTTPException, Security
@@ -9,34 +8,28 @@ from koala.crud.learning.videos_watched import VideosWatchedCollection
 from koala.crud.social.streaks import StreaksCollection
 from koala.models.jobs_models.user import UserModel
 from koala.models.learning.learning import (
-    BaseLearningCategoriesModel,
-    BaseLearningVideosModel,
     CreateLearningCategoriesModelIn,
     CreateLearningVideosModelIn,
     CreateVideoWatchedModelIn,
-    CreateLearningCategoriesModelOut,
     CreateLearningCategoriesModelOutList,
-    CreateLearningVideosModelOut,
-    CreateLearningVideosModelOutList
+    CreateLearningVideosModelOutList,
 )
 
 router = APIRouter()
+
 
 @router.post(
     "/create_learning_category",
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def create_learning_category(
-    title: str = Form(None),
-    image: Optional[str] = None
+    title: str = Form(None), image: Optional[str] = None
 ):
     try:
         learning_categories_collection = LearningCategoriesCollection()
 
         category_details = CreateLearningCategoriesModelIn(
-            title=title,
-            image=image,
-            is_deleted=False
+            title=title, image=image, is_deleted=False
         )
 
         return await learning_categories_collection.create_learning_category(
@@ -45,26 +38,24 @@ async def create_learning_category(
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
+
 @router.post(
     "/update_learning_category",
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def update_learning_category(
-    category_id: str = Form(None),
-    title: str = Form(None),
-    image: Optional[str] = None
+    category_id: str = Form(None), title: str = Form(None), image: Optional[str] = None
 ):
     try:
         learning_categories_collection = LearningCategoriesCollection()
 
         response = await learning_categories_collection.update_learning_category(
-            category_id=category_id,
-            title=title,
-            image=image
+            category_id=category_id, title=title, image=image
         )
         return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/all_learning_categories",
@@ -76,15 +67,16 @@ async def get_all_learning_categories(page_no: Optional[int] = 1):
         learning_categories_collection = LearningCategoriesCollection()
 
         categories_list = []
-        categories_list = await learning_categories_collection.get_all_learning_categories()
-        #return post_list
-
-        return CreateLearningCategoriesModelOutList(
-            categories_list=categories_list
+        categories_list = (
+            await learning_categories_collection.get_all_learning_categories()
         )
+        # return post_list
+
+        return CreateLearningCategoriesModelOutList(categories_list=categories_list)
 
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/create_learning_video",
@@ -97,7 +89,7 @@ async def create_learning_video(
     lesson_number: int = None,
     video_id: str = None,
     description: Optional[str] = None,
-    image: Optional[str] = None
+    image: Optional[str] = None,
 ):
     try:
         learning_videos_collection = LearningVideosCollection()
@@ -110,7 +102,7 @@ async def create_learning_video(
             video_id=video_id,
             description=description,
             image=image,
-            is_deleted=False
+            is_deleted=False,
         )
 
         return await learning_videos_collection.create_learning_video(
@@ -118,6 +110,7 @@ async def create_learning_video(
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/create_learning_videos_list",
@@ -139,15 +132,16 @@ async def create_learning_videos_list(
                     video_id=video.video_id,
                     description=video.description,
                     image=video.image,
-                    is_deleted=False
+                    is_deleted=False,
                 )
 
                 await learning_videos_collection.create_learning_video(
                     video_details=video_details
                 )
-                
+
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/update_learning_video",
@@ -161,7 +155,7 @@ async def update_learning_video(
     category_id: str = None,
     lesson_number: int = None,
     description: Optional[str] = None,
-    image: Optional[str] = None
+    image: Optional[str] = None,
 ):
     try:
         learning_videos_collection = LearningVideosCollection()
@@ -174,11 +168,12 @@ async def update_learning_video(
             category_id=category_id,
             lesson_number=lesson_number,
             description=description,
-            image=image
+            image=image,
         )
         return response
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/all_learning_videos",
@@ -186,28 +181,28 @@ async def update_learning_video(
     dependencies=[Security(get_current_active_user, scopes=["social:read"])],
 )
 async def get_all_learning_videos(
-        category_id: str,
-    ):
+    category_id: str,
+):
     try:
         learning_videos_collection = LearningVideosCollection()
 
         videos_list = []
-        videos_list = await learning_videos_collection.get_all_learning_videos(category_id=category_id)
-
-        return CreateLearningVideosModelOutList(
-            videos_list=videos_list
+        videos_list = await learning_videos_collection.get_all_learning_videos(
+            category_id=category_id
         )
+
+        return CreateLearningVideosModelOutList(videos_list=videos_list)
 
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/video_started",
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def video_started(
-    video_id: str,
-    current_user: UserModel = Depends(get_current_active_user)
+    video_id: str, current_user: UserModel = Depends(get_current_active_user)
 ):
     try:
         learning_videos_collection = LearningVideosCollection()
@@ -228,7 +223,7 @@ async def video_started(
             video_id=video_id,
             user_id=ObjectId(current_user.id),
             is_started_log=True,
-            is_finished_log=False
+            is_finished_log=False,
         )
 
         return await videos_watched_collection.video_watched_action(
@@ -237,13 +232,13 @@ async def video_started(
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
 
+
 @router.post(
     "/video_finished",
     dependencies=[Security(get_current_active_user, scopes=["social:write"])],
 )
 async def video_finished(
-    video_id: str,
-    current_user: UserModel = Depends(get_current_active_user)
+    video_id: str, current_user: UserModel = Depends(get_current_active_user)
 ):
     try:
         learning_videos_collection = LearningVideosCollection()
@@ -258,7 +253,7 @@ async def video_finished(
             video_id=video_id,
             user_id=ObjectId(current_user.id),
             is_started_log=False,
-            is_finished_log=True
+            is_finished_log=True,
         )
 
         return await videos_watched_collection.video_watched_action(
@@ -266,6 +261,7 @@ async def video_finished(
         )
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
+
 
 @router.post(
     "/recommended_learning_videos",
@@ -279,11 +275,7 @@ async def get_recommended_learning_videos():
         videos_list = []
         videos_list = await learning_videos_collection.get_recommended_learning_videos()
 
-        return CreateLearningVideosModelOutList(
-            videos_list=videos_list
-        )
+        return CreateLearningVideosModelOutList(videos_list=videos_list)
 
     except Exception:
         raise HTTPException(status_code=500, detail="Something went wrong")
-
-

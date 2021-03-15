@@ -453,11 +453,8 @@ class JobUser:
         try:
             self.collection(JOBS)
             filter_condition = {
-                "$query": {
-                    "is_deleted": False,
-                    "is_closed": False
-                },
-                "$orderby": {"created_on": -1}
+                "$query": {"is_deleted": False, "is_closed": False},
+                "$orderby": {"created_on": -1},
             }
 
             jobs_data = await self.collection.find(
@@ -518,15 +515,41 @@ class JobUser:
             #     }
             # else:
             filter_condition = {}
-            if(city or job_type or salary_start_range or salary_end_range or area or company_name):
+            if (
+                city
+                or job_type
+                or salary_start_range
+                or salary_end_range
+                or area
+                or company_name
+            ):
                 filter_condition = {
                     "$and": [
-                        {"city": city if city and city != "" else {"$regex":""} },
-                        {"job_info.job_types": {"$elemMatch": {"name": job_type}} if job_type and job_type != "" else {"$elemMatch": {"name": {"$regex":""} }}},
-                        {"title": title if title else {"$regex":""}},
-                        {"job_info.company_details.company_name": company_name if company_name else {"$regex":""}},                   
-                        {"salary.start_range": { "$gte": salary_start_range if salary_start_range and salary_start_range <= salary_end_range else 0 }},
-                        {"salary.end_range": { "$lte": salary_end_range if salary_end_range and salary_start_range <= salary_end_range else 10000000}}
+                        {"city": city if city else {"$regex": ""}},
+                        {
+                            "job_info.job_types": {"$elemMatch": {"name": job_type}}
+                            if job_type
+                            else {"$elemMatch": {"name": {"$regex": ""}}}
+                        },
+                        {"area": area if area else {"$regex": ""}},
+                        {"title": title if title else {"$regex": ""}},
+                        {
+                            "job_info.company_details.company_name": company_name
+                            if company_name
+                            else {"$regex": ""}
+                        },
+                        {
+                            "salary.start_range": {
+                                "$gte": salary_start_range if salary_start_range else 0
+                            }
+                        },
+                        {
+                            "salary.end_range": {
+                                "$lte": salary_end_range
+                                if salary_end_range
+                                else 10000000
+                            }
+                        },
                     ]
                 }
             sort = [("created_on", -1)]

@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from typing import Optional, Type
 
@@ -189,35 +188,29 @@ class MongoDBUserDatabase:
             return result_transformation if result else None
         except Exception as e:
             raise e
-            
-    async def user_increment_coins(
-        self, user_id: str = None, coins: int = 0
-    ) -> any:
+
+    async def user_increment_coins(self, user_id: str = None, coins: int = 0) -> any:
         try:
-            finder={"_id": ObjectId(user_id)}
+            finder = {"_id": ObjectId(user_id)}
 
             data = await self.collection.find_one(
                 finder=finder,
                 return_doc_id=True,
-                extended_class_model=BioUpdateWithUserDetailOutModel
+                extended_class_model=BioUpdateWithUserDetailOutModel,
             )
 
             if data is not None:
                 if data.coins is not None:
-                    updater = {
-                        "$inc": {"coins": coins}
-                    }
+                    updater = {"$inc": {"coins": coins}}
                 else:
-                    updater = {
-                        "$set": {"coins": coins}
-                    }
+                    updater = {"$set": {"coins": coins}}
 
                 result = await self.collection.find_one_and_modify(
                     find=finder,
                     update=updater,
                     return_doc_id=True,
                     return_updated_document=True,
-                    extended_class_model=BioUpdateWithUserDetailOutModel
+                    extended_class_model=BioUpdateWithUserDetailOutModel,
                 )
 
                 return BaseIsUpdated(id=result.id, is_updated=True) if result else None
@@ -225,7 +218,6 @@ class MongoDBUserDatabase:
             raise HTTPException(status_code=200, detail="Bio not available")
         except Exception:
             raise HTTPException(status_code=500, detail="Something went wrong")
-
 
     async def user_bio_fetch(
         self, username: str, user_id: str = None

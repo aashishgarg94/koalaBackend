@@ -5,9 +5,12 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # from starlette.middleware.cors import CORSMiddleware
-from koala.modules.auth import otp
+from koala.modules.otp import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
+from koala.modules.devices import main
+from koala.modules.social.posts import posts, likes
+from koala.aws.consumers import consumer
 from koala.routers.jobs_routers import (
     healthcheck,
     auth,
@@ -20,8 +23,9 @@ from koala.routers.jobs_routers import (
     user,
     website,
 )
-from koala.routers.social import groups, users
+from koala.routers.social import users
 from koala.routers.learning import learning
+from koala.routers.social import users
 from koala.routers import supported_version
 
 app = FastAPI()
@@ -93,7 +97,7 @@ app.include_router(jobs.router, tags=["Jobs"])
 app.include_router(job_user.router, tags=["Users & Jobs"])
 
 # SOCIAL ROUTERS
-app.include_router(groups.router, prefix="/group", tags=["Social Groups"])
+app.include_router(posts.router, prefix="/group", tags=["Social Groups"])
 
 app.include_router(users.router, prefix="/user", tags=["Social Users"])
 
@@ -101,7 +105,7 @@ app.include_router(image_uploads.router, prefix="/upload", tags=["Image Upload"]
 
 app.include_router(supported_version.router, tags=["App Version Check"])
 
-#LEARNING ROUTERS
+# LEARNING ROUTERS
 app.include_router(learning.router, prefix="/learning", tags=["Learning"])
 
 # Website API's
@@ -114,6 +118,27 @@ app.include_router(
 app.include_router(
     otp.router,
     tags=["OTP APIs"],
+)
+
+# Notifications
+app.include_router(
+    main.router,
+    prefix="/notification",
+    tags=["Notifications APIs"],
+)
+
+# Like
+app.include_router(
+    likes.router,
+    prefix="/post",
+    tags=["Cache APIs"],
+)
+
+# Cache
+app.include_router(
+    consumer.router,
+    prefix="/cache",
+    tags=["Cache APIs"],
 )
 
 
