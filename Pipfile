@@ -9,7 +9,6 @@ autoflake = "*"
 
 [packages]
 fastapi = "*"
-uvicorn = "*"
 python-multipart = "*"
 pyjwt = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
@@ -19,6 +18,8 @@ requests = "*"
 email-validator = "*"
 telesign = "*"
 pyfcm = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+websockets = "*"
 
 [requires]
 python_version = "3.8"

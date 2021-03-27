@@ -46,26 +46,11 @@ async def cache_create_post(message: dict):
         message_title = "Pragaty"
         message_body = "New post added"
         notification = Notifications()
-        await notification.send_notifications(
+        notif_result = await notification.send_notifications(
             fcm_tokens=fcm_tokens,
             notification_title=message_title,
             notification_body=message_body,
         )
-
-        # # 3. Cache Trending Posts
-        # # 2.3. Update Trending feed based on this post weightage(Currently just dumping it in the treding feed)
-        # await cache_feed_posts.upsert_cache_trending_posts(
-        #     user_id=owner_id, post_id=post_id, following_list=following_list
-        # )
-        #
-        # # 4. Send Notification
-        # # 4.1. Get Device IDs for all followers
-        # user_devices = UserDevices()
-        # fcm_tokens = await user_devices.get_fcm_tokens(following_list)
-        #
-        # # 4.2. Send notifications to all devices
-        # notifications = Notifications()
-        # notifications_status = await notifications.send_notifications(fcm_tokens)
-
+        logging.info(f"Notification send result : {notif_result}")
     except Exception as e:
         logging.info(e)
