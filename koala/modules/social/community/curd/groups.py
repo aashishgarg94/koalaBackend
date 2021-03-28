@@ -22,7 +22,7 @@ class UserSocial:
             )
 
             # Update `POSTS_LIKE` COLLECTION
-            self.collection(POST_LIKES)
+            self.collection(POSTS_LIKES)
             find = {"_id": ObjectId(post_id)}
             updater = {
                 "$push": {

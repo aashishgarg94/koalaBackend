@@ -45,41 +45,36 @@ class CacheFeedPosts:
                 )
 
             return True
+        except Exception as e:
+            logging.error(f"Error: While creating user feed posts")
+            raise e
 
-            # Not needed here as it's create post
-            # # 1. Check if post is liked by user
-            # find = {
-            #     "_id": ObjectId(post_id),
-            #     "liked_by": {"$elemMatch": {"user_id": ObjectId(user_id)}},
-            # }
-            # projection = {"_id": 1}
-            # post_like_resp = await self.collection.find_one(
-            #     finder=find,
-            #     projection=projection,
-            # )
-            # logging.info(post_like_resp)
+    async def update_cache_feed_post(
+        self, user_id: str, post_id: str, is_liked: bool
+    ) -> any:
+        try:
+            find = {"user_id": ObjectId(user_id), "posts.post_id": ObjectId(post_id)}
+            updater = {"$set": {"posts.$.is_liked": is_liked}}
 
-            # 2. Insert into `CACHE FEED POSTS` collections
-            # find = {"_id": {"$in": followers_list}}
-            # updater = {
-            #     "$push": {
-            #         "posts": {
-            #             "post_id": post_id,
-            #             "is_liked": False,
-            #         }
-            #     }
-            # }
-            # insert_resp = await self.collection.insert_many(
-            #     document_list=,
-            #     document=updater,
-            # )
-            # insert_resp = await self.collection.find_one_and_modify(
-            #     find,
-            #     update=updater,
-            #     projection=projection,
-            #     upsert=True,
-            # )
-            # logging.info(insert_resp)
+            self.collection(CACHE_FEED_POSTS)
+            data = await self.collection.update_one(finder=find, update=updater)
+
+            if data.matched_count == 0:
+                find = {"user_id": ObjectId(user_id)}
+                updater = {
+                    "$push": {
+                        "posts": {
+                            "post_id": ObjectId(post_id),
+                            "is_liked": is_liked,
+                        }
+                    }
+                }
+                await self.collection.find_one_and_modify(
+                    finder=find,
+                    update=updater,
+                    upsert=True,
+                )
+            return True
         except Exception as e:
             logging.error(f"Error: While creating user feed posts")
             raise e

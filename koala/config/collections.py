@@ -47,8 +47,8 @@ DEVICES = "devices"
 
 
 # MASTER COLLECTIONS - NEW
-POST_LIKES = "post_likes"
-POST_COMMENTS = "post_comments"
+POSTS_LIKES = "posts_likes"
+POSTS_COMMENTS = "posts_comments"
 
 # Cache collection
 CACHE_FEED_POSTS = "cache_feed_posts"

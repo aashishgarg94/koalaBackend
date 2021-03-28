@@ -39,7 +39,7 @@ async def post_comment(
                     "commented_at": str(datetime.utcnow()),
                 },
             )
-            return {"status_code": 200, "post_id": str(post_id.get("_id"))}
+            return {"status_code": 200, "post_id": str(comment_post_id.get("_id"))}
         elif comment_post_id is None:
             return {"status_code": 404, "error": {"msg": "Post Not Found"}}
         else:

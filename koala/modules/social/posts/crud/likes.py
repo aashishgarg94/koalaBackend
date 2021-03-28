@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from bson import ObjectId
-from koala.config.collections import SOCIAL_POSTS, POST_LIKES
+from koala.config.collections import SOCIAL_POSTS, POSTS_LIKES
 from koala.dao.mongo_base import MongoBase
 
 
@@ -21,7 +21,7 @@ class Likes:
             )
 
             # Update `POSTS_LIKE` COLLECTION
-            self.collection(POST_LIKES)
+            self.collection(POSTS_LIKES)
             find = {"_id": ObjectId(post_id)}
             updater = {
                 "$push": {
@@ -36,6 +36,18 @@ class Likes:
             )
 
             return post_id if update_post_resp and update_like_resp else None
+
+        except Exception as e:
+            logging.error(f"Error: While deleting post {e}")
+            raise e
+
+    async def get_by_post_id_and_user_id(self, post_id: str, user_id: str) -> any:
+        try:
+            self.collection(POSTS_LIKES)
+            find = {"_id": ObjectId(post_id), "liked_by.user_id": ObjectId(user_id)}
+            return await self.collection.find_one(
+                finder=find,
+            )
 
         except Exception as e:
             logging.error(f"Error: While deleting post {e}")
