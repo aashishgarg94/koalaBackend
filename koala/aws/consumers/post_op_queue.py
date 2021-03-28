@@ -28,6 +28,7 @@ async def message_consumer() -> any:
     sqs_wrapper = SqsWrapper(POST_OP_QUEUE)
 
     try:
+        logging.info("About to fetch messages from SQS...")
         sqs_messages = sqs_wrapper.receive_messages(queue=POST_OP_QUEUE)
         for msg in sqs_messages:
             msg_body = json.loads(msg.body)
@@ -37,6 +38,8 @@ async def message_consumer() -> any:
 
             # Get Message
             message = json.loads(msg_body.get("Message"))
+            logging.info("message....fetched...")
+            logging.info(message)
 
             # Perform Op
             if event == POST_CREATE:

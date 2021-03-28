@@ -22,6 +22,7 @@ async def op_post_upsert(message: dict):
         post_id = message.get("post_id")
         owner_id = message.get("owner_id")
 
+        logging.info("about to perform op...")
         # 1. Update secondary posts
         cache_user_posts = CacheUserPosts()
         # 1.1 Get Collection from Post collection
@@ -64,6 +65,7 @@ async def op_post_upsert(message: dict):
         )
         logging.info(f"Notification send result : {notif_result}")
     except Exception as e:
+        logging.info("ohhhh SNAP.... Error while performing op")
         logging.info(e)
 
 
