@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -11,5 +13,6 @@ class BaseHealthCheck(BaseModel):
 
 @router.get("/healthcheck")
 def healthcheck():
+    logging.info("healthcheck endpoint called...")
     msg = "I am good"
     return BaseHealthCheck(message=msg, status=200)
