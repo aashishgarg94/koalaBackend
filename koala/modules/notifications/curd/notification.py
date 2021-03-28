@@ -7,7 +7,7 @@ API_KEY = "AAAA-fbXQUY:APA91bHc_r96dsYSkR4H4mzaUutNXnnW4nXRgM5AGhMsOxTV6TChT15e2
 class Notifications:
     @staticmethod
     async def send_notifications(
-            fcm_tokens: list, notification_title: str, notification_body: str
+        fcm_tokens: list, notification_title: str, notification_body: str
     ) -> bool:
         try:
             push_service = FCMNotification(api_key=API_KEY)

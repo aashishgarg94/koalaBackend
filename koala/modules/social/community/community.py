@@ -3,8 +3,15 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_user import get_current_active_user
+from koala.aws.constants import FOLLOW_USER
+from koala.aws.producers.producer import message_producer
+from koala.constants import REQUEST_LIMIT
+from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
-from koala.models.jobs_models.user import UserModel
+from koala.models.jobs_models.user import UserModel, UserInModel
+from koala.models.social.groups import GroupsFollowed, UsersFollowed
+from koala.models.social.users import BaseIsFollowed, BasePostMemberCountListModel
+from koala.routers.social.users import get_user_model
 
 router = APIRouter()
 
@@ -37,6 +44,10 @@ async def make_user_follow_group(
         social_posts_collection = SocialPostsCollection()
         data = await social_posts_collection.make_user_follow_user(
             user_id=user_id, user_map=user_map
+        )
+        message_producer(
+            event=FOLLOW_USER,
+            detail={"user_id": str(current_user.id), "follower": str(user_id)},
         )
         return data
     except Exception:

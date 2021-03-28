@@ -9,7 +9,8 @@ from koala.modules.otp import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.modules.devices import main
-from koala.modules.social.posts import posts, likes
+from koala.modules.social.posts import posts, likes, comments
+from koala.modules.social.community import community
 from koala.aws.consumers import consumer
 from koala.routers.jobs_routers import (
     healthcheck,
@@ -131,6 +132,20 @@ app.include_router(
 app.include_router(
     likes.router,
     prefix="/post",
+    tags=["Cache APIs"],
+)
+
+# Comment
+app.include_router(
+    comments.router,
+    prefix="/post",
+    tags=["Cache APIs"],
+)
+
+# Community
+app.include_router(
+    community.router,
+    prefix="/community",
     tags=["Cache APIs"],
 )
 

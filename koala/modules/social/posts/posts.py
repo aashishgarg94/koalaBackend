@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFil
 from fastapi.params import File
 from koala.authentication.authentication_user import get_current_active_user
 from koala.aws.constants import POST_CREATE
-from koala.aws.producers.posts import post_producer
+from koala.aws.producers.producer import message_producer
 from koala.models.jobs_models.user import UserModel
 from koala.modules.social.posts.crud.posts import Posts
 from koala.modules.social.posts.models.posts import (
@@ -45,7 +45,7 @@ async def create_post(
 
         if post_id:
             # Publish event to topic
-            post_producer(
+            message_producer(
                 event=POST_CREATE,
                 detail={"post_id": str(post_id), "owner_id": str(current_user.id)},
             )

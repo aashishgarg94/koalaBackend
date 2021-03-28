@@ -1,13 +1,12 @@
 import logging
 
-
 from koala.cache.feed.curd.feed import CacheFeedPosts
 from koala.cache.posts.curd.posts import CacheUserPosts
 from koala.modules.devices.curd.device import UserDevices
 from koala.modules.notifications.curd.notification import Notifications
 
 
-async def cache_create_post(message: dict):
+async def op_post_upsert(message: dict):
     """This function updates the following cache collections
     1. Cache User Posts
     2. Cache User Feed
@@ -52,5 +51,76 @@ async def cache_create_post(message: dict):
             notification_body=message_body,
         )
         logging.info(f"Notification send result : {notif_result}")
+    except Exception as e:
+        logging.info(e)
+
+
+async def op_post_like(message: dict):
+    """This function updates the following cache collections
+    1. Cache User Posts
+    2. Cache User Feed
+    3. Cache Posts Trending
+
+    :param message:
+    :return:
+    """
+    try:
+        post_id = message.get("post_id")
+        user_id = message.get("user_id")
+
+        """
+        1. Update cache collection with user details
+        2. Update secondary post collection
+        3. Send notification
+        """
+
+    except Exception as e:
+        logging.info(e)
+
+
+async def op_post_comment(message: dict):
+    """This function updates the following cache collections
+    1. Cache User Posts
+    2. Cache User Feed
+    3. Cache Posts Trending
+
+    :param message:
+    :return:
+    """
+    try:
+        post_id = message.get("post_id")
+        user_id = message.get("user_id")
+        comment = message.get("comment")
+        commented_at = message.get("commented_at")
+
+        """
+        1. Update cache collection with user details
+        2. Update secondary post collection
+        3. Send notification
+        """
+
+    except Exception as e:
+        logging.info(e)
+
+
+async def op_follow_user(message: dict):
+    """This function updates the following cache collections
+    1. Cache User Posts
+    2. Cache User Feed
+    3. Cache Posts Trending
+
+    :param message:
+    :return:
+    """
+    try:
+        user_id = message.get("user_id")
+        follower = message.get("follower")
+
+        """
+        1. Update cache collection with user details
+        2. Update secondary post collection
+        3. Send notification
+        """
+
     except Exception as e:
         logging.info(e)
