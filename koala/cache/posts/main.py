@@ -1,5 +1,7 @@
 import logging
 
+from bson import ObjectId
+
 from koala.cache.feed.curd.feed import CacheFeedPosts
 from koala.cache.posts.curd.posts import CacheUserPosts
 from koala.modules.devices.curd.device import UserDevices
@@ -162,7 +164,7 @@ async def op_post_comment(message: dict):
         )
 
         # 3. Send Notification
-        # 3.1. Get Device IDs for all followers
+        # 3.1. Get owner Device ID
         user_devices = UserDevices()
         fcm_tokens = await user_devices.get_fcm_tokens(
             user_ids=[post_detail.get("owner")]
@@ -193,14 +195,28 @@ async def op_follow_user(message: dict):
     :return:
     """
     try:
-        message.get("user_id")
-        message.get("follower")
+        user_id = message.get("user_id")
+        follower = message.get("follower")
+        """
+        Currently we are not doing anything with follower, we can use it later like for showing specific alerts
+        and other stuff based on follower id
+        """
 
-        """
-        1. Update cache collection with user details
-        2. Update secondary post collection
-        3. Send notification
-        """
+        # 1. Send Notification
+        # 1.1. Get user Device ID
+        user_devices = UserDevices()
+        fcm_tokens = await user_devices.get_fcm_tokens(user_ids=[ObjectId(user_id)])
+
+        # 1.2. Send Notifications
+        message_title = "Pragaty"
+        message_body = "Someone just started following you"
+        notification = Notifications()
+        notif_result = await notification.send_notifications(
+            fcm_tokens=fcm_tokens,
+            notification_title=message_title,
+            notification_body=message_body,
+        )
+        logging.info(f"Notification send result : {notif_result}")
 
     except Exception as e:
         logging.info(e)

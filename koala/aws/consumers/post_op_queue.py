@@ -50,8 +50,8 @@ async def message_consumer() -> any:
 
             # logging.info("Received message: %s: %s", msg.message_id, msg.body)
             # Finally, Delete messages from the queue
-            for msg in sqs_messages:
-                sqs_wrapper.delete_message(msg)
+            # for sqs_msg in sqs_messages:
+            #     sqs_wrapper.delete_message(sqs_msg)
 
     except Exception as e:
         logging.exception("Couldn't receive messages from queue: %s", e)

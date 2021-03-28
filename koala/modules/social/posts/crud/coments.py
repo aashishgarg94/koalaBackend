@@ -18,10 +18,6 @@ class Comments:
         try:
             find = {"_id": ObjectId(post_id)}
             updater = {"$push": {"comments": comment_details.dict()}}
-            # updater = {
-            #     "$inc": {"total_comments": 1},
-            #     "$set": {"comments": comment_details.dict()},
-            # }
             projection = {"_id": 1}
             return await self.collection.find_one_and_modify(
                 find,

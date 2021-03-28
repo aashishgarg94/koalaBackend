@@ -1,10 +1,13 @@
 import logging
+import math
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_user import get_current_active_user
+from koala.constants import REQUEST_LIMIT
 from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.user import UserModel
+from koala.models.social.users import CreatePostModelOutList
 
 router = APIRouter()
 

@@ -142,12 +142,12 @@ app.include_router(
     tags=["Cache APIs"],
 )
 
-# Community
-app.include_router(
-    community.router,
-    prefix="/community",
-    tags=["Cache APIs"],
-)
+# # Community
+# app.include_router(
+#     community.router,
+#     prefix="/community",
+#     tags=["Cache APIs"],
+# )
 
 # Cache
 app.include_router(

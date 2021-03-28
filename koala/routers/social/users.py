@@ -6,6 +6,8 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, UploadFile
 from fastapi.params import File
 from koala.authentication.authentication_user import get_current_active_user
+from koala.aws.constants import FOLLOW_USER
+from koala.aws.producers.producer import message_producer
 from koala.constants import REQUEST_LIMIT
 from koala.crud.jobs_crud.user import MongoDBUserDatabase
 from koala.crud.social.users import SocialPostsCollection
@@ -289,6 +291,10 @@ async def make_user_follow_group(
         social_posts_collection = SocialPostsCollection()
         data = await social_posts_collection.make_user_follow_user(
             user_id=user_id, user_map=user_map
+        )
+        message_producer(
+            event=FOLLOW_USER,
+            detail={"user_id": str(user_id), "follower": str(current_user.id)},
         )
         return data
     except Exception:

@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Security
 from koala.authentication.authentication_user import get_current_active_user
 from koala.crud.social.users import SocialPostsCollection
 from koala.models.jobs_models.user import UserModel
+from koala.models.social.users import FollowerModel
+from koala.routers.social.users import get_user_model
 
 router = APIRouter()
 
