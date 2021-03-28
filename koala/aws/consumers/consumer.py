@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException, Security
-from koala.authentication.authentication_user import get_current_active_user
+from fastapi import APIRouter, HTTPException
 from koala.aws.consumers.post_op_queue import message_consumer
 
 router = APIRouter()

@@ -196,7 +196,7 @@ async def op_follow_user(message: dict):
     """
     try:
         user_id = message.get("user_id")
-        follower = message.get("follower")
+        message.get("follower")
         """
         Currently we are not doing anything with follower, we can use it later like for showing specific alerts
         and other stuff based on follower id

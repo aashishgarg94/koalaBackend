@@ -10,7 +10,6 @@ from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.modules.devices import main
 from koala.modules.social.posts import posts, likes, comments
-from koala.modules.social.community import community
 from koala.aws.consumers import consumer
 from koala.routers.jobs_routers import (
     healthcheck,
