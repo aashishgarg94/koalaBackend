@@ -1,9 +1,20 @@
 import json
 import logging
 
-from koala.aws.constants import POST_OP_QUEUE, POST_CREATE, POST_LIKE, POST_COMMENT, FOLLOW_USER
+from koala.aws.constants import (
+    POST_OP_QUEUE,
+    POST_CREATE,
+    POST_LIKE,
+    POST_COMMENT,
+    FOLLOW_USER,
+)
 from koala.aws.services.SQS.sqs import SqsWrapper
-from koala.cache.posts.main import op_post_upsert, op_post_like, op_post_comment, op_follow_user
+from koala.cache.posts.main import (
+    op_post_upsert,
+    op_post_like,
+    op_post_comment,
+    op_follow_user,
+)
 
 
 async def message_consumer() -> any:

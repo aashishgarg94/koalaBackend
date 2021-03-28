@@ -57,3 +57,7 @@ CACHE_USER_FOLLOWERS = "cache_user_followers"
 CACHE_USER_FOLLOWINGS = "cache_user_following"
 CACHE_TRENDING_POSTS = "cache_trending_posts"
 CACHE_POSTS = "cache_posts"
+
+
+# LIMITS
+CACHE_COLLECTION_LIMIT = 500

@@ -117,3 +117,53 @@ class MongoBase:
                 f"Mongo base: Error while inserting/updating in collection. Error: {e}"
             )
             raise e
+
+    async def find_one_and_replace(
+        self,
+        finder: dict,
+        replacement: dict,
+        projection: [dict] = None,
+        sort: list = None,
+        upsert: bool = False,
+        return_updated_document: bool = True,
+    ):
+        try:
+            result = await self.collection.find_one_and_replace(
+                filter=finder,
+                replacement=replacement,
+                projection=projection,
+                sort=sort,
+                upsert=upsert,
+                return_document=ReturnDocument.AFTER
+                if return_updated_document
+                else ReturnDocument.BEFORE,
+            )
+            return result
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while inserting/updating in collection. Error: {e}"
+            )
+            raise e
+
+    async def update_one(
+        self,
+        finder: dict,
+        update: dict,
+        upsert: bool = False,
+        bypass_document_validation: bool = False,
+        array_filters: list = None,
+    ):
+        try:
+            result = await self.collection.update_one(
+                filter=finder,
+                update=update,
+                upsert=upsert,
+                bypass_document_validation=bypass_document_validation,
+                array_filters=array_filters,
+            )
+            return result
+        except Exception as e:
+            logging.error(
+                f"Mongo base: Error while inserting/updating in collection. Error: {e}"
+            )
+            raise e

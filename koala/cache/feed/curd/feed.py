@@ -23,7 +23,7 @@ class CacheFeedPosts:
             raise e
 
     # Union(it should be up to date) - post - like, unlike, action
-    async def upsert_cache_feed_posts(self, user_id, post_id, followers_list) -> any:
+    async def upsert_cache_feed_posts(self, post_id: str, followers_list: list) -> any:
         try:
             self.collection(CACHE_FEED_POSTS)
 
@@ -33,7 +33,7 @@ class CacheFeedPosts:
                 updater = {
                     "$push": {
                         "posts": {
-                            "post_id": post_id,
+                            "post_id": ObjectId(post_id),
                             "is_liked": False,
                         }
                     }
