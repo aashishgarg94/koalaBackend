@@ -11,7 +11,6 @@ from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
 from koala.modules.devices import main
 from koala.modules.social.posts import posts, likes, comments
 from koala.routers.jobs_routers import (
-    healthcheck,
     auth,
     company,
     image_uploads,
@@ -22,6 +21,7 @@ from koala.routers.jobs_routers import (
     user,
     website,
 )
+from koala import healthcheck
 from koala.routers.learning import learning
 from koala.routers.social import users
 from koala.routers import supported_version
