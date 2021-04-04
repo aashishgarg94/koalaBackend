@@ -88,3 +88,22 @@ class CacheFeedPosts:
         except Exception as e:
             logging.error(f"Error: While creating user feed posts")
             raise e
+
+    async def get_user_feed_posts_ids(
+        self, user_id: str, skip: int, limit: int
+    ) -> list:
+        try:
+            self.collection(CACHE_FEED_POSTS)
+
+            finder = {"user_id": ObjectId(user_id)}
+            post_ids_cursor = await self.collection.find(
+                finder=finder,
+                skip=skip,
+                limit=limit,
+            )
+
+            user_post_ids = await post_ids_cursor.to_list(length=limit)
+            return user_post_ids[0].get("posts") if len(user_post_ids) > 0 else []
+        except Exception as e:
+            logging.error(f"Error: While getting user feed posts")
+            raise e

@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # from starlette.middleware.cors import CORSMiddleware
+from koala.cache.feed import feed
 from koala.modules.otp import otp
 from koala.authentication.authentication_user import get_current_active_user
 from koala.db.mongo_adaptor import close_mongo_connection, connect_to_mongo
@@ -151,6 +152,12 @@ app.include_router(
 # Cache
 app.include_router(
     consumer.router,
+    prefix="/cache",
+    tags=["Cache APIs"],
+)
+
+app.include_router(
+    feed.router,
     prefix="/cache",
     tags=["Cache APIs"],
 )

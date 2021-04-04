@@ -64,19 +64,28 @@ class MongoBase:
     async def find(
         self,
         finder: dict,
-        limit: int,
+        limit: int = None,
         sort: list = None,
         projection: [dict] = None,
         skip: int = None,
     ):
         try:
-            result = self.collection.find(
-                filter=finder,
-                projection=projection,
-                sort=sort,
-                skip=skip,
-                limit=limit,
-            )
+            if skip is None and limit is None:
+                result = self.collection.find(
+                    filter=finder,
+                    projection=projection,
+                    sort=sort,
+                )
+            elif skip is not None and limit is not None:
+                result = self.collection.find(
+                    filter=finder,
+                    projection=projection,
+                    sort=sort,
+                    skip=skip,
+                    limit=limit,
+                )
+            else:
+                logging.error("Query not valid")
             return result
         except Exception as e:
             logging.error(
