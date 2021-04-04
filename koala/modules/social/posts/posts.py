@@ -7,6 +7,7 @@ from koala.authentication.authentication_user import get_current_active_user
 from koala.aws.constants import POST_CREATE
 from koala.aws.producers.producer import message_producer
 from koala.models.jobs_models.user import UserModel
+from koala.modules.social.community.curd.groups import SocialGroups
 from koala.modules.social.posts.crud.posts import Posts
 from koala.modules.social.posts.models.posts import (
     BasePostModel,
@@ -31,6 +32,16 @@ async def create_post(
     current_user: UserModel = Depends(get_current_active_user),
 ):
     try:
+        if is_group_post:
+            social_group = SocialGroups()
+            is_group_exists = social_group.check_group_exists(group_id=group_id)
+
+            if not is_group_exists:
+                return {
+                    "status_code": 500,
+                    "error": {"msg": "Group does not exists. Post can't be created"},
+                }
+
         post_details = BasePostModel(
             media_type=media_type,
             content=content,
@@ -42,6 +53,21 @@ async def create_post(
 
         posts = Posts()
         post_id = await posts.create_post(post_details=post_details, file=file)
+
+        group_result = None
+        if is_group_post:
+            social_group = SocialGroups()
+            group_result = await social_group.upsert_post_details(
+                group_id=group_id, post_id=post_id
+            )
+
+            # Currently not being used
+            # if group_result:
+            #     # Publish event to topic
+            #     message_producer(
+            #         event=GROUP_POST_CREATE,
+            #         detail={"post_id": str(post_id), "owner_id": str(current_user.id), "group_id": str(group_id)},
+            #     )
 
         if post_id:
             # Publish event to topic

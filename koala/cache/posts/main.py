@@ -1,9 +1,12 @@
 import logging
+from datetime import datetime
 
 from bson import ObjectId
 
 from koala.cache.feed.curd.feed import CacheFeedPosts
 from koala.cache.posts.curd.posts import CacheUserPosts
+from koala.crud.social.coins import CoinsCollection
+from koala.models.social.users import CreateCoinsModelIn
 from koala.modules.devices.curd.device import UserDevices
 from koala.modules.notifications.curd.notification import Notifications
 from koala.modules.social.posts.crud.likes import Likes
@@ -49,12 +52,25 @@ async def op_post_upsert(message: dict):
             post_id=post_id, followers_list=followers_list
         )
 
-        # 4. Send Notification
-        # 4.1. Get Device IDs for all followers
+        # 4. Update coins collection
+        coins_collection = CoinsCollection()
+        coins_details = CreateCoinsModelIn(
+            user_id=ObjectId(owner_id),
+            coins_reason="Post",
+            coins=5,
+            time_added=datetime.now(),
+        )
+
+        await coins_collection.coins_added(
+            coins_details=coins_details, user_id=owner_id, coins=5
+        )
+
+        # 5. Send Notification
+        # 5.1. Get Device IDs for all followers
         user_devices = UserDevices()
         fcm_tokens = await user_devices.get_fcm_tokens(user_ids=followers_list)
 
-        # 4.2. Send Notifications
+        # 5.2. Send Notifications
         message_title = "Pragaty"
         message_body = "New post added"
         notification = Notifications()

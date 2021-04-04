@@ -1,43 +1,47 @@
 import logging
-from datetime import datetime
 
 from bson import ObjectId
 
-from koala.config.collections import USER_SOCIAL
+from koala.config.collections import SOCIAL_GROUPS
 from koala.dao.mongo_base import MongoBase
 
 
-class UserSocial:
+class SocialGroups:
     def __init__(self):
         self.collection = MongoBase()
-        self.collection(USER_SOCIAL)
+        self.collection(SOCIAL_GROUPS)
 
-    async def like_post(self, post_id: str, user_id: ObjectId) -> any:
+    async def check_group_exists(self, group_id: str):
         try:
-            find = {"_id": ObjectId(post_id)}
-            updater = {"$inc": {"total_likes": 1}}
-            projection = {"_id": 1}
-            update_post_resp = await self.collection.find_one_and_modify(
-                find, update=updater, projection=projection
+            finder = {"_id": ObjectId(group_id)}
+            find_result = await self.collection.find_one(
+                finder=finder, projection={"_id": 1}
             )
 
-            # Update `POSTS_LIKE` COLLECTION
-            self.collection(POSTS_LIKES)
-            find = {"_id": ObjectId(post_id)}
-            updater = {
-                "$push": {
-                    "liked_by": {"user_id": user_id, "liked_at": datetime.utcnow()}
-                }
-            }
-            update_like_resp = await self.collection.find_one_and_modify(
-                find,
-                update=updater,
-                projection=projection,
-                upsert=True,
-            )
-
-            return post_id if update_post_resp and update_like_resp else None
-
+            return True if find_result is not None else False
         except Exception as e:
-            logging.error(f"Error: While deleting post {e}")
+            logging.error(f"Error: While checking if group exists. Error {e}")
+            raise e
+
+    async def upsert_post_details(
+        self,
+        group_id: str,
+        post_id: str,
+    ) -> any:
+        try:
+            finder = {"_id": ObjectId(group_id)}
+            updater = {
+                "$inc": {"posts.total_posts": 1},
+                "$push": {
+                    "posts.posts_list": {
+                        "$each": [ObjectId(post_id)],
+                    }
+                },
+            }
+
+            return await self.collection.find_one_and_modify(
+                finder=finder, update=updater, projection={"_id": 1}
+            )
+        except Exception as e:
+            logging.error(f"Error: While creating social group. Error {e}")
             raise e
