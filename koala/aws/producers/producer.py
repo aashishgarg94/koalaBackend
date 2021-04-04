@@ -11,7 +11,7 @@ from koala.aws.services.SNS.sns import SnsWrapper
 
 
 def message_producer(event, detail) -> any:
-    sns_wrapper = SnsWrapper(boto3.client("sns"))
+    sns_wrapper = SnsWrapper(boto3.client("sns", region_name="ap-south-1"))
 
     message_group = None
     attributes = None
