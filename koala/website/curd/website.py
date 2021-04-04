@@ -4,7 +4,7 @@ from datetime import datetime
 from koala.config.collections import WEBSITE_APPLICANT, WEBSITE_PROVIDER
 from koala.models.jobs_models.master import BaseIsCreated
 
-from .mongo_base import MongoBase
+from koala.crud.jobs_crud.mongo_base import MongoBase
 
 
 class WebsiteCollections:

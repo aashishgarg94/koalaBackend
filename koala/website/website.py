@@ -1,8 +1,8 @@
 import logging
 
 from fastapi import APIRouter, HTTPException
-from koala.crud.jobs_crud.website import WebsiteCollections
-from koala.models.jobs_models.master import BaseIsCreated
+from koala.website.curd.website import WebsiteCollections
+from koala.website.models.master import BaseIsCreated
 
 router = APIRouter()
 
